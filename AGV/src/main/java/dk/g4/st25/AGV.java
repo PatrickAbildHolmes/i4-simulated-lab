@@ -27,13 +27,14 @@ public class AGV {
 
     public void update() {
         JsonObject status = this.getStatus();
-        battery = status.get("battery").getAsInt();
-        programName = status.get("program name").getAsString();
-        state = status.get("state").getAsInt();
-        timeStamp = status.get("timestamp").getAsString();
+        updateFromJson(status);
     }
 
     public void update(JsonObject status) {
+        updateFromJson(status);
+    }
+
+    private void updateFromJson(JsonObject status) {
         battery = status.get("battery").getAsInt();
         programName = status.get("program name").getAsString();
         state = status.get("state").getAsInt();
@@ -49,60 +50,40 @@ public class AGV {
 
     // Programs
 
-    public void chargeBattery() {
+    public void executeOperation(String programName) {
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("Program name", "MoveToChargerOperation");
+        requestBody.put("Program name", programName);
         requestBody.put("State", 1);
         JsonObject res = protocol.put(url, requestBody);
         this.update(res);
+    }
+
+    public void chargeBattery() {
+        executeOperation("MoveToChargerOperation");
     }
 
     public void moveToAssembly() {
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("Program name", "MoveToAssemblyOperation");
-        requestBody.put("State", 1);
-        JsonObject res = protocol.put(url, requestBody);
-        this.update(res);
+        executeOperation("MoveToAssemblyOperation");
     }
 
     public void moveToStorage() {
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("Program name", "MoveToStorageOperation");
-        requestBody.put("State", 1);
-        JsonObject res = protocol.put(url, requestBody);
-        this.update(res);
+        executeOperation("MoveToStorageOperation");
     }
 
     public void putAssembly() {
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("Program name", "PutAssemblyOperation");
-        requestBody.put("State", 1);
-        JsonObject res = protocol.put(url, requestBody);
-        this.update(res);
+        executeOperation("PutAssemblyOperation");
     }
 
     public void pickAssembly() {
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("Program name", "PickAssemblyOperation");
-        requestBody.put("State", 1);
-        JsonObject res = protocol.put(url, requestBody);
-        this.update(res);
+        executeOperation("PickAssemblyOperation");
     }
 
     public void pickWarehouse() {
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("Program name", "PickWarehouseOperation");
-        requestBody.put("State", 1);
-        JsonObject res = protocol.put(url, requestBody);
-        this.update(res);
+        executeOperation("PickWarehouseOperation");
     }
 
     public void putWarehouse() {
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("Program name", "PutWarehouseOperation");
-        requestBody.put("State", 1);
-        JsonObject res = protocol.put(url, requestBody);
-        this.update(res);
+        executeOperation("PutWarehouseOperation");
     }
 
     @Override

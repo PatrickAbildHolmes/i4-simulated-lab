@@ -6,18 +6,20 @@ import dk.g4.st25.REST.REST;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Objects;
 
 public class AGV {
-    private final String url = "http://localhost:8082/v1/status";
-    private final Protocol protocol = new REST();
+    private final String url;
+    private final Protocol protocol;
 
     private int battery;
     private String programName;
     private int state;
     private String timeStamp;
 
-    AGV() {
+    AGV(String url, Protocol protocol) {
+        this.url = url;
+        this.protocol = protocol;
         this.update();
     }
 
@@ -30,27 +32,30 @@ public class AGV {
         updateFromJson(status);
     }
 
-    public void update(JsonObject status) {
+    private void update(JsonObject status) {
         updateFromJson(status);
     }
 
     private void updateFromJson(JsonObject status) {
+        if (status == null) return; // in tests status will always be null as we are mocking the API call
+
         battery = status.get("battery").getAsInt();
         programName = status.get("program name").getAsString();
         state = status.get("state").getAsInt();
         timeStamp = status.get("timestamp").getAsString();
     }
 
+    // Programs
+
     public void execute() {
+        if (programName == "no program loaded") return; // else AGV will freeze
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("State", 2);
-        JsonObject res = protocol.put(url, requestBody);
+        JsonObject res = this.protocol.put(url, requestBody);
         this.update(res);
     }
 
-    // Programs
-
-    public void executeOperation(String programName) {
+    private void executeOperation(String programName) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("Program name", programName);
         requestBody.put("State", 1);
@@ -115,7 +120,7 @@ public class AGV {
 
 
     public static void main(String[] args) {
-        AGV agv = new AGV();
+        AGV agv = new AGV("http://localhost:8082/v1/status", new REST());
         agv.print();
         agv.execute();
         agv.update();

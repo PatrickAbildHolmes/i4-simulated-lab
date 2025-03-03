@@ -1,13 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>dk.g4.st25</groupId>
   <artifactId>i4-simulated-lab</artifactId>
   <version>1.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>i4-simulated-lab</name>
-  <repositories>
-  </repositories>
+  <repositories/>
   <properties>
     <java>java</java>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -60,7 +58,7 @@
           </execution>
         </executions>
         <configuration>
-          <executable>${java}</executable>
+          <executable>java</executable>
           <workingDirectory>.</workingDirectory>
           <longModulepath>false</longModulepath>
           <arguments>
@@ -79,7 +77,8 @@
             in "java.lang.module.FindException: Module monitor.observer.zero not found";
             strange... -->
             <!--                        <argument>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=127.0.0.1:8000</argument>-->
-            <argument>--add-modules javafx.graphics</argument>
+<!--            <argument>&#45;&#45;add-modules javafx.graphics</argument>-->
+            <argument>--module=MQTT/dk.g4.st25.App</argument>
           </arguments>
         </configuration>
       </plugin>
@@ -151,4 +150,7 @@
       </build>
     </profile>
   </profiles>
+  <modules>
+    <module>MQTT</module>
+  </modules>
 </project>

@@ -6,6 +6,6 @@ import java.util.Map;
 
 public interface Protocol {
     public JsonObject get(String apiUrl);
-    public JsonObject put(String apiUrl, Map<String, Integer> requestBody);
+    public JsonObject put(String apiUrl, Map<String, Object> requestBody);
 
 }

@@ -6,7 +6,11 @@
   <version>1.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>i4-simulated-lab</name>
-  <repositories>
+    <modules>
+        <module>Protocols</module>
+        <module>AGV</module>
+    </modules>
+    <repositories>
   </repositories>
   <properties>
     <java>java</java>

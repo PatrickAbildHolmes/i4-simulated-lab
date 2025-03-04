@@ -14,14 +14,13 @@ class AGVTest {
     private REST protocol;
     private AGV agv;
     private Dotenv dotenv = Dotenv.configure().directory("../").load();
-    private String url = dotenv.get("REST");
+    private String url = dotenv.get("REST_URL");
 
     @BeforeEach
     void setUp() {
         protocol = mock(REST.class);
-        agv = new AGV(url, protocol);
+        agv = new AGV(protocol);
         Mockito.reset(protocol);
-        System.out.println(System.getenv("REST"));
     }
 
     @org.junit.jupiter.api.Test

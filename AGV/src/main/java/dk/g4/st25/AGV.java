@@ -3,6 +3,7 @@ package dk.g4.st25;
 import com.google.gson.JsonObject;
 import dk.g4.st25.REST.Protocol;
 import dk.g4.st25.REST.REST;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +18,9 @@ public class AGV {
     private int state;
     private String timeStamp;
 
-    AGV(String url, Protocol protocol) {
-        this.url = url;
+    AGV(Protocol protocol) {
+        Dotenv dotenv = Dotenv.configure().directory("../").load();
+        this.url = dotenv.get("REST_URL");
         this.protocol = protocol;
         this.update();
     }
@@ -120,7 +122,7 @@ public class AGV {
 
 
     public static void main(String[] args) {
-        AGV agv = new AGV("http://localhost:8082/v1/status", new REST());
+        AGV agv = new AGV(new REST());
         agv.print();
         agv.execute();
         agv.update();

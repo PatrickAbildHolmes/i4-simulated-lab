@@ -33,4 +33,15 @@ public class REST implements Protocol {
     public JsonObject stringToJson(String string) {
         return JsonParser.parseString(string).getAsJsonObject();
     }
+
+    public static void main(String[] args) {
+        REST rest = new REST();
+
+        Map<String, String> env = System.getenv();
+        for (Map.Entry<String, String> entry : env.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+
+
+    }
 }

@@ -37,11 +37,11 @@
     <plugins>
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.4.0</version>
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.10.1</version>
+        <version>3.13.0</version>
         <configuration>
           <fork>true</fork>
         </configuration>
@@ -60,7 +60,7 @@
           </execution>
         </executions>
         <configuration>
-          <executable>${java}</executable>
+          <executable>java</executable>
           <workingDirectory>.</workingDirectory>
           <longModulepath>false</longModulepath>
           <arguments>
@@ -79,6 +79,7 @@
             in "java.lang.module.FindException: Module monitor.observer.zero not found";
             strange... -->
             <!--                        <argument>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=127.0.0.1:8000</argument>-->
+            <argument>--module=Core/dk.g4.st25.core.App</argument>
             <argument>--add-modules javafx.graphics</argument>
           </arguments>
         </configuration>
@@ -151,4 +152,12 @@
       </build>
     </profile>
   </profiles>
+  <modules>
+    <module>
+      Core
+    </module>
+    <module>
+      CommonProtocols
+    </module>
+  </modules>
 </project>

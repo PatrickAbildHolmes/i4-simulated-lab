@@ -16,7 +16,8 @@ public class REST implements Protocol {
 
     public REST() {
         String apiKey = "REST_URL";
-        // In testing working directory is swapped to this module which causes an error
+
+        // In testing the working directory is swapped to this module which makes it unable to find .env file
         try {
             this.apiUrl = Dotenv.load().get(apiKey);
         } catch (Exception e) {

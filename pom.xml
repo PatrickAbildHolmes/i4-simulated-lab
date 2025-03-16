@@ -17,7 +17,8 @@
 
   <modules>
     <module>AVG</module>
-    <module>REST</module>
+    <module>Core</module>
+    <module>Protocols</module>
   </modules>
 
   <dependencies>

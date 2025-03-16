@@ -7,11 +7,11 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.semester.projekt.rest</groupId>
-    <artifactId>REST</artifactId>
+    <groupId>com.semester.projekt.protocols</groupId>
+    <artifactId>Protocols</artifactId>
     <packaging>jar</packaging>
 
-    <name>REST</name>
+    <name>Protocols</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -20,25 +20,22 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.9</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>7.0.0-M2</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.8.9</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <workingDirectory>${project.basedir}</workingDirectory>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

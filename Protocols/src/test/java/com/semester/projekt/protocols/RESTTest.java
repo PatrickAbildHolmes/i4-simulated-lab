@@ -1,11 +1,11 @@
-package com.semester.projekt.rest;
+package com.semester.projekt.protocols;
 
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 class RESTTest {
-    private REST rest = new REST();
+    private RESTProtocol rest = new RESTProtocol();
 
     // Integration test
     @org.junit.jupiter.api.Test

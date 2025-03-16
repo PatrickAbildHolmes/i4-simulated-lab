@@ -4,17 +4,17 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.google.gson.JsonObject;
-import com.semester.projekt.rest.REST;
+import com.semester.projekt.protocols.RESTProtocol;
 import org.junit.jupiter.api.BeforeEach;
 
 class AGVTest {
 
-    private REST protocol;
+    private RESTProtocol protocol;
     private AGV agv;
 
     @BeforeEach
     void setUp() {
-        protocol = mock(REST.class);
+        protocol = mock(RESTProtocol.class);
         agv = new AGV(protocol);
     }
 

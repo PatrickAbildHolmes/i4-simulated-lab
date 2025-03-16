@@ -1,4 +1,4 @@
-package com.semester.projekt.rest.iprotocol;
+package com.semester.projekt.protocols;
 
 import com.google.gson.JsonObject;
 

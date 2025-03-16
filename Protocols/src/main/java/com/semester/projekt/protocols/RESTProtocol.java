@@ -1,20 +1,19 @@
-package com.semester.projekt.rest;
+package com.semester.projekt.protocols;
 
-import com.semester.projekt.rest.iprotocol.Protocol;
+import com.google.gson.JsonParser;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import java.util.Map;
 
-public class REST implements Protocol {
+public class RESTProtocol implements Protocol {
     protected String apiUrl;
 
-    public REST() {
+    public RESTProtocol() {
         String apiKey = "REST_URL";
 
         // In testing the working directory is swapped to this module which makes it unable to find .env file

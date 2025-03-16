@@ -1,8 +1,8 @@
 package com.semester.projekt.avg;
 
 import com.google.gson.JsonObject;
-import com.semester.projekt.rest.iprotocol.Protocol;
-import com.semester.projekt.rest.REST;
+import com.semester.projekt.protocols.Protocol;
+import com.semester.projekt.protocols.RESTProtocol;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +11,7 @@ public class AGV {
     private final Protocol protocol;
     private boolean hasProgram = false;
 
-    AGV(REST rest) {
+    AGV(RESTProtocol rest) {
         this.protocol = rest;
     }
 

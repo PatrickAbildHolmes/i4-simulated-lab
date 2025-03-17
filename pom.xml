@@ -20,8 +20,11 @@
   <name>i4-simulated-lab</name>
       
   
-  <repositories>
-  </repositories>
+  <modules>
+    <module>Core</module>
+    <module>AGV</module>
+    <module>Protocols</module>
+  </modules>
       
   
   <properties>
@@ -440,20 +443,7 @@
   </profiles>
       
   
-  <modules>
-            
-    
-    <module>
-      Core
-    </module>
-            
-    
-    <module>AGV</module>
-          
-    
-    <module>Protocols</module>
-      
-  </modules>
+
     
 
 </project>

@@ -1,7 +1,7 @@
+
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-      
-  
+
   <modelVersion>4.0.0</modelVersion>
       
   
@@ -18,12 +18,10 @@
       
   
   <name>i4-simulated-lab</name>
-      
   
   <repositories>
   </repositories>
-      
-  
+
   <properties>
             
     
@@ -178,11 +176,7 @@
                         
         
         <configuration>
-                              
-          
           <executable>java</executable>
-                              
-          
           <workingDirectory>.</workingDirectory>
                               
           
@@ -219,14 +213,9 @@
                                     
             
             <!--                        <argument>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=127.0.0.1:8000</argument>-->
-                                    
-            
+
             <argument>--module=Core/dk.g4.st25.core.App</argument>
-                                    
-            
             <argument>--add-modules javafx.graphics</argument>
-                                  
-          
           </arguments>
                             
         
@@ -438,22 +427,13 @@
           
   
   </profiles>
-      
-  
+
   <modules>
             
     
     <module>
       Core
     </module>
-            
-    
-    <module>AGV</module>
-          
-    
-    <module>Protocols</module>
-      
   </modules>
-    
 
 </project>

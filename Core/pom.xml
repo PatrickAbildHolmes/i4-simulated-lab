@@ -12,10 +12,5 @@
   <packaging>jar</packaging>
   <name>Core</name>
   <dependencies>
-    <dependency>
-      <groupId>dk.g4.st25</groupId>
-      <artifactId>CommonProtocols</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
   </dependencies>
 </project>

@@ -1,0 +1,49 @@
+package dk.g4.st25.protocols;
+
+import com.google.gson.JsonParser;
+import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+import com.google.gson.JsonObject;
+
+import java.util.Map;
+
+public class RESTProtocol implements Protocol {
+    protected String apiUrl;
+
+    public RESTProtocol() {
+        String apiKey = "REST_URL";
+
+        // In testing the working directory is swapped to this module which makes it unable to find .env file
+        try {
+            this.apiUrl = Dotenv.load().get(apiKey);
+        } catch (Exception e) {
+            this.apiUrl = Dotenv.configure().directory("../").load().get(apiKey);
+        }
+    }
+
+    @Override
+    public JsonObject get() {
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(apiUrl, String.class);
+
+        return stringToJson(response);
+    }
+
+    @Override
+    public JsonObject put(Map<String, Object> requestBody) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody);
+
+        // Send request
+        ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.PUT, entity, String.class);
+
+        return stringToJson(response.getBody());
+    }
+
+    public JsonObject stringToJson(String string) {
+        return JsonParser.parseString(string).getAsJsonObject();
+    }
+}

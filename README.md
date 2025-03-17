@@ -9,7 +9,8 @@
 ## List of Components
 *And what they are used for*
 
-## API calls (SOAP, REST or *Internal Logic*)
+## API calls
+**(SOAP, REST, MQTT or *Internal Logic*)** <br>
 1.1) Warehouse receives "start production" command signal&emsp; (SOAP) <br>
 1.3) Warehouse sends task completion signal with item id &emsp; (INTR) <br>
 2.1) AGV receives 'component pick-up' command signal &emsp; (REST) <br>

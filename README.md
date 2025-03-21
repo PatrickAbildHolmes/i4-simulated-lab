@@ -9,29 +9,29 @@
 ## List of Components
 *And what they are used for*
 
-## API calls
+## API calls (Internal and External)
 **(SOAP, REST, MQTT or *Internal Logic*)** <br>
-1.1) Warehouse receives "start production" command signal&emsp; (SOAP) <br>
-1.3) Warehouse sends task completion signal with item id &emsp; (INTR) <br>
-2.1) AGV receives 'component pick-up' command signal &emsp; (REST) <br>
-2.3) AGV sends 'movement complete' signal &emsp; (INTR) <br>
-2.4) AGV receives pick-up signal &emsp; (REST) <br>
-2.6) AGV sends 'confirm pick-up' signal &emsp; (INTR) <br>
-2.7) AGV receives movement instruction signal &emsp; (REST) <br>
-2.9) AGV sends 'movement complete' signal &emsp; (INTR) <br>
-2.11) AGV sends task completion signal &emsp; (INTR) <br>
-3.1) AssemblyLine receives "execute assembly" command signal &emsp; (MQTT) <br>
-3.3) AssemblyLine sends confirmation signal &emsp; (INTR) <br>
-3.8) AssemblyLine sends task completion signal &emsp; (INTR) <br>
-4.1) Warehouse receives “storage” command signal &emsp; (SOAP) <br>
-4.3A) Warehouse sends 'tray ready' signal &emsp; (INTR) <br>
-4.3B) AGV receives pick-up signal &emsp; (REST) <br>
-4.5B) AGV sends 'movement complete' signal &emsp; (INTR) <br>
-4.7B) AGV receives movement instructions &emsp; (REST)  <br>
-4.10) AGV sends task completion signal &emsp; (INTR)  <br>
-5.1) Warehouse receives "deposit" command signal &emsp; (SOAP)  <br>
-5.2) Warehouse sends confirmation signal &emsp; (INTR) <br>
-5.4) Warehouse sends task completion signal &emsp; (INTR) <br>
+1.1) (SOAP) Warehouse receives "start production" command signal <br>
+1.3) (INTR) Warehouse sends task completion signal with item id <br>
+2.1) (REST) AGV receives 'component pick-up' command signal <br>
+2.3) (INTR) AGV sends 'movement complete' signal <br>
+2.4) (REST) AGV receives pick-up signal <br>
+2.6) (INTR) AGV sends 'confirm pick-up' signal <br>
+2.7) (REST) AGV receives movement instruction signal <br>
+2.9) (INTR) AGV sends 'movement complete' signal <br>
+2.11) (INTR) AGV sends task completion signal <br>
+3.1) (MQTT) AssemblyLine receives "execute assembly" command signal <br>
+3.3) (INTR) AssemblyLine sends confirmation signal <br>
+3.8) (INTR) AssemblyLine sends task completion signal <br>
+4.1) (SOAP) Warehouse receives “storage” command signal <br>
+4.3A) (INTR) Warehouse sends 'tray ready' signal <br>
+4.3B) (REST) AGV receives pick-up signal <br>
+4.5B) (INTR) AGV sends 'movement complete' signal <br>
+4.7B) (REST) AGV receives movement instructions <br>
+4.10) (INTR) AGV sends task completion signal <br>
+5.1) (SOAP) Warehouse receives "deposit" command signal <br>
+5.2) (INTR) Warehouse sends confirmation signal <br>
+5.4) (INTR) Warehouse sends task completion signal <br>
 
 ### Sequence "diagram": Continuous Production
 #### Assumptions:

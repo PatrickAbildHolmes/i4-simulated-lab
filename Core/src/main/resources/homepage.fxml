@@ -9,20 +9,20 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Button layoutX="62.0" layoutY="290.0" mnemonicParsing="false" text="Set parameters" />
+        <Button id="setParametersButt" fx:id="setParametersButt" layoutX="62.0" layoutY="290.0" mnemonicParsing="false" text="Set parameters" />
         <Label layoutX="238.0" layoutY="148.0" prefHeight="44.0" prefWidth="165.0" text="Dronebyg A/S">
             <font>
                 <Font size="22.0" />
             </font>
         </Label>
-        <Button layoutX="178.0" layoutY="290.0" mnemonicParsing="false" text="Status" />
-        <Button layoutX="248.0" layoutY="290.0" mnemonicParsing="false" text="Inventory" />
-        <Button layoutX="339.0" layoutY="290.0" mnemonicParsing="false" text="Backlog" />
+        <Button id="statusButt" fx:id="statusButt" layoutX="178.0" layoutY="290.0" mnemonicParsing="false" text="Status" />
+        <Button id="inventoryButt" fx:id="inventoryButt" layoutX="248.0" layoutY="290.0" mnemonicParsing="false" text="Inventory" />
+        <Button id="backlogButt" fx:id="backlogButt" layoutX="339.0" layoutY="290.0" mnemonicParsing="false" text="Backlog" />
         <ImageView fitHeight="44.0" fitWidth="49.0" layoutX="178.0" layoutY="148.0" pickOnBounds="true" preserveRatio="true">
             <image>
                 <Image url="@DroneLogo.jpg" />
             </image>
         </ImageView>
-        <Button layoutX="416.0" layoutY="290.0" mnemonicParsing="false" text="Monitoring" />
+        <Button id="monitoringButt" fx:id="monitoringButt" layoutX="416.0" layoutY="290.0" mnemonicParsing="false" text="Monitoring" />
     </children>
 </AnchorPane>

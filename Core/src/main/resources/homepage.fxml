@@ -5,24 +5,122 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.g4.st25.core.uicontrollers.HomepageController">
     <children>
-        <Button id="setParametersButt" fx:id="setParametersButt" layoutX="62.0" layoutY="290.0" mnemonicParsing="false" text="Set parameters" />
-        <Label layoutX="238.0" layoutY="148.0" prefHeight="44.0" prefWidth="165.0" text="Dronebyg A/S">
+        <Button id="setParametersBtn" fx:id="setParametersBtn" layoutX="83.0" layoutY="289.0" mnemonicParsing="false" onAction="#switchToSetParameters" style="-fx-background-color: transparent;" text="Set parameters">
+         <textFill>
+            <LinearGradient endX="1.0" endY="1.0" startX="0.23343849106917997">
+               <stops>
+                  <Stop>
+                     <color>
+                        <Color red="0.021767381578683853" green="0.2481481432914734" blue="0.5877193212509155" />
+                     </color>
+                  </Stop>
+                  <Stop offset="1.0">
+                     <color>
+                        <Color red="0.4413580298423767" green="0.785853922367096" blue="1.0" />
+                     </color>
+                  </Stop>
+               </stops>
+            </LinearGradient>
+         </textFill>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Button>
+        <Label layoutX="238.0" layoutY="148.0" prefHeight="44.0" prefWidth="274.0" text="Dronebyg A/S" textFill="#000f91">
             <font>
-                <Font size="22.0" />
+                <Font name="Footlight MT Light" size="36.0" />
             </font>
         </Label>
-        <Button id="statusButt" fx:id="statusButt" layoutX="178.0" layoutY="290.0" mnemonicParsing="false" text="Status" />
-        <Button id="inventoryButt" fx:id="inventoryButt" layoutX="248.0" layoutY="290.0" mnemonicParsing="false" text="Inventory" />
-        <Button id="backlogButt" fx:id="backlogButt" layoutX="339.0" layoutY="290.0" mnemonicParsing="false" text="Backlog" />
-        <ImageView fitHeight="44.0" fitWidth="49.0" layoutX="178.0" layoutY="148.0" pickOnBounds="true" preserveRatio="true">
+        <Button id="statusBtn" fx:id="statusBtn" layoutX="199.0" layoutY="289.0" mnemonicParsing="false" onAction="#switchToStatus" style="-fx-background-color: transparent;" text="Status">
+         <textFill>
+            <LinearGradient endX="1.0" endY="1.0" startX="0.23343849106917997">
+               <stops>
+                  <Stop>
+                     <color>
+                        <Color red="0.021767381578683853" green="0.2481481432914734" blue="0.5877193212509155" />
+                     </color>
+                  </Stop>
+                  <Stop offset="1.0">
+                     <color>
+                        <Color red="0.4413580298423767" green="0.785853922367096" blue="1.0" />
+                     </color>
+                  </Stop>
+               </stops>
+            </LinearGradient>
+         </textFill>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Button>
+        <Button id="inventoryBtn" fx:id="inventoryBtn" layoutX="269.0" layoutY="289.0" mnemonicParsing="false" onAction="#switchToInventory" style="-fx-background-color: transparent;" text="Inventory">
+         <textFill>
+            <LinearGradient endX="1.0" endY="1.0" startX="0.23343849106917997">
+               <stops>
+                  <Stop>
+                     <color>
+                        <Color red="0.021767381578683853" green="0.2481481432914734" blue="0.5877193212509155" />
+                     </color>
+                  </Stop>
+                  <Stop offset="1.0">
+                     <color>
+                        <Color red="0.4413580298423767" green="0.785853922367096" blue="1.0" />
+                     </color>
+                  </Stop>
+               </stops>
+            </LinearGradient>
+         </textFill>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Button>
+        <Button id="backlogBtn" fx:id="backlogBtn" layoutX="360.0" layoutY="289.0" mnemonicParsing="false" onAction="#switchToBacklog" style="-fx-background-color: transparent;" text="Backlog">
+         <textFill>
+            <LinearGradient endX="1.0" endY="1.0" startX="0.23343849106917997">
+               <stops>
+                  <Stop>
+                     <color>
+                        <Color red="0.021767381578683853" green="0.2481481432914734" blue="0.5877193212509155" />
+                     </color>
+                  </Stop>
+                  <Stop offset="1.0">
+                     <color>
+                        <Color red="0.4413580298423767" green="0.785853922367096" blue="1.0" />
+                     </color>
+                  </Stop>
+               </stops>
+            </LinearGradient>
+         </textFill>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Button>
+        <ImageView fitHeight="93.0" fitWidth="95.0" layoutX="124.0" layoutY="124.0" pickOnBounds="true" preserveRatio="true">
             <image>
                 <Image url="@DroneLogo.jpg" />
             </image>
         </ImageView>
-        <Button id="monitoringButt" fx:id="monitoringButt" layoutX="416.0" layoutY="290.0" mnemonicParsing="false" text="Monitoring" />
+        <Button id="monitoringBtn" fx:id="monitoringBtn" layoutX="437.0" layoutY="289.0" mnemonicParsing="false" onAction="#switchToMonitoring" style="-fx-background-color: transparent;" text="Monitoring">
+         <textFill>
+            <LinearGradient endX="1.0" endY="1.0" startX="0.23343849106917997">
+               <stops>
+                  <Stop>
+                     <color>
+                        <Color red="0.021767381578683853" green="0.2481481432914734" blue="0.5877193212509155" />
+                     </color>
+                  </Stop>
+                  <Stop offset="1.0">
+                     <color>
+                        <Color red="0.4413580298423767" green="0.785853922367096" blue="1.0" />
+                     </color>
+                  </Stop>
+               </stops>
+            </LinearGradient>
+         </textFill>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Button>
     </children>
 </AnchorPane>

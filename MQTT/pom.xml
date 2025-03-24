@@ -7,7 +7,7 @@
         <version>1.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>dk.anfra22.cbse.mqtt</groupId>
+    <groupId>dk.g4.st25.mqtt</groupId>
     <artifactId>MQTT</artifactId>
     <packaging>jar</packaging>
 

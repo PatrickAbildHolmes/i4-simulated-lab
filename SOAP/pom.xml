@@ -7,7 +7,7 @@
         <version>1.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>dk.anfra22.cbse.soap</groupId>
+    <groupId>dk.g4.st25.soap</groupId>
     <artifactId>SOAP</artifactId>
     <packaging>jar</packaging>
 

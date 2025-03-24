@@ -1,4 +1,4 @@
-package dk.anfra22.cbse.mqtt;
+package dk.g4.st25.assembly_station;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

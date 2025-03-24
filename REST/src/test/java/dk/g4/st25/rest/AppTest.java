@@ -1,4 +1,4 @@
-package dk.anfra22.cbse.soap;
+package dk.g4.st25.rest;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

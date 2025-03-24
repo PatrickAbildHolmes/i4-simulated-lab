@@ -1,4 +1,4 @@
-package dk.anfra22.cbse.warehouse;
+package dk.g4.st25.mqtt;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

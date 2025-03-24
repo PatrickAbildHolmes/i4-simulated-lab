@@ -1,4 +1,4 @@
-package dk.anfra22.cbse.assembly_station;
+package dk.g4.st25.warehouse;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

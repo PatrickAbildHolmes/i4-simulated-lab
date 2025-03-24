@@ -7,8 +7,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.g4.st25.core.uicontrollers.StatusController">
     <children>
         <ImageView fitHeight="63.0" fitWidth="50.0" layoutX="20.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
             <image>
@@ -20,15 +19,15 @@
         <Label layoutX="85.0" layoutY="138.0" text="Product type:" />
         <Label layoutX="84.0" layoutY="180.0" text="Amount:" />
         <Label layoutX="85.0" layoutY="220.0" text="State:" />
-        <TextField editable="false" layoutX="204.0" layoutY="91.0" />
-        <TextField editable="false" layoutX="204.0" layoutY="134.0" />
-        <TextField editable="false" layoutX="204.0" layoutY="176.0" />
-        <TextField editable="false" layoutX="204.0" layoutY="216.0" />
-        <Button layoutX="31.0" layoutY="334.0" mnemonicParsing="false" text="Back" />
-        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="406.0" layoutY="237.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-                <Image url="@../../Downloads/Loading.png" /> //Laves til en loading animation
-            </image>
-        </ImageView>
+        <TextField fx:id="curProdIdStat" editable="false" layoutX="204.0" layoutY="91.0" />
+        <TextField fx:id="prodTypeStat" editable="false" layoutX="204.0" layoutY="134.0" />
+        <TextField fx:id="amountStat" editable="false" layoutX="204.0" layoutY="176.0" />
+        <TextField fx:id="stateStat" editable="false" layoutX="204.0" layoutY="216.0" />
+        <Button fx:id="backBtnStat" layoutX="31.0" layoutY="334.0" mnemonicParsing="false" text="Back" onAction="#switchToHomepage"/>
+<!--        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="406.0" layoutY="237.0" pickOnBounds="true" preserveRatio="true">-->
+<!--            <image>-->
+<!--&lt;!&ndash;                <Image url="@" /> //Laves til en loading animation&ndash;&gt;-->
+<!--            </image>-->
+<!--        </ImageView>-->
     </children>
 </AnchorPane>

@@ -8,8 +8,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.g4.st25.core.uicontrollers.InventoryController">
     <children>
         <ImageView fitHeight="63.0" fitWidth="50.0" layoutX="14.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true">
             <image>
@@ -17,13 +16,13 @@
             </image>
         </ImageView>
         <Label layoutX="72.0" layoutY="33.0" text="Dronebyg A/S" />
-        <TableView layoutX="61.0" layoutY="94.0" prefHeight="200.0" prefWidth="479.0">
+        <TableView fx:id="invTable" layoutX="61.0" layoutY="94.0" prefHeight="200.0" prefWidth="479.0">
             <columns>
-                <TableColumn prefWidth="75.0" text="Item type" />
-                <TableColumn prefWidth="205.5" text="Item ID" />
-                <TableColumn prefWidth="195.5" text="Amount available (units)" />
+                <TableColumn fx:id="itemTypeColumn" prefWidth="75.0" text="Item type" />
+                <TableColumn fx:id="itemIDColumn" prefWidth="205.5" text="Item ID" />
+                <TableColumn fx:id="amountColumn" prefWidth="195.5" text="Amount available (units)" />
             </columns>
         </TableView>
-        <Button layoutX="20.0" layoutY="334.0" mnemonicParsing="false" text="Back" />
+        <Button fx:id="backBtnInventory" layoutX="20.0" layoutY="334.0" mnemonicParsing="false" text="Back" onAction="#switchToHomepage" />
     </children>
 </AnchorPane>

@@ -9,8 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.g4.st25.core.uicontrollers.SetParametersController">
     <children>
         <ImageView fitHeight="43.0" fitWidth="46.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
             <image>
@@ -25,11 +24,11 @@
         <Label layoutX="70.0" layoutY="119.0" text="Production ID" />
         <Label layoutX="70.0" layoutY="223.0" text="Amount" />
         <Label layoutX="314.0" layoutY="119.0" text="Product type" />
-        <Button layoutX="314.0" layoutY="228.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="106.0" text="Start Production" />
-        <Button layoutX="315.0" layoutY="264.0" mnemonicParsing="false" text="Clear parameters" />
-        <TextField layoutX="69.0" layoutY="148.0" />
-        <TextField layoutX="69.0" layoutY="241.0" />
-        <ChoiceBox layoutX="315.0" layoutY="148.0" prefWidth="150.0" />
-        <Button layoutX="38.0" layoutY="326.0" mnemonicParsing="false" text="Back" />
+        <Button fx:id="startProd" layoutX="314.0" layoutY="228.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="106.0" text="Start Production" />
+        <Button fx:id="clearPara" layoutX="315.0" layoutY="264.0" mnemonicParsing="false" text="Clear parameters" />
+        <TextField fx:id="prodIdPara" layoutX="69.0" layoutY="148.0" promptText="Insert Production ID" />
+        <TextField fx:id="amountPara" layoutX="69.0" layoutY="241.0" promptText="Insert production amount" />
+        <ChoiceBox fx:id="prodTypePara" layoutX="315.0" layoutY="148.0" prefWidth="150.0" />
+        <Button fx:id="backBtnPara" layoutX="38.0" layoutY="326.0" mnemonicParsing="false" text="Back" onAction="#switchToHomepage"/>
     </children>
 </AnchorPane>

@@ -24,6 +24,14 @@
     <module>Core</module>
     <module>AGV</module>
     <module>Protocols</module>
+    <module>Common</module>
+    <module>CommonMachine</module>
+    <module>Warehouse</module>
+    <module>AssemblyStation</module>
+    <module>CommonProtocol</module>
+    <module>MQTT</module>
+    <module>REST</module>
+    <module>SOAP</module>
   </modules>
       
   

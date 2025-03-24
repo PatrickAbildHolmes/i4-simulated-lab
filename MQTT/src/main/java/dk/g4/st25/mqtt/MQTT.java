@@ -1,4 +1,4 @@
-package dk.g4.st25.protocols;
+package dk.g4.st25.mqtt;
 
 import org.eclipse.paho.client.mqttv3.*;
 import com.google.gson.JsonObject;
@@ -9,6 +9,7 @@ public final class MQTT {
     private MqttClient connection;
 
     private MQTT(){
+        // Constructor to create a single instance, and then establish a connection
         try {
             this.connection = connectToBroker();
         } catch (Exception e) {
@@ -45,10 +46,12 @@ public final class MQTT {
     }
 
     public MqttClient getMqttClient() {
+    // Get connection on the single instance
         return this.connection;
     }
 
     public void subscribeToTopic(String topic) {
+    // Subscribes to a topic on the singleton MQTT client
         try {
             getMqttInstance().getMqttClient().subscribe(topic);
         } catch (MqttException e) {
@@ -71,6 +74,7 @@ public final class MQTT {
     }
 
     public void disconnect() {
+    // Disconnects the client from the MQTT
         try {
             getMqttInstance().getMqttClient().disconnect();
         } catch (MqttException e) {

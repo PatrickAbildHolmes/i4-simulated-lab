@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: dk.g4.st25.agv.AGVTest
 -------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.114 s -- in dk.g4.st25.agv.AGVTest
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.299 s -- in dk.g4.st25.agv.AGVTest

@@ -35,19 +35,11 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.8.9</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>dk.g4.st25.protocols</groupId>
             <artifactId>Protocols</artifactId>
             <version>1.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.9</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

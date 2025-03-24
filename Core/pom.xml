@@ -6,7 +6,7 @@
     <groupId>dk.g4.st25</groupId>
     <version>1.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>dk.g4.st25</groupId>
+  <groupId>dk.g4.st25.core</groupId>
   <artifactId>Core</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>

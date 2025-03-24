@@ -20,71 +20,33 @@ public class HomepageController {
     private Parent root;
 
     @FXML
-    private Button setParametersBtn;
+    private Button setParameters;
     @FXML
-    private Button statusBtn;
+    private Button status;
     @FXML
-    private Button inventoryBtn;
+    private Button inventory;
     @FXML
-    private Button backlogBtn;
+    private Button backlog;
     @FXML
-    private Button monitoringBtn;
+    private Button monitoring;
 
+    // This method fetches a button ID and switches the scene to the FXML file which has the button ID + ".fxml"
+    public void switchSceneAction(ActionEvent event) throws IOException {
+        String buttonId = ((Node) event.getSource()).getId(); // Get button ID
+        String fxmlFile = buttonId + ".fxml"; // Assume button ID matches FXML name
 
-    // The following methods all call an action event for switching from the homepage to a specific site
-    // This is connected to a button with the same name on all sites
-    // Method for switching to the "Set Parameters" site
-    public void switchToSetParameters(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("setParameters.fxml"));
-        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        new SceneController().switchScene(event, fxmlFile);
     }
 
-    // Method for switching to the "Status" site
-    public void switchToStatus(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("status.fxml"));
-        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-    }
 
-    // Method for switching to the "Inventory" site
-    public void switchToInventory(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("inventory.fxml"));
-        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    // Method for switching to the "Backlog" site
-    public void switchToBacklog(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("backlog.fxml"));
-        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    // Method for switching to the "Monitoring" site
-    public void switchToMonitoring(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("monitoring.fxml"));
-        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-    }
 
     // Initializes all functionalities when the scene is opened
     public void initialize(){
         // Applies hovering effect to increase size
-        UIEffects.applyHoverEffect(setParametersBtn);
-        UIEffects.applyHoverEffect(statusBtn);
-        UIEffects.applyHoverEffect(inventoryBtn);
-        UIEffects.applyHoverEffect(backlogBtn);
-        UIEffects.applyHoverEffect(monitoringBtn);
+        UIEffects.applyHoverEffect(setParameters);
+        UIEffects.applyHoverEffect(status);
+        UIEffects.applyHoverEffect(inventory);
+        UIEffects.applyHoverEffect(backlog);
+        UIEffects.applyHoverEffect(monitoring);
     }
 }

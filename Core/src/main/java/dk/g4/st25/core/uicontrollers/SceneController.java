@@ -21,7 +21,7 @@ public class SceneController {
         stage.setScene(scene);
         stage.show();
     }
-    public void switchToHomepage(ActionEvent event) throws IOException {
-        //switchScene(event, "homepage.fxml");
+    public static void switchToHomepage(ActionEvent event) throws IOException {
+        switchScene(event, "homepage.fxml");
     }
 }

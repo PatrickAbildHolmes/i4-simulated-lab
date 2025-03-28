@@ -38,6 +38,9 @@ public class BacklogController {
     @FXML
     private Button backBtnBacklog;
 
+    // ALL CODE SHOULD WORK WHEN DATA GETS IMPLEMENTED
+    // THEREFORE WE SHOULD BE ABLE TO REMOVE THE COMMENT INDICATOR AND THE CODE SHOULD WORK
+
     /*
     //Method for when a date is picked
     @FXML

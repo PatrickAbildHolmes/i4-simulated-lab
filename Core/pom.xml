@@ -52,9 +52,9 @@
             <id>default-cli</id>
             <configuration>
               <mainClass>
-                src/main/java/dk/g4/st25/core/App.java
+                dk.g4.st25.core.App
               </mainClass>
-              <launcer>app</launcer>
+              <launcher>app</launcher>
             </configuration>
           </execution>
         </executions>

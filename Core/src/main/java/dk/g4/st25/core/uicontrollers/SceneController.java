@@ -7,9 +7,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Objects;
 
 public class SceneController {
     // Switching between scenes. This takes an FXML file as a parameter
@@ -22,6 +19,6 @@ public class SceneController {
         stage.show();
     }
     public void switchToHomepage(ActionEvent event) throws IOException {
-        switchScene(event, "homepage.fxml");
+        switchScene(event, "/dk/g4/st25/core/homepage.fxml");
     }
 }

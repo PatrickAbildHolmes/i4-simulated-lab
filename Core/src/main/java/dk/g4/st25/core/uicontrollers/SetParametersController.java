@@ -53,19 +53,20 @@ public class SetParametersController {
         clearPara.setOnAction(event -> clearParameters());
         
     }
-
+    // Method for button to clear parameters
     private void clearParameters() {
         prodIdPara.clear();
         amountPara.clear();
         prodTypePara.getSelectionModel().clearSelection();
     }
 
+    // Method for starting production (Might be removed)
     private void startProduction() {
         String prodId = prodIdPara.getText();
         String amountText = amountPara.getText();
         String droneType = (String) prodTypePara.getValue();
 
-        // Validate input
+        // Validate input from user
         if (prodId.isEmpty() || amountText.isEmpty() || droneType == null) {
             showAlert("Error", "All fields must be filled in.");
             return;
@@ -83,12 +84,13 @@ public class SetParametersController {
             return;
         }
 
-        // Simulating production start
+        // Simulating production start (Currently not implemented completely)
         System.out.println("Production Started: " + amount + "x " + droneType + " (ID: " + prodId + ")");
 
         showAlert("Success", "Production started for " + amount + " " + droneType + "(s).");
     }
 
+    // Method for showing the alert (Used elsewhere in this class)
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);

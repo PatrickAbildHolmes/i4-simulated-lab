@@ -40,7 +40,7 @@ public class InventoryController {
 
     // Method for switching back to the "Homepage" site
     public void switchToHomepage(ActionEvent event) throws IOException {
-        SceneController.switchToHomepage(event);
+        new SceneController().switchToHomepage(event);
     }
 
     // Initializes all functionalities when the scene is opened

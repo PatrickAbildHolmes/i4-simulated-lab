@@ -50,6 +50,7 @@ public class StatusController {
         updateStatus("N/A", "N/A", 0, 0, "Idle");
     }
 
+    // Updating the current status
     public void updateStatus(String productionId, String droneType, int producedAmount, int totalAmount, String state) {
         this.productionId = productionId;
         this.droneType = droneType;

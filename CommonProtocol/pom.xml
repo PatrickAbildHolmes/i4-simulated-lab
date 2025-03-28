@@ -7,7 +7,7 @@
         <version>1.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>dk.anfra22.cbse.common.protocol</groupId>
+    <groupId>dk.g4.st25.common.protocol</groupId>
     <artifactId>CommonProtocol</artifactId>
     <packaging>jar</packaging>
 

@@ -7,7 +7,7 @@
         <version>1.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>dk.anfra22.cbse.warehouse</groupId>
+    <groupId>dk.g4.st25.warehouse</groupId>
     <artifactId>Warehouse</artifactId>
     <packaging>jar</packaging>
 

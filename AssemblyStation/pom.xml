@@ -7,7 +7,7 @@
         <version>1.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>dk.anfra22.cbse.assembly_station</groupId>
+    <groupId>dk.g4.st25.assembly_station</groupId>
     <artifactId>AssemblyStation</artifactId>
     <packaging>jar</packaging>
 

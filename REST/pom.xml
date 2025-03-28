@@ -7,7 +7,7 @@
         <version>1.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>dk.anfra22.cbse.rest</groupId>
+    <groupId>dk.g4.st25.rest</groupId>
     <artifactId>REST</artifactId>
     <packaging>jar</packaging>
 

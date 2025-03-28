@@ -45,6 +45,7 @@ public class StatusController {
     public void initialize(){
         // Applies hovering effect to increase size
         UIEffects.applyHoverEffect(backBtnStat);
+
         // Initialize fields with default values
         updateStatus("N/A", "N/A", 0, 0, "Idle");
     }

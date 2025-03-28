@@ -99,7 +99,7 @@
          </font></Button>
         <ImageView fitHeight="93.0" fitWidth="95.0" layoutX="124.0" layoutY="124.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@DroneLogo.jpg" />
+                <Image url="@uicontrollers/DroneLogo.jpg" />
             </image>
         </ImageView>
         <Button id="monitoring" fx:id="monitoring" layoutX="437.0" layoutY="289.0" mnemonicParsing="false" onAction="#switchSceneAction" style="-fx-background-color: transparent;" text="Monitoring">

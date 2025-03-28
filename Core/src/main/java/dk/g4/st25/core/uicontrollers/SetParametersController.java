@@ -6,13 +6,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SetParametersController {
     private Stage stage;
@@ -27,6 +26,14 @@ public class SetParametersController {
     private ChoiceBox prodTypePara;
     @FXML
     private Button backBtnPara;
+    @FXML
+    private Button startProd;
+    @FXML
+    private Button clearPara;
+
+    private List<String> droneList = new ArrayList<String>();
+
+
 
     // Method for switching back to the "Homepage" site
     public void switchToHomepage(ActionEvent event) throws IOException {
@@ -37,5 +44,56 @@ public class SetParametersController {
     public void initialize(){
         // Applies hovering effect to increase size
         UIEffects.applyHoverEffect(backBtnPara);
+        droneList.add("Surveillance drone");
+        droneList.add("Recon drone");
+        prodTypePara.getItems().addAll(droneList);
+
+        // Set button actions
+        startProd.setOnAction(event -> startProduction());
+        clearPara.setOnAction(event -> clearParameters());
+        
+    }
+
+    private void clearParameters() {
+        prodIdPara.clear();
+        amountPara.clear();
+        prodTypePara.getSelectionModel().clearSelection();
+    }
+
+    private void startProduction() {
+        String prodId = prodIdPara.getText();
+        String amountText = amountPara.getText();
+        String droneType = (String) prodTypePara.getValue();
+
+        // Validate input
+        if (prodId.isEmpty() || amountText.isEmpty() || droneType == null) {
+            showAlert("Error", "All fields must be filled in.");
+            return;
+        }
+
+        int amount;
+        try {
+            amount = Integer.parseInt(amountText);
+            if (amount <= 0) {
+                showAlert("Error", "Amount must be a positive number.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Amount must be a valid integer.");
+            return;
+        }
+
+        // Simulating production start
+        System.out.println("Production Started: " + amount + "x " + droneType + " (ID: " + prodId + ")");
+
+        showAlert("Success", "Production started for " + amount + " " + droneType + "(s).");
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

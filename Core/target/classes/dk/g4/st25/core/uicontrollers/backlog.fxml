@@ -30,7 +30,7 @@
         <Label layoutX="236.0" layoutY="196.0" text="Amount:" />
         <Label layoutX="237.0" layoutY="236.0" text="Started at:" />
         <TextField fx:id="prodIDBack" editable="false" layoutX="356.0" layoutY="107.0" />
-        <TextField fx:id="ProdTypeBack" editable="false" layoutX="356.0" layoutY="150.0" />
+        <TextField fx:id="prodTypeBack" editable="false" layoutX="356.0" layoutY="150.0" />
         <TextField fx:id="amountBack" editable="false" layoutX="356.0" layoutY="192.0" />
         <TextField fx:id="startBack" editable="false" layoutX="356.0" layoutY="232.0" />
         <Label layoutX="235.0" layoutY="276.0" text="Finished at:" />

@@ -12,7 +12,4 @@ public interface ProtocolSPI {
 
     // Returns a JSON object of all the requested data through a method lying on the machine
     JsonObject readFrom(String endpoint, String method);
-
-
-
 }

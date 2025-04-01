@@ -21,6 +21,7 @@ public class SceneController {
         stage.setScene(scene);
         stage.show();
     }
+    // function used for the back buttons in all the fxml files
     public void switchToHomepage(ActionEvent event) throws IOException {
         switchScene(event, "/dk/g4/st25/core/homepage.fxml");
     }

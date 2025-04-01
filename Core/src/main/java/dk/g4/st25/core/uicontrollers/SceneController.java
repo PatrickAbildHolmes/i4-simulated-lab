@@ -14,7 +14,10 @@ public class SceneController {
         System.out.println(fxmlFile);
         Parent root = FXMLLoader.load((getClass().getResource(fxmlFile)));
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        Scene scene = new Scene(root);
+        // Method for keeping resizing:
+        double width = stage.getScene().getWidth();
+        double height = stage.getScene().getHeight();
+        Scene scene = new Scene(root, width, height);
         stage.setScene(scene);
         stage.show();
     }

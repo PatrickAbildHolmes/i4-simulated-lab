@@ -7,6 +7,8 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.g4.st25.core.uicontrollers.MonitoringController">
@@ -21,23 +23,39 @@
                 <Font size="13.0" />
             </font>
         </Label>
-        <Button fx:id="backBtnMon" layoutX="38.0" layoutY="326.0" mnemonicParsing="false" text="Back" onAction="#switchToHomepage"/>
-        <ScrollPane fx:id="whPick" layoutX="14.0" layoutY="67.0" prefHeight="93.0" prefWidth="110.0">
-            <content>
-                <AnchorPane  minHeight="0.0" minWidth="0.0" prefHeight="91.0" prefWidth="110.0" />
-            </content>
-        </ScrollPane>
-        <ScrollPane fx:id="agvPick" layoutX="134.0" layoutY="67.0" prefHeight="93.0" prefWidth="110.0">
-            <content>
-                <AnchorPane  minHeight="0.0" minWidth="0.0" prefHeight="91.0" prefWidth="110.0" />
-            </content>
-        </ScrollPane>
-        <ScrollPane fx:id="asPick" layoutX="254.0" layoutY="67.0" prefHeight="93.0" prefWidth="110.0">
-            <content>
-                <AnchorPane  minHeight="0.0" minWidth="0.0" prefHeight="91.0" prefWidth="110.0" />
-            </content>
-        </ScrollPane>
-        <Label layoutX="91.0" layoutY="225.0" text="State:" />
-        <TextField fx:id="machState" editable="false" layoutX="134.0" layoutY="221.0" />
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="550.0" spacing="20.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="100.0">
+         <children>
+              <ScrollPane fx:id="whPick" prefHeight="93.0" prefWidth="110.0">
+                  <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="91.0" prefWidth="110.0" />
+                  </content>
+              </ScrollPane>
+              <ScrollPane fx:id="agvPick" prefHeight="93.0" prefWidth="110.0">
+                  <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="91.0" prefWidth="110.0" />
+                  </content>
+              </ScrollPane>
+              <ScrollPane fx:id="asPick" prefHeight="93.0" prefWidth="110.0">
+                  <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="91.0" prefWidth="110.0" />
+                  </content>
+              </ScrollPane>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="550.0" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="250.0">
+         <children>
+            <VBox prefHeight="100.0" prefWidth="194.0">
+               <children>
+                    <Label text="State:" />
+                    <TextField fx:id="machState" editable="false" prefHeight="25.0" prefWidth="207.0" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="35.0" layoutY="110.0" spacing="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0">
+         <children>
+              <Button fx:id="backBtnMon" mnemonicParsing="false" onAction="#switchToHomepage" text="Back" />
+         </children>
+      </HBox>
     </children>
 </AnchorPane>

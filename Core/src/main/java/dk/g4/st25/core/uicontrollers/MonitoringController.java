@@ -97,7 +97,7 @@ public class MonitoringController {
         public SystemItem(String name) {
             this.name = name;
             this.state = "N/A";
-            this.label = new Label(name + " - " + state);
+            this.label = new Label(name);
             label.setOnMouseClicked(event -> machState.setText(name + ": " + state));
         }
 

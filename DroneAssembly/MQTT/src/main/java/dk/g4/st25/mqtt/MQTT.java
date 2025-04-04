@@ -1,9 +1,10 @@
 package dk.g4.st25.mqtt;
 
+import dk.g4.st25.common.protocol.ProtocolSPI;
 import org.eclipse.paho.client.mqttv3.*;
 import com.google.gson.JsonObject;
 
-public final class MQTT {
+public final class MQTT implements ProtocolSPI {
     // Singleton instance of the MQTT Connection
     private static MQTT mqttInstance;
     private MqttClient connection;
@@ -50,13 +51,31 @@ public final class MQTT {
         return this.connection;
     }
 
-    public void subscribeToTopic(String topic) {
+    @Override
+    public int connect(String endpoint) {
+        return 0;
+    }
+
+    @Override
+    public int writeTo(String message, String endpoint) {
+        return 0;
+    }
+
+    @Override
+    public int subscribeToTopic(String topic) {
     // Subscribes to a topic on the singleton MQTT client
         try {
             getMqttInstance().getMqttClient().subscribe(topic);
+            return 1;
         } catch (MqttException e) {
             e.printStackTrace();
+            return 0;
         }
+    }
+
+    @Override
+    public JsonObject readFrom(String endpoint, String method) {
+        return null;
     }
 
     public void publishMessage(String topic, JsonObject message) {

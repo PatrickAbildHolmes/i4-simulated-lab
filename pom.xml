@@ -16,14 +16,14 @@
   <modules>
     <module>Core</module>
     <module>Common</module>
-    <module>DroneAssemblyTest/AGV</module>
-    <module>DroneAssemblyTest/CommonMachine</module>
-    <module>DroneAssemblyTest/CommonProtocol</module>
-    <module>DroneAssemblyTest/MQTT</module>
-    <module>DroneAssemblyTest/REST</module>
-    <module>DroneAssemblyTest/SOAP</module>
-    <module>DroneAssemblyTest/Warehouse</module>
-    <module>DroneAssemblyTest/AssemblyStation</module>
+    <module>DroneAssembly/AGV</module>
+    <module>DroneAssembly/CommonMachine</module>
+    <module>DroneAssembly/CommonProtocol</module>
+    <module>DroneAssembly/MQTT</module>
+    <module>DroneAssembly/REST</module>
+    <module>DroneAssembly/SOAP</module>
+    <module>DroneAssembly/Warehouse</module>
+    <module>DroneAssembly/AssemblyStation</module>
   </modules>
   <dependencyManagement>
     <dependencies>

@@ -1,2 +1,4 @@
+dk\g4\st25\common\services\IScheduleProduction.class
+dk\g4\st25\common\services\IMonitorStatus.class
 module-info.class
-dk\g4\st25\common\Placeholder.class
+dk\g4\st25\common\services\IExecuteCommand.class

@@ -1,2 +1,3 @@
 module Core {
+    requires Common;
 }

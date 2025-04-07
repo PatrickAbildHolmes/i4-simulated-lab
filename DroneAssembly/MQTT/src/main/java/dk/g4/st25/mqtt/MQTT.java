@@ -3,69 +3,72 @@ package dk.g4.st25.mqtt;
 import dk.g4.st25.common.protocol.ProtocolSPI;
 import org.eclipse.paho.client.mqttv3.*;
 import com.google.gson.JsonObject;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-public final class MQTT implements ProtocolSPI {
-    // Singleton instance of the MQTT Connection
-    private static MQTT mqttInstance;
-    private MqttClient connection;
+public class MQTT implements ProtocolSPI {
 
-    private MQTT(){
-        // Constructor to create a single instance, and then establish a connection
+    private MqttClient client;
+
+    // Constructor to create a MQTT object
+    public MQTT(String endpointPort){
         try {
-            this.connection = connectToBroker();
-        } catch (Exception e) {
+            // Creates a broker with the endpoint port on localhost using tcp
+            String endpoint = "tcp://localhost:" + endpointPort;
+            // Assigns the client to the broker with the client ID
+            this.client = new MqttClient(endpoint, MqttClient.generateClientId());
+        } catch (MqttException e) {
             e.printStackTrace();
         }
     }
 
-    public MqttClient connectToBroker() {
+
+    @Override
+    public int connect(String endpoint) {
+        // Endpoint is never used, and it is irrelevant to have it in the connect method.
+        // Maybe it should be deleted in ProtocolSPI
         try {
-            String broker = "tcp://localhost:1883";
-            String clientId = "JavaClient";
-            //Creates a new client with the broker and client ID
-            MqttClient mqttClient = new MqttClient(broker, clientId);
             // Create a new MqttConnectOptions object which will store all connection settings
             MqttConnectOptions options = new MqttConnectOptions();
             // The broker will remove all information about this client when it disconnects
             // The client will not receive any old messages when it reconnects
             options.setCleanSession(true);
             // Connects to the MQTT using the connection options
-            mqttClient.connect(options);
-            return mqttClient;
+            client.connect(options);
+            // Return 1 for success
+            return 1;
         } catch (MqttException e) {
             e.printStackTrace();
-            return null;
+            // Return 0 for failure
+            return 0;
         }
     }
 
-    public static MQTT getMqttInstance() {
-    // Get singleton instance
-        if (mqttInstance == null) {
-            mqttInstance = new MQTT();
+    @Override
+    public int writeTo(String message, String topic) {
+        /* It uses the input parameter topic instead of the endpoint parameter in ProtocolSPI
+         The endpoint is saved in the MQTTClient instance, and it is thereby not needed
+         Topic is needed instead, as the client needs to know which topic to publish to */
+
+        // Creates a new MQTT message with the JSON message
+        MqttMessage mqttMessage = new MqttMessage(message.getBytes());
+        // Sets the Quality of Service for the MQTT message to level 2
+        // Guarantees that the message will be delivered exactly once
+        // Most reliable but slowest delivery method, highest overhead in network traffic
+        mqttMessage.setQos(2);
+        try{
+            client.publish(topic, mqttMessage);
+            return 1;
+        }catch (MqttException e) {
+            e.printStackTrace();
+            return 0;
         }
-        return mqttInstance;
-    }
-
-    public MqttClient getMqttClient() {
-    // Get connection on the single instance
-        return this.connection;
-    }
-
-    @Override
-    public int connect(String endpoint) {
-        return 0;
-    }
-
-    @Override
-    public int writeTo(String message, String endpoint) {
-        return 0;
     }
 
     @Override
     public int subscribeToTopic(String topic) {
-    // Subscribes to a topic on the singleton MQTT client
+    // Subscribes to a topic on the MQTT client
         try {
-            getMqttInstance().getMqttClient().subscribe(topic);
+            client.subscribe(topic);
             return 1;
         } catch (MqttException e) {
             e.printStackTrace();
@@ -73,31 +76,17 @@ public final class MQTT implements ProtocolSPI {
         }
     }
 
+    public void disconnect() {
+        try {
+            // Disconnects the client from the MQTT
+            client.disconnect();
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public JsonObject readFrom(String endpoint, String method) {
         return null;
-    }
-
-    public void publishMessage(String topic, JsonObject message) {
-        // Creates a new MQTT message with the JSON message
-        MqttMessage mqttMessage = new MqttMessage(message.toString().getBytes());
-        // Sets the Quality of Service for the MQTT message to level 2
-        // Guarantees that the message will be delivered exactly once
-        // Most reliable but slowest delivery method, highest overhead in network traffic
-        mqttMessage.setQos(2);
-        try {
-            getMqttInstance().getMqttClient().publish(topic, mqttMessage);
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void disconnect() {
-    // Disconnects the client from the MQTT
-        try {
-            getMqttInstance().getMqttClient().disconnect();
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
     }
 }

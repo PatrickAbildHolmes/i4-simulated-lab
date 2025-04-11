@@ -3,20 +3,36 @@ package dk.g4.st25.soap;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 
+import javax.swing.text.Document;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+
 public class SOAPtestforsoeg {
     public void getInventory() {
-        HttpResponse<String> response = Unirest.post("http://localhost:8081/Service.asmx")
-                .header("Content-Type", "text/xml; charset=utf-8")
-                .header("SOAPAction", "http://tempuri.org/IEmulatorService/GetInventory")
-                .body("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  " +
-                        "<soap:Body>\n    " +
-                        "<GetInventory xmlns=\"http://tempuri.org/\"/>\n  " +
-                        "</soap:Body>\n</soap:Envelope>\n")
-                .asString();
-        if (response.getStatus() == 200) {
-            System.out.println(response.getBody());
-        } else {
-            System.out.println(response.getStatusText());
+        try {
+            HttpResponse<String> response = Unirest.post("http://localhost:8081/Service.asmx")
+                    .header("Content-Type", "text/xml; charset=utf-8")
+                    .header("SOAPAction", "http://tempuri.org/IEmulatorService/GetInventory")
+                    .body("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  " +
+                            "<soap:Body>\n    " +
+                            "<GetInventory xmlns=\"http://tempuri.org/\"/>\n  " +
+                            "</soap:Body>\n</soap:Envelope>\n")
+                    .asString();
+
+            if (response.getStatus() == 200) {
+                String soapresponse = response.getBody();
+                // We have to parse the XML in an XML DOM
+                Document doc = (Document) DocumentBuilderFactory.newInstance()
+                        .newDocumentBuilder()
+                        .parse(new ByteArrayInputStream(soapresponse.getBytes()));
+
+
+            } else {
+                System.out.println(response.getStatusText());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

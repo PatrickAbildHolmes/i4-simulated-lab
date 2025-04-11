@@ -5,6 +5,6 @@ module SOAP {
     requires CommonProtocol;
     requires com.google.gson;
     requires unirest.java;
-    requires java.net.http;
+    requires java.desktop;
     provides ProtocolSPI with dk.g4.st25.soap.SOAP;
 }

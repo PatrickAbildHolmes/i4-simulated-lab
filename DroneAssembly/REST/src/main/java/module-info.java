@@ -1,6 +1,7 @@
 import dk.g4.st25.common.protocol.ProtocolSPI;
 
 module REST {
+    requires Common;
     exports dk.g4.st25.rest;
     requires CommonProtocol;
     requires com.google.gson;

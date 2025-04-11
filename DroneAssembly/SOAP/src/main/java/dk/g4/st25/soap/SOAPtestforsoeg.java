@@ -19,7 +19,8 @@ public class SOAPtestforsoeg {
             System.out.println(response.getStatusText());
         }
     }
-       public void pickItem(){
+
+    public void pickItem(){
         HttpResponse<String> response = Unirest.post("http://localhost:8081/Service.asmx")
                 .header("Content-Type", "text/xml; charset=utf-8")
                 .header("SOAPAction", "http://tempuri.org/IEmulatorService/PickItem")
@@ -37,6 +38,7 @@ public class SOAPtestforsoeg {
             System.out.println(response.getStatusText());
         }
     }
+
     public void insertItem(){
         HttpResponse<String> response = Unirest.post("http://localhost:8081/Service.asmx")
                 .header("Content-Type", "text/xml; charset=utf-8")

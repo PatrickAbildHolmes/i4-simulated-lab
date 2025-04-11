@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="dk.g4.st25.mqtt.AppTest" time="0.044" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="dk.anfra22.cbse.common.machine.AppTest" time="0.047" tests="1" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="24"/>
     <property name="sun.cpu.isalist" value="amd64"/>
     <property name="sun.jnu.encoding" value="Cp1252"/>
-    <property name="java.class.path" value="C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\DroneAssembly\MQTT\target\test-classes;C:\Users\ander\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;"/>
+    <property name="java.class.path" value="C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\DroneAssembly\CommonMachine\target\test-classes;C:\Users\ander\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="user.variant" value=""/>
@@ -16,23 +16,23 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="GB"/>
     <property name="sun.boot.library.path" value="C:\Users\ander\.jdks\openjdk-24\bin"/>
-    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter C:\Users\ander\AppData\Local\Temp\surefire12363771227135410918 2025-04-07T12-08-02_647-jvmRun1 surefire-20250407120823895_13tmp surefire_4-20250407120823895_14tmp"/>
+    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter C:\Users\ander\AppData\Local\Temp\surefire3847752139007192708 2025-04-07T12-08-02_647-jvmRun1 surefire-20250407120815151_7tmp surefire_2-20250407120815151_8tmp"/>
     <property name="jdk.debug" value="release"/>
-    <property name="surefire.test.class.path" value="C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\DroneAssembly\MQTT\target\test-classes;C:\Users\ander\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;"/>
+    <property name="surefire.test.class.path" value="C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\DroneAssembly\CommonMachine\target\test-classes;C:\Users\ander\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
     <property name="user.home" value="C:\Users\ander"/>
     <property name="user.language" value="en"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
-    <property name="jdk.module.path" value="C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\DroneAssembly\MQTT\target\classes;C:\Users\ander\.m2\repository\com\google\code\gson\gson\2.8.9\gson-2.8.9.jar;C:\Users\ander\.m2\repository\org\eclipse\paho\org.eclipse.paho.client.mqttv3\1.2.5\org.eclipse.paho.client.mqttv3-1.2.5.jar;C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\Common\target\Common-1.0.1-SNAPSHOT.jar;C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\DroneAssembly\CommonProtocol\target\CommonProtocol-1.0.1-SNAPSHOT.jar"/>
+    <property name="jdk.module.path" value="C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\DroneAssembly\CommonMachine\target\classes;C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\Common\target\Common-1.0.1-SNAPSHOT.jar;C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\DroneAssembly\CommonProtocol\target\CommonProtocol-1.0.1-SNAPSHOT.jar;C:\Users\ander\.m2\repository\com\google\code\gson\gson\2.11.0\gson-2.11.0.jar;C:\Users\ander\.m2\repository\com\google\errorprone\error_prone_annotations\2.27.0\error_prone_annotations-2.27.0.jar"/>
     <property name="java.version.date" value="2025-03-18"/>
     <property name="java.home" value="C:\Users\ander\.jdks\openjdk-24"/>
     <property name="file.separator" value="\"/>
-    <property name="basedir" value="C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\DroneAssembly\MQTT"/>
+    <property name="basedir" value="C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\DroneAssembly\CommonMachine"/>
     <property name="java.vm.compressedOopsMode" value="Zero based"/>
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-api\3.1.2\surefire-api-3.1.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-booter\3.1.2\surefire-booter-3.1.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-extensions-spi\3.1.2\surefire-extensions-spi-3.1.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-logger-api\3.1.2\surefire-logger-api-3.1.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-shared-utils\3.1.2\surefire-shared-utils-3.1.2.jar;C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\DroneAssembly\MQTT\target\test-classes;C:\Users\ander\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-junit3\3.1.2\surefire-junit3-3.1.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\common-java5\3.1.2\common-java5-3.1.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\common-junit3\3.1.2\common-junit3-3.1.2.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-api\3.1.2\surefire-api-3.1.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-booter\3.1.2\surefire-booter-3.1.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-extensions-spi\3.1.2\surefire-extensions-spi-3.1.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-logger-api\3.1.2\surefire-logger-api-3.1.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-shared-utils\3.1.2\surefire-shared-utils-3.1.2.jar;C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\DroneAssembly\CommonMachine\target\test-classes;C:\Users\ander\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-junit3\3.1.2\surefire-junit3-3.1.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\common-java5\3.1.2\common-java5-3.1.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\common-junit3\3.1.2\common-junit3-3.1.2.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="24+36-3646"/>
@@ -48,7 +48,7 @@
     <property name="java.io.tmpdir" value="C:\Users\ander\AppData\Local\Temp\"/>
     <property name="idea.version" value="2023.3.3"/>
     <property name="java.version" value="24"/>
-    <property name="user.dir" value="C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\DroneAssembly\MQTT"/>
+    <property name="user.dir" value="C:\Users\ander\Documents\UNI\Software-Teknologi-4-Semester\ST4-Project\i4-simulated-lab\DroneAssembly\CommonMachine"/>
     <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
     <property name="user.language.format" value="da"/>
@@ -62,5 +62,5 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="68.0"/>
   </properties>
-  <testcase name="testApp" classname="dk.g4.st25.mqtt.AppTest" time="0.005"/>
+  <testcase name="testApp" classname="dk.anfra22.cbse.common.machine.AppTest" time="0.004"/>
 </testsuite>

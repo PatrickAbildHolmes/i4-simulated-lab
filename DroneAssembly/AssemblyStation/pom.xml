@@ -26,6 +26,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>dk.g4.st25.common</groupId>
+            <artifactId>Common</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>dk.g4.st25.common.machine</groupId>
             <artifactId>CommonMachine</artifactId>
             <version>1.0.1-SNAPSHOT</version>

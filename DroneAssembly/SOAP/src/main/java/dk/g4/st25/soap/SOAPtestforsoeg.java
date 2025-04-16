@@ -108,10 +108,10 @@ public class SOAPtestforsoeg {
     public void refreshInventory() {
         SOAPtestforsoeg soaPtestforsoeg = new SOAPtestforsoeg();
         for (int i = 0; i<10; i++){
-            soaPtestforsoeg.pickItem(i);
+            soaPtestforsoeg.pickItem(i+1);
         }
         String[] newItems = {"Rollade", "Trøffel", "Cupcake", "Lagkage", "Chokolade kage",
-                    "Cookie dough", "Ben & Jerry's", "Frysepizza", "Chips", "Brunsviger"};
+                    "Cookie dough", "Ben and Jerry's", "Frysepizza", "Chips", "Brunsviger"};
         for (int i = 0; i< newItems.length; i++){
             soaPtestforsoeg.insertItem(i + 1,newItems[i]);
         }

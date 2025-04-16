@@ -2,25 +2,17 @@ package dk.g4.st25.core.uicontrollers;
 
 
 public class InventoryItem {
-    private String itemType;
     private String itemID;
-    private String amount;
+    private String itemName;
 
-    public InventoryItem(String itemType, String itemID, int amount){
-        this.itemType = new String(itemType);
-        this.itemID = new String(itemID);
-        this.amount = new String(String.valueOf(amount));
+    public InventoryItem() {}
+
+    public InventoryItem(String itemID, String itemName) {
+        this.itemID = itemID;
+        this.itemName = itemName;
     }
 
     // Getter and setter for type
-    public String getItemType() {
-        return itemType;
-    }
-
-    public void setItemType(String itemType) {
-        this.itemType = itemType;
-    }
-
     public String getItemID() {
         return itemID;
     }
@@ -29,12 +21,11 @@ public class InventoryItem {
         this.itemID = itemID;
     }
 
-    public String getAmount() {
-        return amount;
+    public String getItemName() {
+        return itemName;
     }
 
-    public void setAmount(String amount) {
-        this.amount = amount;
-    }
-}
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }}
 

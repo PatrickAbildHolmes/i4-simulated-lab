@@ -37,5 +37,11 @@
       <artifactId>javafx-fxml</artifactId>
       <version>25-ea+8</version>
     </dependency>
+      <dependency>
+          <groupId>dk.g4.st25.soap</groupId>
+          <artifactId>SOAP</artifactId>
+          <version>1.0.1-SNAPSHOT</version>
+          <scope>compile</scope>
+      </dependency>
   </dependencies>
 </project>

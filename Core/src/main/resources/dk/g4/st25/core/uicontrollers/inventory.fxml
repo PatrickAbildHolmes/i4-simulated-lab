@@ -26,9 +26,8 @@
          <children>
               <TableView fx:id="invTable" prefHeight="200.0" prefWidth="479.0">
                   <columns>
-                      <TableColumn fx:id="itemTypeColumn" prefWidth="75.0" text="Item type" />
-                      <TableColumn fx:id="itemIDColumn" prefWidth="205.5" text="Item ID" />
-                      <TableColumn fx:id="amountColumn" prefWidth="195.5" text="Amount available (units)" />
+                      <TableColumn fx:id="itemTypeColumn" prefWidth="75.0" text="Item ID" />
+                      <TableColumn fx:id="itemIDColumn" prefWidth="400.0" text="Item Name" />
                   </columns>
               </TableView>
          </children>

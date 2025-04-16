@@ -21,9 +21,10 @@ public class SOAPtestforsoeg {
                             "<GetInventory xmlns=\"http://tempuri.org/\"/>\n  " +
                             "</soap:Body>\n</soap:Envelope>\n")
                     .asString();
-
-            System.out.println("HTTP Status: " + response.getStatus());  // Check status code
-            System.out.println("SOAP Response: " + response.getBody()); // Print full response
+            // Check status code
+            System.out.println("HTTP Status: " + response.getStatus());
+            // Print full response
+            System.out.println("SOAP Response: " + response.getBody());
             if (response.getStatus() == 200) {
                 String soapResponse = response.getBody();
 
@@ -63,7 +64,7 @@ public class SOAPtestforsoeg {
         }
     }
 
-    public void pickItem(){
+    public void pickItem(int trayId){
         HttpResponse<String> response = Unirest.post("http://localhost:8081/Service.asmx")
                 .header("Content-Type", "text/xml; charset=utf-8")
                 .header("SOAPAction", "http://tempuri.org/IEmulatorService/PickItem")
@@ -71,7 +72,8 @@ public class SOAPtestforsoeg {
                         "<soap:Body>\n    " +
                         "<PickItem xmlns=\"http://tempuri.org/\">\n      " +
                         // TrayId is the place it takes item in the warehouse (right now it picks up nr 1)
-                        "<trayId>1</trayId>\n    " +
+                        // Updated to pick on trayId
+                        "<trayId>" + trayId + "</trayId>\n    " +
                         "</PickItem>\n  " +
                         "</soap:Body>\n</soap:Envelope>\n")
                 .asString();
@@ -82,7 +84,7 @@ public class SOAPtestforsoeg {
         }
     }
 
-    public void insertItem(){
+    public void insertItem(int trayId, String name){
         HttpResponse<String> response = Unirest.post("http://localhost:8081/Service.asmx")
                 .header("Content-Type", "text/xml; charset=utf-8")
                 .header("SOAPAction", "http://tempuri.org/IEmulatorService/InsertItem")
@@ -90,9 +92,10 @@ public class SOAPtestforsoeg {
                         "<soap:Body>\n    " +
                         "<InsertItem xmlns=\"http://tempuri.org/\">\n      " +
                         // TrayId is the place it takes item in the warehouse (right now it inserts into nr 1 - IT HAS TO BE EMPTY)
-                        "<trayId>1</trayId>\n      " +
+                        // Updated to pick trayId
+                        "<trayId>" + trayId + "</trayId>\n      " +
                         // name is interchangable
-                        "<name>rollade</name>\n    " +
+                        "<name>" + name + "</name>\n    " +
                         "</InsertItem>\n  " +
                         "</soap:Body>\n</soap:Envelope>\n")
                 .asString();
@@ -102,11 +105,24 @@ public class SOAPtestforsoeg {
             System.out.println(response.getStatusText());
         }
     }
+    public void refreshInventory() {
+        SOAPtestforsoeg soaPtestforsoeg = new SOAPtestforsoeg();
+        for (int i = 0; i<10; i++){
+            soaPtestforsoeg.pickItem(i);
+        }
+        String[] newItems = {"Rollade", "Trøffel", "Cupcake", "Lagkage", "Chokolade kage",
+                    "Cookie dough", "Ben & Jerry's", "Frysepizza", "Chips", "Brunsviger"};
+        for (int i = 0; i< newItems.length; i++){
+            soaPtestforsoeg.insertItem(i + 1,newItems[i]);
+        }
+    }
 
     public static void main(String[] args) {
         SOAPtestforsoeg soaptestforsoeg = new SOAPtestforsoeg();
+        soaptestforsoeg.refreshInventory();
         System.out.println(soaptestforsoeg.getInventory());
-        //soaptestforsoeg.pickItem();
-        //soaptestforsoeg.insertItem();
+        soaptestforsoeg.pickItem(2);
+        soaptestforsoeg.insertItem(2, "TOM");
+        System.out.println(soaptestforsoeg.getInventory());
     }
 }

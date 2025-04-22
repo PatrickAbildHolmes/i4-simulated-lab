@@ -9,7 +9,7 @@ import kong.unirest.json.JSONObject;
 
 public class SOAP implements ProtocolSPI {
 
-    private final SOAPtestforsoeg soaPtestforsoeg = new SOAPtestforsoeg();
+    private final SoapService soapService = new SoapService();
     @Override
     public int connect(String endpoint) {
         try {
@@ -37,12 +37,12 @@ public class SOAP implements ProtocolSPI {
 
             // Checks if the user choses to "pick" an item from the warehouse
             if ("pick".equalsIgnoreCase(action)) {
-                soaPtestforsoeg.pickItem(trayId);
+                soapService.pickItem(trayId);
             }
             // Checks if the user choses to "insert" an item into the warehouse
             else if ("insert".equalsIgnoreCase(action)) {
                 String name = json.getString("itemName");
-                soaPtestforsoeg.insertItem(trayId, name);
+                soapService.insertItem(trayId, name);
             }
             // Does not know what action to perform:
             else {
@@ -70,7 +70,7 @@ public class SOAP implements ProtocolSPI {
             // If the method is getInventory, then do the following:
             if ("getInventory".equalsIgnoreCase(method)) {
                 // Creates a JsonObject
-                JSONObject jsonInventory = soaPtestforsoeg.getInventory();
+                JSONObject jsonInventory = soapService.getInventory();
                 // As the readfrom is a "JsonObject" and not a JSONObject, it is then a gson
                 // This is parsed as a gson then
                 return JsonParser.parseString(jsonInventory.toString()).getAsJsonObject();

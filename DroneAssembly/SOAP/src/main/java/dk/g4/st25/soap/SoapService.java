@@ -10,7 +10,7 @@ import kong.unirest.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-public class SOAPtestforsoeg {
+public class SoapService {
     public JSONObject getInventory() {
         try {
             HttpResponse<String> response = Unirest.post("http://localhost:8081/Service.asmx")
@@ -106,19 +106,19 @@ public class SOAPtestforsoeg {
         }
     }
     public void refreshInventory() {
-        SOAPtestforsoeg soaPtestforsoeg = new SOAPtestforsoeg();
+        SoapService soapService = new SoapService();
         for (int i = 0; i<10; i++){
-            soaPtestforsoeg.pickItem(i+1);
+            soapService.pickItem(i+1);
         }
         String[] newItems = {"Rollade", "Trøffel", "Cupcake", "Lagkage", "Chokolade kage",
                     "Cookie dough", "Ben and Jerry's", "Frysepizza", "Chips", "Brunsviger"};
         for (int i = 0; i< newItems.length; i++){
-            soaPtestforsoeg.insertItem(i + 1,newItems[i]);
+            soapService.insertItem(i + 1,newItems[i]);
         }
     }
 
     public static void main(String[] args) {
-        SOAPtestforsoeg soaptestforsoeg = new SOAPtestforsoeg();
+        SoapService soaptestforsoeg = new SoapService();
         soaptestforsoeg.refreshInventory();
         System.out.println(soaptestforsoeg.getInventory());
         soaptestforsoeg.pickItem(2);

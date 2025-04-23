@@ -2,6 +2,7 @@ package dk.g4.st25.core.uicontrollers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.soap.SOAP;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -18,6 +19,10 @@ import javafx.stage.Stage;
 import javafx.collections.ObservableList;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.ServiceLoader;
+
+import static java.util.stream.Collectors.toList;
 
 public class InventoryController {
     private Stage stage;
@@ -60,8 +65,13 @@ public class InventoryController {
 
     }
     private void loadInventoryFromSOAP() {
+        List<IExecuteCommand> listImple = sendCommandImplementationsList();
+
+        listImple.get(0).sendCommand("readFrom", "getInventory",
+                "http://localhost:8081/Service.asmx");
 
         SOAP soap = new SOAP();
+
         JsonObject response = soap.readFrom("http://localhost:8081/Service.asmx", "getInventory");
 
         if (response != null && response.has("Inventory")) {
@@ -75,5 +85,9 @@ public class InventoryController {
         } else {
             System.err.println("Could not fetch items from SOAP: " + response);
         }
+    }
+
+    public List<IExecuteCommand> sendCommandImplementationsList() {
+        return ServiceLoader.load(IExecuteCommand.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 }

@@ -2,7 +2,7 @@ package dk.g4.st25.soap;
 import com.google.gson.JsonObject;
 import kong.unirest.json.JSONObject;
 
-public class TestSOAPProtocol {
+public class SoapServiceTest {
     public static void main(String[] args) {
         // Use the protocol interface
         SOAP protocol = new SOAP();

@@ -1,16 +1,11 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36" version="26.1.3">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36" modified="2025-04-24T20:34:35.050Z" version="24.4.13" etag="cdjfopcgvntAeWwLVwmd" type="github">
   <diagram name="Page-1" id="5f0bae14-7c28-e335-631c-24af17079c00">
-    <mxGraphModel dx="-526" dy="744" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
+    <mxGraphModel dx="-766" dy="744" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="Nb-623n4n7A27UwxZiqx-445" value="" style="html=1;dropTarget=0;whiteSpace=wrap;" parent="1" vertex="1">
-          <mxGeometry x="2570" y="20" width="640" height="670" as="geometry" />
-        </mxCell>
-        <mxCell id="Nb-623n4n7A27UwxZiqx-446" value="" style="shape=module;jettyWidth=8;jettyHeight=4;" parent="Nb-623n4n7A27UwxZiqx-445" vertex="1">
-          <mxGeometry x="1" width="20" height="20" relative="1" as="geometry">
-            <mxPoint x="-27" y="7" as="offset" />
-          </mxGeometry>
+        <mxCell id="VLPU1U21MBXbzWu9x8Ee-1" value="" style="shape=folder;fontStyle=1;spacingTop=10;tabWidth=40;tabHeight=14;tabPosition=left;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="2570" y="10" width="640" height="690" as="geometry" />
         </mxCell>
         <mxCell id="Nb-623n4n7A27UwxZiqx-368" value="" style="fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;marginBottom=0;" parent="1" vertex="1">
           <mxGeometry x="2690" y="440" width="220" height="98" as="geometry" />
@@ -194,8 +189,8 @@
         <mxCell id="Nb-623n4n7A27UwxZiqx-435" value="ProtocolSPI" style="html=1;align=left;spacingLeft=4;verticalAlign=top;strokeColor=none;fillColor=none;whiteSpace=wrap;" parent="Nb-623n4n7A27UwxZiqx-427" vertex="1">
           <mxGeometry y="186" width="210" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Nb-623n4n7A27UwxZiqx-447" value="&lt;span style=&quot;font-weight: normal;&quot;&gt;&amp;lt;&amp;lt;component&amp;gt;&amp;gt;&lt;br&gt;&lt;/span&gt;:DroneAssembly" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=none;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;" parent="1" vertex="1">
-          <mxGeometry x="2590" y="30" width="80" height="26" as="geometry" />
+        <mxCell id="Nb-623n4n7A27UwxZiqx-447" value="&lt;span style=&quot;font-weight: normal;&quot;&gt;&amp;lt;&amp;lt;package&amp;gt;&amp;gt;&lt;br&gt;&lt;/span&gt;:DroneAssembly" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=none;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;" parent="1" vertex="1">
+          <mxGeometry x="2590" y="40" width="80" height="26" as="geometry" />
         </mxCell>
         <mxCell id="Nb-623n4n7A27UwxZiqx-580" value="" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=halfCircle;endFill=0;endSize=6;strokeWidth=1;sketch=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;" parent="1" source="Nb-623n4n7A27UwxZiqx-428" target="Nb-623n4n7A27UwxZiqx-582" edge="1">
           <mxGeometry relative="1" as="geometry">

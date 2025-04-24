@@ -25,7 +25,7 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
             itemsFetched++;
             return "Item successfully fetched from tray 1.";
         } catch (Exception e) {
-            // Log the error and return a failure message
+            // Return a failure message
             System.err.println("Error fetching item from tray 1: " + e.getMessage());
             return "Failed to fetch item from tray 1.";
         }

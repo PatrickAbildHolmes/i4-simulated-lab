@@ -6,4 +6,7 @@ module Core {
     requires javafx.fxml;
     requires Common;
     uses IExecuteCommand; // Joakim
+    exports dk.g4.st25.core;
+    opens dk.g4.st25.core to javafx.fxml;
+    opens dk.g4.st25.core.uicontrollers to javafx.fxml, javafx.base;
 }

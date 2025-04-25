@@ -1,9 +1,12 @@
 package dk.g4.st25.assembly_station;
 
+import dk.g4.st25.common.machine.Drone;
 import dk.g4.st25.common.machine.MachineSPI;
+import dk.g4.st25.common.util.Connection;
 import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
 import dk.g4.st25.common.services.IScheduleProduction;
+import dk.g4.st25.common.util.Part;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,11 +48,11 @@ public class AssemblyStation implements MachineSPI, IMonitorStatus, IExecuteComm
     }
 
     @Override
-    public Object taskCompletion() {
+    public int taskCompletion() {
         // Signals that a task is complete
         // Only used internally in class
         // ---- we should change method to return int ----
-        return null;
+        return 0;
     }
 
     @Override

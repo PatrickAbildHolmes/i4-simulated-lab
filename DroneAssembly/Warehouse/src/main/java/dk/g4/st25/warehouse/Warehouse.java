@@ -16,18 +16,20 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
     private int itemsFetched = 0;
 
     @Override
-    public Object taskCompletion() {
+    public int taskCompletion() {
         try {
             // Attempt to fetch an item from tray 1
             soapTest.pickItem(1);
 
             // Increment the counter if no exception is thrown
             itemsFetched++;
-            return "Item successfully fetched from tray 1.";
+            System.out.println("Item successfully fetched from tray 1.");
+            return 0;
         } catch (Exception e) {
             // Return a failure message
             System.err.println("Error fetching item from tray 1: " + e.getMessage());
-            return "Failed to fetch item from tray 1.";
+            System.out.println("Failed to fetch item from tray 1.");
+            return 0;
         }
     }
 

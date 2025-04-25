@@ -4,14 +4,12 @@ import dk.g4.st25.common.machine.MachineSPI;
 import com.google.gson.JsonObject;
 import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
-import dk.g4.st25.common.services.IScheduleProduction;
 import dk.g4.st25.rest.REST;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AGV implements MachineSPI, IExecuteCommand, IMonitorStatus, IScheduleProduction {
+public class AGV implements MachineSPI, IExecuteCommand, IMonitorStatus {
     private final REST protocol;
     private boolean hasProgram = false;
 
@@ -101,47 +99,18 @@ public class AGV implements MachineSPI, IExecuteCommand, IMonitorStatus, ISchedu
     }
 
     @Override
-    public int sendCommand(String commandType, String commandParam, String endpoint) {
+    public int sendCommand(String commandType, String commandParam) {
         return 0;
     }
 
     @Override
-    public ArrayList<String> getCurrentSystemStatus() {
-        return null;
-    }
-
-    @Override
-    public String getCurrentSystemStatus(String machineId) {
+    public String getCurrentSystemStatus() {
         return "";
     }
 
     @Override
-    public String getCurrentProductionStatus() {
+    public String getCurrentConnectionStatus() {
         return "";
     }
 
-    @Override
-    public ArrayList<String> getCurrentConnectionStatus() {
-        return null;
-    }
-
-    @Override
-    public String getCurrentConnectionStatus(String machineId) {
-        return "";
-    }
-
-    @Override
-    public int addProductionToQueue(String product, int amount, ArrayList<Object> itemsNeeded) {
-        return 0;
-    }
-
-    @Override
-    public ArrayList<Object> getProductionQueue() {
-        return null;
-    }
-
-    @Override
-    public Object getProductionQueue(String id) {
-        return null;
-    }
 }

@@ -7,8 +7,4 @@ module AssemblyStation {
     requires Common;
     requires CommonMachine;
     requires CommonProtocol;
-    provides MachineSPI with dk.g4.st25.assembly_station;
-    provides IExecuteCommand with dk.g4.st25.assembly_station;
-    provides IMonitorStatus with dk.g4.st25.assembly_station;
-    provides IScheduleProduction with dk.g4.st25.assembly_station;
 }

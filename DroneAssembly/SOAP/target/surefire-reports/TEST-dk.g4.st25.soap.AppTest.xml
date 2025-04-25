@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="dk.g4.st25.soap.AppTest" time="0.046" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="dk.g4.st25.soap.AppTest" time="0.071" tests="1" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="23"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="GB"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-23\bin"/>
-    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter C:\Users\nikob\AppData\Local\Temp\surefire4000840918073742427 2025-04-25T12-28-05_230-jvmRun1 surefire-20250425122812216_7tmp surefire_2-20250425122812216_8tmp"/>
+    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter C:\Users\nikob\AppData\Local\Temp\surefire14037125622822729775 2025-04-25T12-13-32_613-jvmRun1 surefire-20250425121350537_13tmp surefire_4-20250425121350537_14tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="C:\Users\nikob\OneDrive\Skrivebord\Gitfork\i4-simulated-lab\DroneAssembly\SOAP\target\test-classes;C:\Users\nikob\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;C:\Users\nikob\.m2\repository\org\apache\httpcomponents\httpmime\4.5.13\httpmime-4.5.13.jar;C:\Users\nikob\.m2\repository\org\apache\httpcomponents\httpcore-nio\4.4.13\httpcore-nio-4.4.13.jar;C:\Users\nikob\.m2\repository\org\apache\httpcomponents\httpasyncclient\4.1.5\httpasyncclient-4.1.5.jar;C:\Users\nikob\.m2\repository\commons-codec\commons-codec\1.15\commons-codec-1.15.jar;C:\Users\nikob\.m2\repository\org\apache\httpcomponents\httpclient\4.5.13\httpclient-4.5.13.jar;C:\Users\nikob\.m2\repository\org\apache\httpcomponents\httpcore\4.4.13\httpcore-4.4.13.jar;C:\Users\nikob\.m2\repository\commons-logging\commons-logging\1.2\commons-logging-1.2.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -62,5 +62,5 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="67.0"/>
   </properties>
-  <testcase name="testApp" classname="dk.g4.st25.soap.AppTest" time="0.001"/>
+  <testcase name="testApp" classname="dk.g4.st25.soap.AppTest" time="0.002"/>
 </testsuite>

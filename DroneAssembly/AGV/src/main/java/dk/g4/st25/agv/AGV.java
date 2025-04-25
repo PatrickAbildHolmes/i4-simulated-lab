@@ -86,8 +86,8 @@ public class AGV implements MachineSPI, IExecuteCommand, IMonitorStatus, ISchedu
     }
 
     @Override
-    public Object taskCompletion() {
-        return null;
+    public int taskCompletion() {
+        return 0;
     }
 
     @Override

@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: dk.anfra22.cbse.common.protocol.AppTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.047 s -- in dk.anfra22.cbse.common.protocol.AppTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.053 s -- in dk.anfra22.cbse.common.protocol.AppTest

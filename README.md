@@ -1,40 +1,34 @@
 # How to run project
 
 # Architecture
-*Text about architecture. Overarching vision/purpose of the following elements.*
-
-## Frameworks/languages (and essential libraries)
-*And what they are used for*
-
-## List of Components
+### List of Components
 * **Core**: Core is where the main is located, it includes the core UI, and the core logic for the overall system
 * **Common**: Common provides services from the core system, for all other components to utilize
-through interfaces
-
-
+  through interfaces
 * **CommonMachine**: Provides the Core-module with the Service-provider interface, for all of the machines
   (Meaning it is the contract between Core and Machines)
 * **AGV**: The AGV is the representation of the physical AGV robot, and the module includes the implementation
-of the **MachineSPI** (Machine service-provider interface) from the **CommonMachine** module, in context of the
-AGV-Machine
+  of the **MachineSPI** (Machine service-provider interface) from the **CommonMachine** module, in context of the
+  AGV-Machine
 * **Warehouse**: Warehouse is the representation of the physical warehouse, and the module includes the implementation
   of the **MachineSPI** (Machine service-provider interface) from the **CommonMachine** module, in context of the
   warehouse
-* **AssemblyStation**: The AssemblyStation is the representation of the physical assembly station, 
-and the module includes the implementation
+* **AssemblyStation**: The AssemblyStation is the representation of the physical assembly station,
+  and the module includes the implementation
   of the **MachineSPI** (Machine service-provider interface) from the **CommonMachine** module, in context of the
   assembly station
-
-
-* **CommonProtocol**: Provides the Core-module with the SPI for all the protocols, through the 
-ProtocolSPI-interface. The interface contains generalized methods like: "writeTo()", and "readFrom()" that is a
-function of all the protocols
+* **CommonProtocol**: Provides the Core-module with the SPI for all the protocols, through the
+  ProtocolSPI-interface. The interface contains generalized methods like: "writeTo()", and "readFrom()" that is a
+  function of all the protocols
 * **SOAP**: Soap is the implementation of the ProtocolSPI, in context of the soap protocol
 * **REST**: Rest is the implementation of the ProtocolSPI, in context of the REST protocol
 * **MQTT**: MQTT is the implementation of the ProtocolSPI, in context of the MQTT protocol'
 
+![i4_component_diagram.drawio.png](i4_component_diagram.drawio.png)
 
-* **Protocols**: This is the temporary component containing the protocols all together, and should be replaced by: 
+## Frameworks/languages (and essential libraries)
+*And what they are used for*
+
 
 ## API calls (Internal and External)
 **(SOAP, REST, MQTT or *Internal Logic*)** <br>

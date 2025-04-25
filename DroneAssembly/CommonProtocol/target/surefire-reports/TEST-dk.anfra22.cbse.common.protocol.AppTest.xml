@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="dk.anfra22.cbse.common.protocol.AppTest" time="0.055" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="dk.anfra22.cbse.common.protocol.AppTest" time="0.047" tests="1" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="23"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="GB"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-23\bin"/>
-    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter C:\Users\nikob\AppData\Local\Temp\surefire11458412583805526114 2025-04-25T11-51-38_643-jvmRun1 surefire-20250425115143278_4tmp surefire_1-20250425115143278_5tmp"/>
+    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter C:\Users\nikob\AppData\Local\Temp\surefire157528828929229825 2025-04-25T12-28-05_230-jvmRun1 surefire-20250425122809422_4tmp surefire_1-20250425122809422_5tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="C:\Users\nikob\OneDrive\Skrivebord\Gitfork\i4-simulated-lab\DroneAssembly\CommonProtocol\target\test-classes;C:\Users\nikob\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;C:\Users\nikob\OneDrive\Skrivebord\Gitfork\i4-simulated-lab\Common\target\Common-1.0.1-SNAPSHOT.jar;"/>
     <property name="sun.cpu.endian" value="little"/>

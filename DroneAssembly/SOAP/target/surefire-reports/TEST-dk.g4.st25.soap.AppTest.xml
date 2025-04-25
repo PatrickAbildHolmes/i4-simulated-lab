@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="GB"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-23\bin"/>
-    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter C:\Users\nikob\AppData\Local\Temp\surefire5290315868696594642 2025-04-25T11-51-38_643-jvmRun1 surefire-20250425115146199_7tmp surefire_2-20250425115146199_8tmp"/>
+    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter C:\Users\nikob\AppData\Local\Temp\surefire4000840918073742427 2025-04-25T12-28-05_230-jvmRun1 surefire-20250425122812216_7tmp surefire_2-20250425122812216_8tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="C:\Users\nikob\OneDrive\Skrivebord\Gitfork\i4-simulated-lab\DroneAssembly\SOAP\target\test-classes;C:\Users\nikob\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;C:\Users\nikob\.m2\repository\org\apache\httpcomponents\httpmime\4.5.13\httpmime-4.5.13.jar;C:\Users\nikob\.m2\repository\org\apache\httpcomponents\httpcore-nio\4.4.13\httpcore-nio-4.4.13.jar;C:\Users\nikob\.m2\repository\org\apache\httpcomponents\httpasyncclient\4.1.5\httpasyncclient-4.1.5.jar;C:\Users\nikob\.m2\repository\commons-codec\commons-codec\1.15\commons-codec-1.15.jar;C:\Users\nikob\.m2\repository\org\apache\httpcomponents\httpclient\4.5.13\httpclient-4.5.13.jar;C:\Users\nikob\.m2\repository\org\apache\httpcomponents\httpcore\4.4.13\httpcore-4.4.13.jar;C:\Users\nikob\.m2\repository\commons-logging\commons-logging\1.2\commons-logging-1.2.jar;"/>
     <property name="sun.cpu.endian" value="little"/>

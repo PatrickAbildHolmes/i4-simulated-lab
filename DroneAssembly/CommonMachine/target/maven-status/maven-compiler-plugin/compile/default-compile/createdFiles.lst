@@ -1,4 +1,6 @@
+dk\g4\st25\common\machine\DroneComponent.class
 dk\g4\st25\common\machine\MachineSPI.class
+dk\g4\st25\common\machine\Drone.class
 dk\g4\st25\common\machine\Machine.class
 module-info.class
-dk\g4\st25\common\machine\Placeholder.class
+dk\g4\st25\common\machine\MachineSPI$systemState.class

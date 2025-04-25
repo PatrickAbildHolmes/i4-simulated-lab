@@ -1,11 +1,12 @@
 package dk.g4.st25.mqtt;
 
+import dk.g4.st25.common.protocol.Protocol;
 import dk.g4.st25.common.protocol.ProtocolSPI;
 import org.eclipse.paho.client.mqttv3.*;
 import com.google.gson.JsonObject;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-public class MQTT implements ProtocolSPI {
+public class MQTT extends Protocol implements ProtocolSPI {
 
     private MqttClient client;
 

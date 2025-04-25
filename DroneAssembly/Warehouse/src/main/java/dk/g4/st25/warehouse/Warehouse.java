@@ -4,8 +4,8 @@ import dk.g4.st25.common.machine.MachineSPI;
 
 public class Warehouse implements MachineSPI {
     @Override
-    public Object taskCompletion() {
-        return null;
+    public int taskCompletion() {
+        return 0;
     }
 
     @Override

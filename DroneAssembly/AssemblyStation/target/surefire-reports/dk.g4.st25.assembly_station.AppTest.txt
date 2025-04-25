@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: dk.g4.st25.assembly_station.AppTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.102 s -- in dk.g4.st25.assembly_station.AppTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.049 s -- in dk.g4.st25.assembly_station.AppTest

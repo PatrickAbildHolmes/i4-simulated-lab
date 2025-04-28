@@ -1,11 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>dk.g4.st25</groupId>
   <artifactId>i4-simulated-lab</artifactId>
   <version>1.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>i4-simulated-lab</name>
+
   <repositories/>
+
   <properties>
     <java>java</java>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -13,6 +19,7 @@
     <maven.compiler.target>1.9</maven.compiler.target>
     <spring.version>6.1.3</spring.version>
   </properties>
+
   <modules>
     <module>Core</module>
     <module>Common</module>
@@ -25,8 +32,14 @@
     <module>DroneAssembly/Warehouse</module>
     <module>DroneAssembly/AssemblyStation</module>
   </modules>
+
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>com.konghq</groupId>
+        <artifactId>unirest-java</artifactId>
+        <version>3.14.5</version>
+      </dependency>
       <dependency>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-controls</artifactId>
@@ -43,6 +56,11 @@
         <version>21.0.2</version>
       </dependency>
       <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-fxml</artifactId>
+        <version>17.0.10</version>
+      </dependency>
+      <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
         <version>2.11.0</version>
@@ -56,59 +74,7 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-clean-plugin</artifactId>
-        <version>3.2.0</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.10.1</version>
-        <configuration>
-          <fork>true</fork>
-        </configuration>
-      </plugin>
-      <!-- execute the resulting project -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.6.0</version>
-        <inherited>false</inherited>
-        <executions>
-          <execution>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <executable>${java}</executable>
-          <workingDirectory>.</workingDirectory>
-          <longModulepath>false</longModulepath>
-          <arguments>
-            <!--
-                                    On Mac Devices this line should not be commented out
-                                    <argument>-XstartOnFirstThread</argument>
-            -->
-            <!--                        <argument>-Dorg.lwjgl.util.Debug=true</argument>-->
-            <argument>-Djava.library.path=libs</argument>
-            <argument>--module-path=mods-mvn</argument>
-            <argument>--class-path=libs/*</argument>
-            <!-- because spark.core is an automatic module and actually required,
-            monitor.observer.zero would be resolved as well and does not need
-            to be added explicitly;
-            I still wanted to do it for clarity, but for some reason that results
-            in "java.lang.module.FindException: Module monitor.observer.zero not found";
-            strange... -->
-            <!--                        <argument>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=127.0.0.1:8000</argument>-->
-            <argument>--module=Core/dk.g4.st25.core.App</argument>
-            <argument>--add-modules javafx.graphics</argument>
-          </arguments>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+
   <profiles>
     <profile>
       <!-- parent project should delete 'mods-mvn' -->
@@ -126,10 +92,10 @@
             <configuration>
               <filesets>
                 <fileset>
-                  <directory>mods-mvn</directory>
+                  <directory>${project.basedir}/mods-mvn</directory>
                 </fileset>
                 <fileset>
-                  <directory>libs</directory>
+                  <directory>${project.basedir}/libs</directory>
                 </fileset>
               </filesets>
             </configuration>
@@ -137,6 +103,7 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
       <!-- child projects should copy artifact into 'mods-mvn' -->
       <id>child-project</id>
@@ -166,7 +133,7 @@
                       <type>jar</type>
                     </artifactItem>
                   </artifactItems>
-                  <outputDirectory>../mods-mvn</outputDirectory>
+                  <outputDirectory>${project.parent.basedir}/mods-mvn</outputDirectory>
                 </configuration>
               </execution>
             </executions>
@@ -175,4 +142,43 @@
       </build>
     </profile>
   </profiles>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.3.0</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeArtifactIds>javafx-controls,javafx-graphics,javafx-base,javafx-fxml,gson,unirest-java,java-dotenv,spring-web</includeArtifactIds>
+              <outputDirectory>${project.parent.basedir}/mods-mvn</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.openjfx</groupId>
+                  <artifactId>javafx-controls</artifactId>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.parent.basedir}/libs</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

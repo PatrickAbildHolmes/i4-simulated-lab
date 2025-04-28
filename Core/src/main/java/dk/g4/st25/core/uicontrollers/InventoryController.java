@@ -3,12 +3,10 @@ package dk.g4.st25.core.uicontrollers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dk.g4.st25.common.services.IExecuteCommand;
-import dk.g4.st25.soap.SOAP;
+import dk.g4.st25.core.App;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -19,10 +17,6 @@ import javafx.stage.Stage;
 import javafx.collections.ObservableList;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.ServiceLoader;
-
-import static java.util.stream.Collectors.toList;
 
 public class InventoryController {
     private Stage stage;
@@ -58,21 +52,27 @@ public class InventoryController {
         itemTypeColumn.setCellValueFactory(new PropertyValueFactory<>("itemID"));
         itemIDColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
 
-        loadInventoryFromSOAP();
+        getInventory();
 
         invTable.setItems(inventoryItems);
 
 
     }
-    private void loadInventoryFromSOAP() {
-        List<IExecuteCommand> listImple = sendCommandImplementationsList();
+    private void getInventory() {
+        App app = App.getAppContext();
 
-        listImple.get(0).sendCommand("readFrom", "getInventory",
-                "http://localhost:8081/Service.asmx");
+        JsonObject response = new JsonObject();
 
-        SOAP soap = new SOAP();
+        System.out.println(app.getConfiguration().getIExecuteCommandImplementationsList());
 
-        JsonObject response = soap.readFrom("http://localhost:8081/Service.asmx", "getInventory");
+        for (IExecuteCommand implementation : app.getConfiguration().getIExecuteCommandImplementationsList()) {
+            System.out.println("Got run");
+            System.out.println(app.getConfiguration().getIExecuteCommandImplementationsList().stream().findAny());
+            if (implementation.getClass().getModule().getName().equals("Warehouse")) {
+                response = implementation.sendCommand("readFrom", "getInventory", "http://localhost:8081/Service.asmx");
+            }
+        }
+
 
         if (response != null && response.has("Inventory")) {
             JsonArray itemsArray = response.getAsJsonArray("Inventory");
@@ -83,11 +83,7 @@ public class InventoryController {
                 inventoryItems.add(new InventoryItem(id, name));
             }
         } else {
-            System.err.println("Could not fetch items from SOAP: " + response);
+            System.err.println("Could not fetch items: " + response);
         }
-    }
-
-    public List<IExecuteCommand> sendCommandImplementationsList() {
-        return ServiceLoader.load(IExecuteCommand.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 }

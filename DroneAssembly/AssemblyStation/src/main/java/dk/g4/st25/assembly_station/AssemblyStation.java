@@ -1,5 +1,6 @@
 package dk.g4.st25.assembly_station;
 
+import com.google.gson.JsonObject;
 import dk.g4.st25.common.machine.Drone;
 import dk.g4.st25.common.machine.MachineSPI;
 import dk.g4.st25.common.util.Connection;
@@ -35,17 +36,17 @@ public class AssemblyStation implements MachineSPI, IMonitorStatus, IExecuteComm
     //3.7) AssemblyLine places product for pick-up
     //3.8) AssemblyLine sends task completion signal
 
-    AssemblyStation(Connection connection) {
-        this.connection = connection;
-        this.productionStatus = new HashMap<>();
-        this.systemStatus = SystemStatus.IDLE;
-        this.command = "";
-        this.inventory = new ArrayList<>();
-        this.trays = new Tray[2]; // Two trays?
-        this.NeedsMoreComponents = true;
-        this.ProductReadyForPickup = false;
-        this.AvailableTray = true;
-    }
+//    public AssemblyStation(Connection connection) {
+//        this.connection = connection;
+//        this.productionStatus = new HashMap<>();
+//        this.systemStatus = SystemStatus.IDLE;
+//        this.command = "";
+//        this.inventory = new ArrayList<>();
+//        this.trays = new Tray[2]; // Two trays?
+//        this.NeedsMoreComponents = true;
+//        this.ProductReadyForPickup = false;
+//        this.AvailableTray = true;
+//    }
 
     @Override
     public int taskCompletion() {
@@ -62,9 +63,9 @@ public class AssemblyStation implements MachineSPI, IMonitorStatus, IExecuteComm
     }
 
     @Override
-    public int sendCommand(String commandType, String commandParam, String endpoint) {
+    public JsonObject sendCommand(String commandType, String commandParam, String endpoint) {
         //
-        return 0;
+        return null;
     }
 
     @Override

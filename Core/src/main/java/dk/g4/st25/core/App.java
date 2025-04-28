@@ -8,10 +8,14 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
-import static javafx.application.Application.launch;
-
 public class App extends Application {
+
+    private static App appContext = new App();
+
+    private final Configuration configuration = new Configuration();
+
     public static void main(String[] args) {
+
         launch(args);
     }
     public void start(Stage stage) {
@@ -23,5 +27,13 @@ public class App extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public static App getAppContext() {
+        return appContext;
     }
 }

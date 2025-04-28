@@ -12,12 +12,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AGV implements MachineSPI, IExecuteCommand, IMonitorStatus, IScheduleProduction {
-    private final REST protocol;
+    private final REST protocol = new REST();
     private boolean hasProgram = false;
 
-    AGV(REST rest) {
-        this.protocol = rest;
-    }
+//    AGV(REST rest) {
+//        this.protocol = rest;
+//    }
 
     public JsonObject getStatus() {
         return protocol.get();
@@ -96,13 +96,13 @@ public class AGV implements MachineSPI, IExecuteCommand, IMonitorStatus, ISchedu
     }
 
     public static void main(String[] args) {
-        AGV agv = new AGV(new REST());
-        System.out.println(agv.getStatus());
+//        AGV agv = new AGV(new REST());
+//        System.out.println(agv.getStatus());
     }
 
     @Override
-    public int sendCommand(String commandType, String commandParam, String endpoint) {
-        return 0;
+    public JsonObject sendCommand(String commandType, String commandParam, String endpoint) {
+        return null;
     }
 
     @Override

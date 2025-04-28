@@ -5,7 +5,7 @@ import com.google.gson.JsonParser;
 import dk.g4.st25.common.protocol.ProtocolSPI;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
-import kong.unirest.json.JSONObject;
+//import kong.unirest.json.JsonObject;
 
 public class SOAP implements ProtocolSPI {
 
@@ -31,9 +31,11 @@ public class SOAP implements ProtocolSPI {
         // {"action":"pick", "trayId":2}
         // or {"action":"insert", "trayId":2, "itemName":"Cupcake"}
         try {
-            JSONObject json = new JSONObject(message);
-            String action = json.getString("action");
-            int trayId = json.getInt("trayId");
+            JsonObject json = new JsonObject();
+
+            json = new JsonParser().parseString(message).getAsJsonObject();
+            String action = json.get("action").getAsString();
+            int trayId = json.get("trayId").getAsInt();
 
             // Checks if the user choses to "pick" an item from the warehouse
             if ("pick".equalsIgnoreCase(action)) {
@@ -41,7 +43,7 @@ public class SOAP implements ProtocolSPI {
             }
             // Checks if the user choses to "insert" an item into the warehouse
             else if ("insert".equalsIgnoreCase(action)) {
-                String name = json.getString("itemName");
+                String name = json.get("itemName").getAsString();
                 soapService.insertItem(trayId, name);
             }
             // Does not know what action to perform:
@@ -70,8 +72,8 @@ public class SOAP implements ProtocolSPI {
             // If the method is getInventory, then do the following:
             if ("getInventory".equalsIgnoreCase(method)) {
                 // Creates a JsonObject
-                JSONObject jsonInventory = soapService.getInventory();
-                // As the readfrom is a "JsonObject" and not a JSONObject, it is then a gson
+                JsonObject jsonInventory = soapService.getInventory();
+                // As the readfrom is a "JsonObject" and not a JsonObject, it is then a gson
                 // This is parsed as a gson then
                 return JsonParser.parseString(jsonInventory.toString()).getAsJsonObject();
             }

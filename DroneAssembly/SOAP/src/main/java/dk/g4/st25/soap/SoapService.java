@@ -1,17 +1,20 @@
 package dk.g4.st25.soap;
 
+import com.google.gson.JsonParser;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
+
+import com.google.gson.JsonObject;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 
-import kong.unirest.json.JSONObject;
+//import kong.unirest.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 public class SoapService {
-    public JSONObject getInventory() {
+    public JsonObject getInventory() {
         try {
             HttpResponse<String> response = Unirest.post("http://localhost:8081/Service.asmx")
                     .header("Content-Type", "text/xml; charset=utf-8")
@@ -41,25 +44,27 @@ public class SoapService {
                 if (nl.getLength() > 0) {
                     String jsonString = nl.item(0).getTextContent();
                     // Return the parsed JSON
-                    return new JSONObject(jsonString);
+                    JsonObject json = new JsonParser().parseString(jsonString).getAsJsonObject();
+
+                    return json;
 
                 } else {
                     // Error handling if getInventory is not found
-                    JSONObject errorJson = new JSONObject();
-                    errorJson.put("error", "GetInventoryResult element not found");
+                    JsonObject errorJson = new JsonObject();
+                    errorJson.addProperty("error", "GetInventoryResult element not found");
                     return errorJson;
                 }
             } else {
                     // Error handling if the getStatus does not equal 200
-                    JSONObject errorJson = new JSONObject();
-                    errorJson.put("error", response.getStatusText());
+                    JsonObject errorJson = new JsonObject();
+                    errorJson.addProperty("error", response.getStatusText());
                     return errorJson;
                 }
         } catch (Exception e) {
             // catch block for the try-catch
             // Needed for handling JSON object
-            JSONObject errorJson = new JSONObject();
-            errorJson.put("exception", e.getMessage());
+            JsonObject errorJson = new JsonObject();
+            errorJson.addProperty("exception", e.getMessage());
             return errorJson;
         }
     }

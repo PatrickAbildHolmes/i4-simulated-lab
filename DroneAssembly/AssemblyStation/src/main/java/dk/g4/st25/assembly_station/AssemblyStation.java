@@ -6,6 +6,7 @@ import dk.g4.st25.common.protocol.Protocol;
 import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class AssemblyStation extends Machine implements MachineSPI, IMonitorStatus, IExecuteCommand, ItemConfirmationI {
@@ -14,14 +15,16 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
     public enum SystemStatus {
         IDLE,
         AWAITING_PARTS,
+        READY,
         ASSEMBLING,
-        AWAITING_PICKUP;
+        AWAITING_PICKUP,
+        ERROR
     }
 
     private Tray[] trays; // Trays for delivery and pick-up. Fixed number
-    private Boolean NeedsMoreComponents;
-    private Boolean ProductReadyForPickup;
-    private Boolean AvailableTray;
+    private boolean needsMoreComponents;
+    private boolean productReadyForPickup;
+    private Object mostRecentlyReceived;
 
     AssemblyStation(Protocol protocol) {
         this.protocol = protocol;
@@ -29,10 +32,10 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
         this.processNumber = 1;
         this.command = "";
         this.inventory = new HashMap<>();
+        this.inventory.put("DroneComponents",0);
         this.trays = new Tray[2]; // Two trays?
-        this.NeedsMoreComponents = true;
-        this.ProductReadyForPickup = false;
-        this.AvailableTray = true;
+        this.needsMoreComponents = true;
+        this.productReadyForPickup = false;
     }
     // From README section: 'Sequence (actions) with checks'
     //3) Assembly assemble product
@@ -62,17 +65,36 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
     }
 
     @Override
-    public boolean confirmItemDelivery() {
-        // Confirm that correct item type was delivered
-        //      AssemblyStation will only every receive parts,
-        //      and Warehouse only every products.
-        // Called by coordinator. If true, check Item Quantity
-        return true;
+    public boolean confirmItemDelivery() { // Add object to parameter
+        for (Tray tray : trays) {
+            if (tray.isAvailable()) {
+                tray.setContent(new DroneComponent()); // Adds received item to tray. Placeholder until AGV can transfer object
+                tray.setAvailable(false);
+                if (mostRecentlyReceived instanceof DroneComponent) {
+                    // Add it to inventory
+                    this.inventory.put("DroneComponents", this.inventory.get("DroneComponents") + 1);
+                    return true;
+                } else {
+                    tray.setContent(null); // remove the incorrect item
+                    tray.setAvailable(true);
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void setMostRecentlyReceived(Object mostRecentlyReceived) {
+        // Used by Coordinator when AGV hands off item
+        this.mostRecentlyReceived = mostRecentlyReceived;
     }
 
     public boolean confirmItemQuantity() {
-        return true;
+        // How many Drone components to make a Drone?
+        int componentsNeeded = 1;
+        return this.inventory.get("DroneComponents") >= componentsNeeded;
     }
+
 
     @Override
     public int sendCommand(String commandType, String commandParam) {

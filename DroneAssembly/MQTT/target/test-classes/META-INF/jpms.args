@@ -1,4 +1,0 @@
---patch-module
-MQTT=_
---add-reads
-MQTT=ALL-UNNAMED

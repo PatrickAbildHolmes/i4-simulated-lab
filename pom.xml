@@ -114,9 +114,6 @@
                 <fileset>
                   <directory>${project.basedir}/mods-mvn</directory>
                 </fileset>
-                <fileset>
-                  <directory>${project.basedir}/libs</directory>
-                </fileset>
               </filesets>
             </configuration>
           </plugin>
@@ -177,25 +174,9 @@
             </goals>
             <configuration>
               <includeArtifactIds>javafx-controls,javafx-graphics,javafx-base,javafx-fxml,
-                gson,unirest-java,java-dotenv,spring-web,kotlin-stdlib,httpclient,httpcore,httpasyncclient </includeArtifactIds>
+                gson,unirest-java,java-dotenv,spring-web,kotlin-stdlib,httpclient,httpcore,httpasyncclient,httpcore-nio,
+                commons-logging,httpmime </includeArtifactIds>
               <outputDirectory>${project.parent.basedir}/mods-mvn</outputDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.openjfx</groupId>
-                  <artifactId>javafx-controls</artifactId>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>libs</outputDirectory>
-                </artifactItem>
-              </artifactItems>
             </configuration>
           </execution>
         </executions>

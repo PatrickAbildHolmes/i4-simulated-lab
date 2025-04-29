@@ -43,6 +43,11 @@
       <version>2.11.0</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-stdlib</artifactId>
+      <version>1.9.22</version> <!-- or a version compatible with your tools -->
+    </dependency>
       <dependency>
           <groupId>dk.g4.st25.soap</groupId>
           <artifactId>SOAP</artifactId>

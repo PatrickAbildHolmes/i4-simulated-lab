@@ -13,4 +13,5 @@ module Core {
     requires Common;
     requires com.google.gson;
     requires java.sql;
+    requires kotlin.stdlib;
 }

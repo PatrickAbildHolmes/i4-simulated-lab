@@ -1,20 +1,17 @@
 package dk.g4.st25.soap;
 
-import com.google.gson.JsonParser;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
-
-import com.google.gson.JsonObject;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 
-//import kong.unirest.json.JSONObject;
+import kong.unirest.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 public class SoapService {
-    public JsonObject getInventory() {
+    public JSONObject getInventory() {
         try {
             HttpResponse<String> response = Unirest.post("http://localhost:8081/Service.asmx")
                     .header("Content-Type", "text/xml; charset=utf-8")
@@ -44,27 +41,25 @@ public class SoapService {
                 if (nl.getLength() > 0) {
                     String jsonString = nl.item(0).getTextContent();
                     // Return the parsed JSON
-                    JsonObject json = new JsonParser().parseString(jsonString).getAsJsonObject();
-
-                    return json;
+                    return new JSONObject(jsonString);
 
                 } else {
                     // Error handling if getInventory is not found
-                    JsonObject errorJson = new JsonObject();
-                    errorJson.addProperty("error", "GetInventoryResult element not found");
+                    JSONObject errorJson = new JSONObject();
+                    errorJson.put("error", "GetInventoryResult element not found");
                     return errorJson;
                 }
             } else {
-                    // Error handling if the getStatus does not equal 200
-                    JsonObject errorJson = new JsonObject();
-                    errorJson.addProperty("error", response.getStatusText());
-                    return errorJson;
-                }
+                // Error handling if the getStatus does not equal 200
+                JSONObject errorJson = new JSONObject();
+                errorJson.put("error", response.getStatusText());
+                return errorJson;
+            }
         } catch (Exception e) {
             // catch block for the try-catch
             // Needed for handling JSON object
-            JsonObject errorJson = new JsonObject();
-            errorJson.addProperty("exception", e.getMessage());
+            JSONObject errorJson = new JSONObject();
+            errorJson.put("exception", e.getMessage());
             return errorJson;
         }
     }
@@ -116,7 +111,7 @@ public class SoapService {
             soapService.pickItem(i+1);
         }
         String[] newItems = {"Rollade", "Trøffel", "Cupcake", "Lagkage", "Chokolade kage",
-                    "Cookie dough", "Ben and Jerry's", "Frysepizza", "Chips", "Brunsviger"};
+                "Cookie dough", "Ben and Jerry's", "Frysepizza", "Chips", "Brunsviger"};
         for (int i = 0; i< newItems.length; i++){
             soapService.insertItem(i + 1,newItems[i]);
         }

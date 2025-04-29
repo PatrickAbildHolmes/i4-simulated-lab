@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import dk.g4.st25.common.protocol.ProtocolSPI;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
+import kong.unirest.json.JSONObject;
 //import kong.unirest.json.JsonObject;
 
 public class SOAP implements ProtocolSPI {
@@ -71,11 +72,14 @@ public class SOAP implements ProtocolSPI {
         try {
             // If the method is getInventory, then do the following:
             if ("getInventory".equalsIgnoreCase(method)) {
+                System.out.println("INSIDE JSON SOAP");
+
                 // Creates a JsonObject
-                JsonObject jsonInventory = soapService.getInventory();
+                JSONObject jsonInventory = soapService.getInventory();
                 // As the readfrom is a "JsonObject" and not a JsonObject, it is then a gson
                 // This is parsed as a gson then
-                return JsonParser.parseString(jsonInventory.toString()).getAsJsonObject();
+                System.out.println("Json Inventory: " + jsonInventory.toString());
+                return null;
             }
             return null;
 

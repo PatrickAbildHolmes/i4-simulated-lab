@@ -23,14 +23,14 @@
   <modules>
     <module>Core</module>
     <module>Common</module>
-    <module>DroneAssembly/AGV</module>
-    <module>DroneAssembly/CommonMachine</module>
-    <module>DroneAssembly/CommonProtocol</module>
-    <module>DroneAssembly/MQTT</module>
-    <module>DroneAssembly/REST</module>
-    <module>DroneAssembly/SOAP</module>
-    <module>DroneAssembly/Warehouse</module>
-    <module>DroneAssembly/AssemblyStation</module>
+    <module>AGV</module>
+    <module>CommonMachine</module>
+    <module>CommonProtocol</module>
+    <module>MQTT</module>
+    <module>REST</module>
+    <module>SOAP</module>
+    <module>Warehouse</module>
+    <module>AssemblyStation</module>
   </modules>
 
   <dependencyManagement>
@@ -71,6 +71,26 @@
         <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
         <version>1.2.5</version>
         <scope>compile</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-stdlib</artifactId>
+        <version>1.9.22</version> <!-- or a version compatible with your tools -->
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>4.5.13</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpcore</artifactId>
+        <version>4.4.13</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpasyncclient</artifactId>
+        <version>4.1.4</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -156,7 +176,8 @@
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>javafx-controls,javafx-graphics,javafx-base,javafx-fxml,gson,unirest-java,java-dotenv,spring-web</includeArtifactIds>
+              <includeArtifactIds>javafx-controls,javafx-graphics,javafx-base,javafx-fxml,
+                gson,unirest-java,java-dotenv,spring-web,kotlin-stdlib,httpclient,httpcore,httpasyncclient </includeArtifactIds>
               <outputDirectory>${project.parent.basedir}/mods-mvn</outputDirectory>
             </configuration>
           </execution>
@@ -172,7 +193,7 @@
                   <groupId>org.openjfx</groupId>
                   <artifactId>javafx-controls</artifactId>
                   <overWrite>true</overWrite>
-                  <outputDirectory>${project.parent.basedir}/libs</outputDirectory>
+                  <outputDirectory>libs</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>

@@ -7,7 +7,7 @@ module Warehouse {
     requires CommonMachine;
     requires CommonProtocol;
     requires SOAP;
-   // requires unirest.java;
+    requires unirest.java;
     requires com.google.gson;
     provides MachineSPI with dk.g4.st25.warehouse.Warehouse;
     provides IExecuteCommand with dk.g4.st25.warehouse.Warehouse;

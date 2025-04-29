@@ -42,16 +42,17 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
 
     @Override
     public int productionCompletion() {
-        // Fetch the current inventory from the SOAP service
-        JsonObject inventory = soapTest.getInventory();
-        // Check if the number of fetched items matches the inventory size
-        if (inventory != null && inventory.size() == itemsFetched) {
-            System.out.println("All requested items have been fetched.");
-            return 1; // Success
-        } else {
-            System.out.println("Not all items have been fetched yet.");
-            return 0; // Incomplete
-        }
+//        // Fetch the current inventory from the SOAP service
+//        JsonObject inventory = soapTest.getInventory();
+//        // Check if the number of fetched items matches the inventory size
+//        if (inventory != null && inventory.size() == itemsFetched) {
+//            System.out.println("All requested items have been fetched.");
+//            return 1; // Success
+//        } else {
+//            System.out.println("Not all items have been fetched yet.");
+//            return 0; // Incomplete
+//        }
+        return 0;
     }
 
     @Override
@@ -63,9 +64,12 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
 //        }
 //        // Return -1 for unknown commands
 //        return null;
+        System.out.println("PROTOCOLS: " + getProtocolSPIImplementationsList());
         for (ProtocolSPI implementation : getProtocolSPIImplementationsList()) {
+            System.out.println("Inside protocol loop");
             if (implementation.getClass().getModule().getName().equals("SOAP")) {
-                return implementation.readFrom(commandParam, endpoint);
+                System.out.println("SOAP found!!");
+                return implementation.readFrom(endpoint, commandParam);
             }
         }
         return null;
@@ -93,11 +97,11 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
     @Override
     public String getCurrentProductionStatus() {
         // Fetch the current inventory from the SOAP service
-        JsonObject inventory = soapTest.getInventory();
-        // Return the number of items in the inventory if available
-        if (inventory != null) {
-            return "Items in inventory: " + inventory.size();
-        }
+//        JsonObject inventory = soapTest.getInventory();
+//        // Return the number of items in the inventory if available
+//        if (inventory != null) {
+//            return "Items in inventory: " + inventory.size();
+//        }
         // Return an error message if the inventory cannot be fetched
         return "Unable to fetch inventory status";
     }

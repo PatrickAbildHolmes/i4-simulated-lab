@@ -69,7 +69,8 @@ public class InventoryController {
             System.out.println("Got run");
             System.out.println(app.getConfiguration().getIExecuteCommandImplementationsList().stream().findAny());
             if (implementation.getClass().getModule().getName().equals("Warehouse")) {
-                response = implementation.sendCommand("readFrom", "getInventory", "http://localhost:8081/Service.asmx");
+                System.out.println("TEST");
+                response = implementation.sendCommand("readFrom", "GetInventory", "http://localhost:8081/Service.asmx");
             }
         }
 

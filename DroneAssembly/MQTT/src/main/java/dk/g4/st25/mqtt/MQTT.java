@@ -1,5 +1,6 @@
 package dk.g4.st25.mqtt;
 
+import com.google.gson.Gson;
 import dk.g4.st25.common.protocol.Protocol;
 import dk.g4.st25.common.protocol.ProtocolSPI;
 import org.eclipse.paho.client.mqttv3.*;
@@ -11,23 +12,23 @@ public class MQTT extends Protocol implements ProtocolSPI {
     private MqttClient client;
 
     // Constructor to create a MQTT object
-    public MQTT(String endpointPort){
-        try {
+    public MQTT(){
+//        try {
             // Creates a broker with the endpoint port on localhost using tcp
-            String endpoint = "tcp://localhost:" + endpointPort;
+//            String endpoint = "tcp://localhost:" + endpointPort;
             // Assigns the client to the broker with the client ID
-            this.client = new MqttClient(endpoint, MqttClient.generateClientId());
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
+//            this.client = new MqttClient(endpoint, MqttClient.generateClientId());
+//        } catch (MqttException e) {
+//            e.printStackTrace();
+//        }
     }
-
 
     @Override
     public int connect(String endpoint) {
-        // Endpoint is never used, and it is irrelevant to have it in the connect method.
-        // Maybe it should be deleted in ProtocolSPI
+        // endpoint is the address of the intended machine, e.g.:"tcp://localhost:1883"
         try {
+            // Assigns the client to the broker with the client ID
+            this.client = new MqttClient(endpoint, MqttClient.generateClientId());
             // Create a new MqttConnectOptions object which will store all connection settings
             MqttConnectOptions options = new MqttConnectOptions();
             // The broker will remove all information about this client when it disconnects
@@ -50,7 +51,11 @@ public class MQTT extends Protocol implements ProtocolSPI {
          The endpoint is saved in the MQTTClient instance, and it is thereby not needed
          Topic is needed instead, as the client needs to know which topic to publish to */
 
-        // Creates a new MQTT message with the JSON message
+        // Convert String message to JSON
+        Gson gson = new Gson();
+        message = gson.toJson(message);
+
+        // Creates Mqtt message by converting String message to bytes format
         MqttMessage mqttMessage = new MqttMessage(message.getBytes());
         // Sets the Quality of Service for the MQTT message to level 2
         // Guarantees that the message will be delivered exactly once
@@ -87,7 +92,21 @@ public class MQTT extends Protocol implements ProtocolSPI {
     }
 
     @Override
-    public JsonObject readFrom(String endpoint, String method) {
+    public JsonObject readFrom(String topic, String method) {
+        // Method is unused. Topic must be either "emulator/checkhealth" or "emulator/status"
+        if (subscribeToTopic(topic)==1) {
+            try {
+                // Waits for response, converts it to a String, and then to a JSON that is returned
+                IMqttToken response = client.subscribeWithResponse(topic);
+                response.waitForCompletion();
+                String stringified =response.toString();
+                Gson gson = new Gson();
+                JsonObject returnStatement = gson.fromJson(stringified, JsonObject.class);
+                return returnStatement;
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+        }
         return null;
     }
 }

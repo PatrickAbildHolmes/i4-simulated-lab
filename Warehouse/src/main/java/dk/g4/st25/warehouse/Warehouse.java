@@ -2,12 +2,10 @@ package dk.g4.st25.warehouse;
 
 import com.google.gson.JsonObject;
 import dk.g4.st25.common.machine.MachineSPI;
-import dk.g4.st25.common.protocol.Protocol;
 import dk.g4.st25.common.protocol.ProtocolSPI;
 import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
 import dk.g4.st25.soap.SoapService;
-//import kong.unirest.json.JSONObject;
 
 
 import java.util.ArrayList;
@@ -21,12 +19,13 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
     private final SoapService soapTest = new SoapService();
     // Counter to track the number of items successfully fetched
     private int itemsFetched = 0;
+    private final String endpoint = "http://localhost:8081/Service.asmx";
 
     @Override
     public int taskCompletion() {
         try {
             // Attempt to fetch an item from tray 1
-            soapTest.pickItem(1);
+            soapTest.pickItem(1, endpoint);
 
             // Increment the counter if no exception is thrown
             itemsFetched++;
@@ -56,7 +55,7 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
     }
 
     @Override
-    public JsonObject sendCommand(String commandType, String commandParam, String endpoint) {
+    public JsonObject sendCommand(String commandType, String commandParam) {
 //        // Handle the "refresh" command to refresh the inventory
 //        if ("refresh".equalsIgnoreCase(commandType)) {
 //            soapTest.refreshInventory();
@@ -64,64 +63,35 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
 //        }
 //        // Return -1 for unknown commands
 //        return null;
-        System.out.println("PROTOCOLS: " + getProtocolSPIImplementationsList());
+
+        /*System.out.println("PROTOCOLS: " + getProtocolSPIImplementationsList());
         for (ProtocolSPI implementation : getProtocolSPIImplementationsList()) {
             System.out.println("Inside protocol loop");
             if (implementation.getClass().getModule().getName().equals("SOAP")) {
                 System.out.println("SOAP found!!");
                 return implementation.readFrom(endpoint, commandParam);
             }
+        }*/
+        if (commandType.equalsIgnoreCase("readFrom")) {
+            for (ProtocolSPI implementation : getProtocolSPIImplementationsList()) {
+                if (implementation.getClass().getModule().getName().equals("SOAP")) {
+                    return implementation.readFrom(endpoint, commandParam);
+                }
+            }
         }
         return null;
     }
 
     @Override
-    public ArrayList<String> getCurrentSystemStatus() {
+    public String getCurrentSystemStatus() {
         // Create a list to store system status messages
-        ArrayList<String> statusList = new ArrayList<>();
-        statusList.add("Warehouse operational");
-        statusList.add("Items fetched: " + itemsFetched);
-        return statusList;
+        return "OPERATING";
     }
 
     @Override
-    public String getCurrentSystemStatus(String machineId) {
-        // Return the status of the warehouse if the machine ID matches
-        if ("Warehouse".equalsIgnoreCase(machineId)) {
-            return "Warehouse operational, Items fetched: " + itemsFetched;
-        }
-        // Return an error message for unknown machine IDs
-        return "Unknown machine ID";
-    }
-
-    @Override
-    public String getCurrentProductionStatus() {
-        // Fetch the current inventory from the SOAP service
-//        JsonObject inventory = soapTest.getInventory();
-//        // Return the number of items in the inventory if available
-//        if (inventory != null) {
-//            return "Items in inventory: " + inventory.size();
-//        }
-        // Return an error message if the inventory cannot be fetched
-        return "Unable to fetch inventory status";
-    }
-
-    @Override
-    public ArrayList<String> getCurrentConnectionStatus() {
+    public String getCurrentConnectionStatus() {
         // Create a list to store connection status messages
-        ArrayList<String> connectionStatus = new ArrayList<>();
-        connectionStatus.add("SOAP connection: Active");
-        return connectionStatus;
-    }
-
-    @Override
-    public String getCurrentConnectionStatus(String machineId) {
-        // Return the connection status of the warehouse if the machine ID matches
-        if ("Warehouse".equalsIgnoreCase(machineId)) {
-            return "SOAP connection: Active";
-        }
-        // Return an error message for unknown machine IDs
-        return "Unknown machine ID";
+        return "Soap Active";
     }
 
     public Collection<? extends ProtocolSPI> getProtocolSPIImplementationsList() {

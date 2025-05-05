@@ -1,7 +1,6 @@
 module Core {
     uses dk.g4.st25.common.services.IExecuteCommand;
     uses dk.g4.st25.common.services.IMonitorStatus;
-    uses dk.g4.st25.common.services.IScheduleProduction;
 
 
     requires javafx.graphics;

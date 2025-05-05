@@ -2,7 +2,6 @@ package dk.g4.st25.core;
 
 import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
-import dk.g4.st25.common.services.IScheduleProduction;
 
 import java.sql.SQLOutput;
 import java.util.Collection;
@@ -24,9 +23,5 @@ public class Configuration {
 
     public List<IMonitorStatus> getIMonitorStatusImplementationsList () {
         return ServiceLoader.load(IMonitorStatus.class).stream().map(ServiceLoader.Provider::get).collect(toList());
-    }
-
-    public List<IScheduleProduction> getIScheduleProductionImplementationsList () {
-        return ServiceLoader.load(IScheduleProduction.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 }

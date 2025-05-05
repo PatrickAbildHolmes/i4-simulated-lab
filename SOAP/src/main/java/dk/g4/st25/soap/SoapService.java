@@ -2,29 +2,32 @@ package dk.g4.st25.soap;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
-
 import kong.unirest.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 public class SoapService {
-    public JSONObject getInventory() {
+    private String headerSoapActionURL = "http://tempuri.org/IEmulatorService/";
+
+    private HttpResponse<String> buildAndPostHttpResponse(String headerSoapAction, String bodyInput, String endpoint) {
+        HttpResponse<String> httpResponse = Unirest.post(endpoint)
+                .header("Content-Type", "text/xml; charset=utf-8")
+                .header("SOAPAction", headerSoapActionURL + headerSoapAction)
+                .body("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  " +
+                        "<soap:Body>\n    " + bodyInput +
+                        "</soap:Body>\n</soap:Envelope>\n")
+                .asString(); {
+        }
+        return httpResponse;
+    }
+    public JSONObject getInventory(String endpoint) {
         try {
-            HttpResponse<String> response = Unirest.post("http://localhost:8081/Service.asmx")
-                    .header("Content-Type", "text/xml; charset=utf-8")
-                    .header("SOAPAction", "http://tempuri.org/IEmulatorService/GetInventory")
-                    .body("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  " +
-                            "<soap:Body>\n    " +
-                            "<GetInventory xmlns=\"http://tempuri.org/\"/>\n  " +
-                            "</soap:Body>\n</soap:Envelope>\n")
-                    .asString();
+            HttpResponse<String> response = buildAndPostHttpResponse("GetInventory",
+                    "<GetInventory xmlns=\"http://tempuri.org/\"/>\n  ", endpoint);
             // Check status code
             System.out.println("HTTP Status: " + response.getStatus());
-            // Print full response
-            System.out.println("SOAP Response: " + response.getBody());
             if (response.getStatus() == 200) {
                 String soapResponse = response.getBody();
 
@@ -64,19 +67,11 @@ public class SoapService {
         }
     }
 
-    public void pickItem(int trayId){
-        HttpResponse<String> response = Unirest.post("http://localhost:8081/Service.asmx")
-                .header("Content-Type", "text/xml; charset=utf-8")
-                .header("SOAPAction", "http://tempuri.org/IEmulatorService/PickItem")
-                .body("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  " +
-                        "<soap:Body>\n    " +
-                        "<PickItem xmlns=\"http://tempuri.org/\">\n      " +
-                        // TrayId is the place it takes item in the warehouse (right now it picks up nr 1)
-                        // Updated to pick on trayId
+    public void pickItem(int trayId, String endpoint){
+        HttpResponse<String> response = buildAndPostHttpResponse("PickItem",
+                "<PickItem xmlns=\"http://tempuri.org/\">\n      " +
                         "<trayId>" + trayId + "</trayId>\n    " +
-                        "</PickItem>\n  " +
-                        "</soap:Body>\n</soap:Envelope>\n")
-                .asString();
+                        "</PickItem>\n  ", endpoint);
         if (response.getStatus() == 200) {
             System.out.println(response.getBody());
         } else {
@@ -84,45 +79,37 @@ public class SoapService {
         }
     }
 
-    public void insertItem(int trayId, String name){
-        HttpResponse<String> response = Unirest.post("http://localhost:8081/Service.asmx")
-                .header("Content-Type", "text/xml; charset=utf-8")
-                .header("SOAPAction", "http://tempuri.org/IEmulatorService/InsertItem")
-                .body("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  " +
-                        "<soap:Body>\n    " +
-                        "<InsertItem xmlns=\"http://tempuri.org/\">\n      " +
-                        // TrayId is the place it takes item in the warehouse (right now it inserts into nr 1 - IT HAS TO BE EMPTY)
-                        // Updated to pick trayId
+    public void insertItem(int trayId, String name, String endpoint){
+        HttpResponse<String> response = buildAndPostHttpResponse("InsertItem",
+                "<InsertItem xmlns=\"http://tempuri.org/\">\n      " +
                         "<trayId>" + trayId + "</trayId>\n      " +
-                        // name is interchangable
                         "<name>" + name + "</name>\n    " +
-                        "</InsertItem>\n  " +
-                        "</soap:Body>\n</soap:Envelope>\n")
-                .asString();
+                        "</InsertItem>\n  ", endpoint);
         if(response.getStatus() == 200) {
             System.out.println(response.getBody());
         } else {
             System.out.println(response.getStatusText());
         }
     }
-    public void refreshInventory() {
+    public void refreshInventory(String endpoint) {
         SoapService soapService = new SoapService();
         for (int i = 0; i<10; i++){
-            soapService.pickItem(i+1);
+            soapService.pickItem(i+1, endpoint);
         }
-        String[] newItems = {"Rollade", "Trøffel", "Cupcake", "Lagkage", "Chokolade kage",
+        String[] newItems = {"Rollade" , "Trøffel", "Cupcake", "Lagkage", "Chokolade kage",
                 "Cookie dough", "Ben and Jerry's", "Frysepizza", "Chips", "Brunsviger"};
         for (int i = 0; i< newItems.length; i++){
-            soapService.insertItem(i + 1,newItems[i]);
+            soapService.insertItem(i + 1,newItems[i], endpoint);
         }
     }
 
     public static void main(String[] args) {
         SoapService soaptestforsoeg = new SoapService();
-        soaptestforsoeg.refreshInventory();
-        System.out.println(soaptestforsoeg.getInventory());
-        soaptestforsoeg.pickItem(2);
-        soaptestforsoeg.insertItem(2, "TOM");
-        System.out.println(soaptestforsoeg.getInventory());
+        String endpoint = "http://localhost:8081/Service.asmx";
+        soaptestforsoeg.refreshInventory(endpoint);
+        System.out.println(soaptestforsoeg.getInventory(endpoint));
+        //soaptestforsoeg.pickItem(2);
+        //soaptestforsoeg.insertItem(2, "TOM");
+        //System.out.println(soaptestforsoeg.getInventory(endpoint));
     }
 }

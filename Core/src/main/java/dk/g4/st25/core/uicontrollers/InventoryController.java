@@ -1,10 +1,12 @@
 package dk.g4.st25.core.uicontrollers;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import dk.g4.st25.common.services.IExecuteCommand;
+import dk.g4.st25.core.App;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -29,8 +31,6 @@ public class InventoryController {
     private TableColumn<InventoryItem, String> itemTypeColumn;
     @FXML
     private TableColumn<InventoryItem, String> itemIDColumn;
-    @FXML
-    private TableColumn<InventoryItem, Integer> amountColumn;
 
     private ObservableList<InventoryItem> inventoryItems = FXCollections.observableArrayList();
 
@@ -49,27 +49,42 @@ public class InventoryController {
         UIEffects.applyHoverEffect(backBtnInventory);
 
         // Setup table columns to the table
-        itemTypeColumn.setCellValueFactory(new PropertyValueFactory<>("itemType"));
-        itemIDColumn.setCellValueFactory(new PropertyValueFactory<>("itemID"));
-        amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        itemTypeColumn.setCellValueFactory(new PropertyValueFactory<>("itemID"));
+        itemIDColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
 
-        // Adds temporary items
-        // We remove these when we have a database
-        inventoryItems.add(new InventoryItem("JoeBalls", "1", 10));
-        inventoryItems.add(new InventoryItem("Mike Hunt", "2", 5));
-        inventoryItems.add(new InventoryItem("Hugh G. Rection", "3", 20));
+        getInventory();
 
-        // Set the items in the table
         invTable.setItems(inventoryItems);
-    }
 
-    // Method to add an item to the inventory (can be triggered by a button)
-    public void addItem(String itemType, String itemID, int amount) {
-        inventoryItems.add(new InventoryItem(itemType, itemID, amount));
-    }
 
-    // Method to remove an item by ID
-    public void removeItem(String itemID) {
-        inventoryItems.removeIf(item -> item.getItemID().equals(itemID));
+    }
+    private void getInventory() {
+        App app = App.getAppContext();
+
+        JsonObject response = new JsonObject();
+
+        System.out.println(app.getConfiguration().getIExecuteCommandImplementationsList());
+
+        for (IExecuteCommand implementation : app.getConfiguration().getIExecuteCommandImplementationsList()) {
+            System.out.println("Got run");
+            System.out.println(app.getConfiguration().getIExecuteCommandImplementationsList().stream().findAny());
+            if (implementation.getClass().getModule().getName().equals("Warehouse")) {
+                System.out.println("TEST");
+                response = implementation.sendCommand("readFrom", "GetInventory");
+            }
+        }
+
+
+        if (response != null && response.has("Inventory")) {
+            JsonArray itemsArray = response.getAsJsonArray("Inventory");
+            for (int i = 0; i < itemsArray.size(); i++) {
+                JsonObject obj = itemsArray.get(i).getAsJsonObject();
+                String id = String.valueOf(obj.get("Id").getAsInt());
+                String name = obj.get("Content").getAsString();
+                inventoryItems.add(new InventoryItem(id, name));
+            }
+        } else {
+            System.err.println("Could not fetch items: " + response);
+        }
     }
 }

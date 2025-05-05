@@ -7,11 +7,11 @@
         <version>1.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>dk.g4.st25.common</groupId>
-    <artifactId>Common</artifactId>
+    <groupId>dk.g4.st25.assembly_station</groupId>
+    <artifactId>AssemblyStation</artifactId>
     <packaging>jar</packaging>
 
-    <name>Common</name>
+    <name>AssemblyStation</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -26,8 +26,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
+            <groupId>dk.g4.st25.common</groupId>
+            <artifactId>Common</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>dk.g4.st25.common.machine</groupId>
+            <artifactId>CommonMachine</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

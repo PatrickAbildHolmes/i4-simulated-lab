@@ -2,16 +2,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
+        <relativePath>../../pom.xml</relativePath>
         <groupId>dk.g4.st25</groupId>
         <artifactId>i4-simulated-lab</artifactId>
         <version>1.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>dk.g4.st25.common</groupId>
-    <artifactId>Common</artifactId>
+    <groupId>dk.g4.st25.common.protocol</groupId>
+    <artifactId>CommonProtocol</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Common</name>
+    <name>CommonProtocol</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -28,6 +30,12 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>dk.g4.st25.common</groupId>
+            <artifactId>Common</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

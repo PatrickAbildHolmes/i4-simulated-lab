@@ -150,12 +150,11 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
     }
 
     @Override
-    public JsonObject sendCommand(String commandType, String commandParam) {
+    public JsonObject sendCommand(String commandType) {
         /**
          * commandType: whether to:
          *     "assemble": execute operation (assemble)
          *     "checkhealth": check machine health
-         * commandParam: Not used.
          */
         if (commandType.equals("assemble")) {
             if (this.systemStatus == SystemStatus.READY) {
@@ -180,6 +179,16 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
         } else {
             return null;
         }
+    }
+
+    @Override
+    public JsonObject sendCommand(String commandType, String commandName) {
+        return null;
+    }
+
+    @Override
+    public JsonObject sendCommand(String commandType, String commandName, String commandParam) {
+        return null;
     }
 
     @Override

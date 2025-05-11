@@ -11,12 +11,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AGV implements MachineSPI, IExecuteCommand, IMonitorStatus {
-    private final REST protocol = new REST();
+    private final REST protocol;
     private boolean hasProgram = false;
 
-//    AGV(REST rest) {
-//        this.protocol = rest;
-//    }
+    public AGV(REST rest) {
+        this.protocol = rest;
+    }
+
+    public AGV() {
+        this(new REST());
+    }
 
     public JsonObject getStatus() {
         return protocol.get();

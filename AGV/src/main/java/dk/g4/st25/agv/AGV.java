@@ -6,7 +6,6 @@ import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
 import dk.g4.st25.rest.REST;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 

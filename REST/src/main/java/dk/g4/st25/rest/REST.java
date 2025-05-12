@@ -54,7 +54,7 @@ public class REST implements ProtocolSPI {
 
     @Override
     public int writeTo(String message, String endpoint) {
-        return 0;
+        return 1;
     }
 
     @Override

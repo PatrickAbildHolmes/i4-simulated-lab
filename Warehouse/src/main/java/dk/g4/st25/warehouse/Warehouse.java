@@ -1,11 +1,15 @@
 package dk.g4.st25.warehouse;
 
 import com.google.gson.JsonObject;
+import dk.g4.st25.common.machine.DroneComponent;
+import dk.g4.st25.common.machine.ItemConfirmationI;
 import dk.g4.st25.common.machine.MachineSPI;
+import dk.g4.st25.common.machine.Tray;
 import dk.g4.st25.common.protocol.ProtocolSPI;
 import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
 import dk.g4.st25.soap.SoapService;
+import dk.g4.st25.soap.SOAP;
 
 
 import java.util.ArrayList;
@@ -14,19 +18,24 @@ import java.util.ServiceLoader;
 
 import static java.util.stream.Collectors.toList;
 
-public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
+public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus, ItemConfirmationI {
     // SOAP service object for interacting with the warehouse system
-    private final SoapService soapTest = new SoapService();
+    private final SOAP soapTest = new SOAP();
     // Counter to track the number of items successfully fetched
     private int itemsFetched = 0;
     private final String endpoint = "http://localhost:8081/Service.asmx";
+    private Tray[] trays; // Trays for delivery and pick-up. Fixed number
+    private Object mostRecentlyReceived;
+
+
 
     @Override
     public int taskCompletion() {
         try {
             // Attempt to fetch an item from tray 1
-            soapTest.pickItem(1, endpoint);
-
+            String message = "{\"action\":\"pick\", \"trayId\":1}";
+            soapTest.writeTo(message, endpoint);
+            //{"action":"pick", "trayId":2}
             // Increment the counter if no exception is thrown
             itemsFetched++;
             System.out.println("Item successfully fetched from tray 1.");
@@ -38,6 +47,42 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
             return 0;
         }
     }
+
+    /**
+    * Vi vil gerne tjekke for at den item der bliver puttet i et tray er i warehouset lige nu.
+    * Hvis det er, så skal den finde id'et som er placeret i warehouset og bruge writeTo kommandoen som er i message
+    *
+     * Derefter skulle den gerne følge resten af logikken fra samme metode i "assembly-line" klassen, som også har
+    * en confirmItemDelivery() metode
+     */
+    @Override
+    public boolean confirmItemDelivery() { // Add object to parameter
+        for (Tray tray: trays){
+            if (tray.isAvailable()){
+                tray.setContent(new DroneComponent());
+                tray.setAvailable(false);
+                if (mostRecentlyReceived instanceof DroneComponent){
+                    JsonObject inventory = soapTest.readFrom(endpoint, "getInventory");
+                    if (inventory.has(mostRecentlyReceived.getClass().getName())){
+                        // Item exists in warehouse
+                        return true;
+                    } else {
+                        // Item doesn't exist in warehouse
+                        tray.setContent(null);
+                        tray.setAvailable(true);
+                        return false;
+                    }
+                }else {
+                    tray.setContent(null);
+                    tray.setAvailable(true);
+                    return false;
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+
 
     @Override
     public int productionCompletion() {
@@ -52,6 +97,11 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
 //            return 0; // Incomplete
 //        }
         return 0;
+    }
+
+    @Override
+    public JsonObject sendCommand(String commandType) {
+        return null;
     }
 
     @Override
@@ -79,6 +129,11 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
                 }
             }
         }
+        return null;
+    }
+
+    @Override
+    public JsonObject sendCommand(String commandType, String commandName, String commandParam) {
         return null;
     }
 

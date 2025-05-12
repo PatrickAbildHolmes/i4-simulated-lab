@@ -1,5 +1,6 @@
 package dk.g4.st25.agv;
 
+import dk.g4.st25.common.machine.Machine;
 import dk.g4.st25.common.machine.MachineSPI;
 import com.google.gson.JsonObject;
 import dk.g4.st25.common.services.IExecuteCommand;
@@ -8,8 +9,9 @@ import dk.g4.st25.rest.REST;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
-public class AGV implements MachineSPI, IExecuteCommand, IMonitorStatus {
+public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonitorStatus {
     private final REST protocol;
     private boolean hasProgram = false;
 
@@ -50,7 +52,7 @@ public class AGV implements MachineSPI, IExecuteCommand, IMonitorStatus {
         return res;
     }
 
-    private JsonObject executeOperation(String programName) {
+    private JsonObject loadProgram(String programName) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("Program name", programName);
         requestBody.put("State", 1);
@@ -59,32 +61,44 @@ public class AGV implements MachineSPI, IExecuteCommand, IMonitorStatus {
         return res;
     }
 
+    public static void main(String[] args) {
+        AGV agv = new AGV();
+
+        agv.moveToAssembly();
+        System.out.println(agv.getStatus());
+        Scanner scanner = new Scanner(System.in);
+        scanner.next();
+        agv.execute();
+        scanner.next();
+        System.out.println(agv.getStatus());
+    }
+
     public JsonObject chargeBattery() {
-        return executeOperation("MoveToChargerOperation");
+        return loadProgram("MoveToChargerOperation");
     }
 
     public JsonObject moveToAssembly() {
-        return executeOperation("MoveToAssemblyOperation");
+        return loadProgram("MoveToAssemblyOperation");
     }
 
     public JsonObject moveToStorage() {
-        return executeOperation("MoveToStorageOperation");
+        return loadProgram("MoveToStorageOperation");
     }
 
     public JsonObject putAssembly() {
-        return executeOperation("PutAssemblyOperation");
+        return loadProgram("PutAssemblyOperation");
     }
 
     public JsonObject pickAssembly() {
-        return executeOperation("PickAssemblyOperation");
+        return loadProgram("PickAssemblyOperation");
     }
 
     public JsonObject pickWarehouse() {
-        return executeOperation("PickWarehouseOperation");
+        return loadProgram("PickWarehouseOperation");
     }
 
     public JsonObject putWarehouse() {
-        return executeOperation("PutWarehouseOperation");
+        return loadProgram("PutWarehouseOperation");
     }
 
     @Override
@@ -97,15 +111,22 @@ public class AGV implements MachineSPI, IExecuteCommand, IMonitorStatus {
         return 0;
     }
 
-    public static void main(String[] args) {
-//        AGV agv = new AGV(new REST());
-//        System.out.println(agv.getStatus());
-    }
 
     @Override
-    public JsonObject sendCommand(String commandType, String commandParam) {
+    public JsonObject sendCommand(String commandType) {
         return null;
     }
+    @Override
+    public JsonObject sendCommand(String commandType, String commandName) {
+        if (commandType.equals("writeTo")) {
+        }
+        return null;
+    }
+    @Override
+    public JsonObject sendCommand(String commandType, String commandName, String commandParam) {
+        return null;
+    }
+
 
     @Override
     public String getCurrentSystemStatus() {

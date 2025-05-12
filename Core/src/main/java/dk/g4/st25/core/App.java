@@ -15,7 +15,6 @@ public class App extends Application {
     private final Configuration configuration = new Configuration();
 
     public static void main(String[] args) {
-
         launch(args);
     }
     public void start(Stage stage) {

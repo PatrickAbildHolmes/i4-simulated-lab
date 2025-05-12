@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
         <groupId>dk.g4.st25</groupId>
         <artifactId>i4-simulated-lab</artifactId>
         <version>1.0.1-SNAPSHOT</version>
@@ -21,12 +21,6 @@
     </properties>
   
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>dk.g4.st25.common</groupId>
             <artifactId>Common</artifactId>

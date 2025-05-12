@@ -32,8 +32,8 @@
          <children>
             <VBox spacing="10.0">
                <children>
-                    <Label text="Production ID" />
-                    <TextField fx:id="prodIdPara" promptText="Insert Production ID" />
+                    <Label text="Production name" />
+                    <TextField fx:id="prodNamePara" promptText="Insert Production name" />
                </children>
             </VBox>
             <VBox spacing="10.0">

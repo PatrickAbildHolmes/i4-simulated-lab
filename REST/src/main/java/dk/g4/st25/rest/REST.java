@@ -22,7 +22,7 @@ public class REST implements ProtocolSPI {
         try {
             this.apiUrl = Dotenv.load().get(apiKey);
         } catch (Exception e) {
-            this.apiUrl = Dotenv.configure().directory("../../").load().get(apiKey);
+            this.apiUrl = Dotenv.configure().directory("../").load().get(apiKey);
         }
     }
 

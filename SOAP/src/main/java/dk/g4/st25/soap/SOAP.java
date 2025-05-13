@@ -2,13 +2,14 @@ package dk.g4.st25.soap;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import dk.g4.st25.common.protocol.Protocol;
 import dk.g4.st25.common.protocol.ProtocolSPI;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.json.JSONObject;
 //import kong.unirest.json.JsonObject;
 
-public class SOAP implements ProtocolSPI {
+public class SOAP extends Protocol implements ProtocolSPI {
 
     private final SoapService soapService = new SoapService();
     @Override

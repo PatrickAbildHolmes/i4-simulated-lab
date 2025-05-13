@@ -1,5 +1,6 @@
 package dk.g4.st25.warehouse;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dk.g4.st25.common.machine.DroneComponent;
 import dk.g4.st25.common.machine.ItemConfirmationI;
@@ -65,6 +66,9 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus, I
                     JsonObject inventory = soapTest.readFrom(endpoint, "getInventory");
                     if (inventory.has(mostRecentlyReceived.getClass().getName())){
                         // Item exists in warehouse
+                        JsonElement pickedItem = inventory.get(mostRecentlyReceived.getClass().getName());
+                        String message = "{\"action\":\"pick\", \"trayId\":"+ pickedItem.getAsJsonObject().get("trayId") +"}";
+                        soapTest.writeTo(message, endpoint);
                         return true;
                     } else {
                         // Item doesn't exist in warehouse

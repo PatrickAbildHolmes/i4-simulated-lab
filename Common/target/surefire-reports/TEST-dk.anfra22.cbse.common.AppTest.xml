@@ -1,39 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="dk.anfra22.cbse.common.AppTest" time="0.066" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="dk.anfra22.cbse.common.AppTest" time="0.042" tests="1" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="23"/>
-    <property name="sun.jnu.encoding" value="UTF-8"/>
-    <property name="java.class.path" value="/home/silas/Documents/i4-simulated-lab/Common/target/test-classes:/home/silas/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="java.class.path" value="C:\Users\ander\OneDrive\Skrivebord\Softwareteknologi\4-Semester\Semester Project\Project Code\i4-simulated-lab\Common\target\test-classes;C:\Users\ander\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
     <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
     <property name="java.vendor.url" value="https://java.oracle.com/"/>
+    <property name="user.timezone" value="Europe/Copenhagen"/>
+    <property name="user.country.format" value="DK"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="23"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="C:\Users\ander\.jdks\openjdk-23.0.2\bin"/>
+    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter C:\Users\ander\AppData\Local\Temp\surefire11467140674699508475 2025-05-13T10-38-09_768-jvmRun1 surefire-20250513103810012_1tmp surefire_0-20250513103810012_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="C:\Users\ander\OneDrive\Skrivebord\Softwareteknologi\4-Semester\Semester Project\Project Code\i4-simulated-lab\Common\target\test-classes;C:\Users\ander\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\ander"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="jdk.module.path" value="C:\Users\ander\OneDrive\Skrivebord\Softwareteknologi\4-Semester\Semester Project\Project Code\i4-simulated-lab\Common\target\classes;C:\Users\ander\.m2\repository\com\google\code\gson\gson\2.11.0\gson-2.11.0.jar;C:\Users\ander\.m2\repository\com\google\errorprone\error_prone_annotations\2.27.0\error_prone_annotations-2.27.0.jar"/>
+    <property name="java.version.date" value="2025-01-21"/>
+    <property name="java.home" value="C:\Users\ander\.jdks\openjdk-23.0.2"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\ander\OneDrive\Skrivebord\Softwareteknologi\4-Semester\Semester Project\Project Code\i4-simulated-lab\Common"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
-    <property name="surefire.real.class.path" value="/home/silas/.m2/repository/org/apache/maven/surefire/surefire-booter/3.2.5/surefire-booter-3.2.5.jar:/home/silas/.m2/repository/org/apache/maven/surefire/surefire-api/3.2.5/surefire-api-3.2.5.jar:/home/silas/.m2/repository/org/apache/maven/surefire/surefire-logger-api/3.2.5/surefire-logger-api-3.2.5.jar:/home/silas/.m2/repository/org/apache/maven/surefire/surefire-shared-utils/3.2.5/surefire-shared-utils-3.2.5.jar:/home/silas/.m2/repository/org/apache/maven/surefire/surefire-extensions-spi/3.2.5/surefire-extensions-spi-3.2.5.jar:/home/silas/Documents/i4-simulated-lab/Common/target/test-classes:/home/silas/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:/home/silas/.m2/repository/org/apache/maven/surefire/surefire-junit3/3.2.5/surefire-junit3-3.2.5.jar:/home/silas/.m2/repository/org/apache/maven/surefire/common-java5/3.2.5/common-java5-3.2.5.jar:/home/silas/.m2/repository/org/apache/maven/surefire/common-junit3/3.2.5/common-junit3-3.2.5.jar"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-booter\3.2.2\surefire-booter-3.2.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-api\3.2.2\surefire-api-3.2.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-logger-api\3.2.2\surefire-logger-api-3.2.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-shared-utils\3.2.2\surefire-shared-utils-3.2.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-extensions-spi\3.2.2\surefire-extensions-spi-3.2.2.jar;C:\Users\ander\OneDrive\Skrivebord\Softwareteknologi\4-Semester\Semester Project\Project Code\i4-simulated-lab\Common\target\test-classes;C:\Users\ander\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\surefire-junit3\3.2.2\surefire-junit3-3.2.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\common-java5\3.2.2\common-java5-3.2.2.jar;C:\Users\ander\.m2\repository\org\apache\maven\surefire\common-junit3\3.2.2\common-junit3-3.2.2.jar"/>
+    <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="23.0.2+7-58"/>
-    <property name="user.name" value="silas"/>
-    <property name="stdout.encoding" value="UTF-8"/>
-    <property name="path.separator" value=":"/>
-    <property name="os.version" value="6.11.0-19-generic"/>
+    <property name="user.name" value="ander"/>
+    <property name="stdout.encoding" value="Cp1252"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="file.encoding" value="UTF-8"/>
     <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
-    <property name="localRepository" value="/home/silas/.m2/repository"/>
+    <property name="localRepository" value="C:\Users\ander\.m2\repository"/>
     <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
-    <property name="java.io.tmpdir" value="/tmp"/>
-    <property name="idea.version" value="2025.1"/>
+    <property name="java.io.tmpdir" value="C:\Users\ander\AppData\Local\Temp\"/>
+    <property name="idea.version" value="2024.1.1"/>
     <property name="java.version" value="23.0.2"/>
-    <property name="user.dir" value="/home/silas/Documents/i4-simulated-lab/Common"/>
+    <property name="user.dir" value="C:\Users\ander\OneDrive\Skrivebord\Softwareteknologi\4-Semester\Semester Project\Project Code\i4-simulated-lab\Common"/>
     <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="native.encoding" value="UTF-8"/>
-    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="native.encoding" value="Cp1252"/>
+    <property name="java.library.path" value="C:\Users\ander\.jdks\openjdk-23.0.2\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Python312\Scripts\;C:\Python312\;C:\Program Files\Eclipse Adoptium\jdk-21.0.2.13-hotspot\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\dotnet\;C:\Program Files\Git\cmd;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\Program Files\php-8.3.12-nts-Win32-vs16-x64;C:\composer;C:\Users\ander\.config\herd\bin\nvm;C:\Program Files\nodejs;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA app\NvDLISR;C:\Program Files\Maven\apache-maven-3.9.9\bin;C:\Program Files\Eclipse Adoptium\jdk-21.0.2.13-hotspot\\bin;C:\Program Files\PuTTY\;C:\Users\ander\.config\herd\bin;C:\Users\ander\AppData\Local\Microsoft\WindowsApps;C:\Program Files\JetBrains\DataGrip 2023.3.4\bin;C:\Users\ander\AppData\Local\Programs\mongosh\;C:\Users\ander\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\ander\AppData\Local\JetBrains\Toolbox\scripts;C:\Users\ander\AppData\Roaming\npm;C:\Users\ander\AppData\Roaming\Composer\vendor\bin;C:\Users\ander\AppData\Local\Microsoft\WindowsApps;;."/>
     <property name="java.vm.info" value="mixed mode"/>
-    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="stderr.encoding" value="Cp1252"/>
     <property name="java.vendor" value="Oracle Corporation"/>
     <property name="java.vm.version" value="23.0.2+7-58"/>
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="67.0"/>
   </properties>
-  <testcase name="testApp" classname="dk.anfra22.cbse.common.AppTest" time="0.003"/>
+  <testcase name="testApp" classname="dk.anfra22.cbse.common.AppTest" time="0.002"/>
 </testsuite>

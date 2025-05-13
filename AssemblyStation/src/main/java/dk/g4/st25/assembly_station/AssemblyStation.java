@@ -8,7 +8,7 @@ import dk.g4.st25.common.services.IMonitorStatus;
 
 import java.util.HashMap;
 
-public class AssemblyStation extends Machine implements MachineSPI, IMonitorStatus, IExecuteCommand, ItemConfirmationI {
+public class AssemblyStation extends Machine implements MachineSPI{
     private SystemStatus systemStatus; // What it is currently doing (producing, idle, etc.)
     private int processNumber; // Increasing integer starting at 1 that logs what process nr. it is at. '9999' is not allowed.
     public enum SystemStatus {

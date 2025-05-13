@@ -1,6 +1,9 @@
 package dk.g4.st25.common.machine;
 
-public interface MachineSPI {
+import dk.g4.st25.common.services.IExecuteCommand;
+import dk.g4.st25.common.services.IMonitorStatus;
+
+public interface MachineSPI extends IExecuteCommand, IMonitorStatus, ItemConfirmationI {
     enum systemState{
     }
     // Signals that a task is complete

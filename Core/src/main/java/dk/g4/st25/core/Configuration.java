@@ -22,6 +22,7 @@ public class Configuration {
 
 
     public List<IMonitorStatus> getIMonitorStatusImplementationsList () {
+        System.out.println(ServiceLoader.load(IMonitorStatus.class));
         return ServiceLoader.load(IMonitorStatus.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 }

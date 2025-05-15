@@ -69,20 +69,21 @@ public class MonitoringController {
                     String warehouseStatus = "unavailable";
                     String agvStatus = "unavailable";
                     String assemblyStationStatus = "unavailable";
+                    System.out.println(implementations);
                     for (IMonitorStatus implementation : implementations) {
-                        String module = implementation.getClass().getModule().getName();
+                        String module = implementation.getClass().getSimpleName();
+                        System.out.println("Module: " + module);
                         String response = implementation.getCurrentSystemStatus();
-                        switch (module) {
+                        switch (module.toLowerCase()) {
                             case "warehouse":
-
-                                warehouseStatus = mapWarehouseState(response);
+                                warehouseStatus = response;
                                 break;
                             case "agv":
-                                agvStatus = mapAGVStatus(response);
+                                agvStatus = response;
                                 break;
 
                             case "assemblyStation":
-                                assemblyStationStatus = mapAssemblyState(response);
+                                assemblyStationStatus = response;
                                 break;
                         }
                     }
@@ -113,32 +114,6 @@ public class MonitoringController {
         monitoringThread.start();
     }
 
-
-    private String mapWarehouseState(String stateCode) {
-        switch (stateCode) {
-            case "0": return "idle";
-            case "1": return "Executing";
-            case "2": return "Error";
-            default: return "Unknown: State = " + stateCode;
-        }
-
-    }
-    private String mapAGVStatus(String stateCode) {
-        switch (stateCode) {
-            case "1": return "idle";
-            case "2": return "Executing";
-            case "3": return "Charging";
-            default: return "Unknown: State = " + stateCode;
-        }
-    }
-    private String mapAssemblyState(String stateCode) {
-        switch (stateCode) {
-            case "0": return "idle";
-            case "1": return "Executing";
-            case "2": return "Error";
-            default: return "Unknown: State = " + stateCode;
-        }
-    }
 
 
     // Method for switching back to the "Homepage" site

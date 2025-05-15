@@ -64,7 +64,7 @@ public class MonitoringController {
         monitoringThread = new Thread(() -> {
             while (running) {
                 try {
-                    List<IMonitorStatus> implementations = app.getConfiguration().getIMonitorStatusImplementationsList();
+                    List<IMonitorStatus> implementations = app.getIMonitorStatusImplementations();
 
                     String warehouseStatus = "unavailable";
                     String agvStatus = "unavailable";

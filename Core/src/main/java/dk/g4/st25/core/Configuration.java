@@ -1,5 +1,6 @@
 package dk.g4.st25.core;
 
+import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
 
@@ -14,7 +15,7 @@ public class Configuration {
 
     public Configuration() {}
 
-    public Collection<? extends IExecuteCommand> getIExecuteCommandImplementationsList() {
+    public List<IExecuteCommand> getIExecuteCommandImplementationsList() {
         System.out.println(ServiceLoader.load(IExecuteCommand.class));
         System.out.println("Count " + ServiceLoader.load(IExecuteCommand.class).stream().count());
         return ServiceLoader.load(IExecuteCommand.class).stream().map(ServiceLoader.Provider::get).collect(toList());
@@ -24,5 +25,9 @@ public class Configuration {
     public List<IMonitorStatus> getIMonitorStatusImplementationsList () {
         System.out.println(ServiceLoader.load(IMonitorStatus.class));
         return ServiceLoader.load(IMonitorStatus.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+    }
+
+    public List<ICoordinate> getICoordinateImplementationsList () {
+        return ServiceLoader.load(ICoordinate.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 }

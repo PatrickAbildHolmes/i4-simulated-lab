@@ -25,8 +25,7 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
     private boolean productReadyForPickup;
     private Object mostRecentlyReceived;
 
-    AssemblyStation(Protocol protocol) {
-        this.protocol = protocol;
+    AssemblyStation() {
         this.systemStatus = SystemStatus.IDLE;
         this.processNumber = 1;
         this.command = "";

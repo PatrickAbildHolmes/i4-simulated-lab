@@ -2,6 +2,7 @@ package dk.g4.st25.rest;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import dk.g4.st25.common.protocol.Protocol;
 import dk.g4.st25.common.protocol.ProtocolSPI;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -12,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-public class REST implements ProtocolSPI {
+public class REST extends Protocol implements ProtocolSPI {
     protected String apiUrl;
 
     public REST() {
@@ -49,12 +50,19 @@ public class REST implements ProtocolSPI {
 
     @Override
     public int connect(String endpoint) {
-        return 0;
+        if (!get().equals(null)) {
+            return 1;
+        } else {
+            return -1;
+        }
     }
 
     @Override
     public int writeTo(String message, String endpoint) {
-        return 0;
+//        switch (message) {
+//            case ""
+//        }
+        return 1;
     }
 
     @Override
@@ -64,6 +72,9 @@ public class REST implements ProtocolSPI {
 
     @Override
     public JsonObject readFrom(String endpoint, String method) {
-        return null;
+        if (method.equals("getStatus")) {
+            return get();
+        } else return null;
     }
+
 }

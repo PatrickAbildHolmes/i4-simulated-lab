@@ -15,7 +15,7 @@ class AGVTest {
     @BeforeEach
     void setUp() {
         protocol = mock(REST.class);
-        agv = new AGV(protocol);
+        agv = new AGV();
     }
 
     @org.junit.jupiter.api.Test

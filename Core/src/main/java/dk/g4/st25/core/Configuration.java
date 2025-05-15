@@ -13,14 +13,19 @@ import static java.util.stream.Collectors.toList;
 
 public class Configuration {
 
-    public Configuration() {}
+    static private final Configuration configuration = new Configuration();
+
+    private Configuration() {}
+
+    static public Configuration get() {
+        return configuration;
+    }
 
     public List<IExecuteCommand> getIExecuteCommandImplementationsList() {
         System.out.println(ServiceLoader.load(IExecuteCommand.class));
         System.out.println("Count " + ServiceLoader.load(IExecuteCommand.class).stream().count());
         return ServiceLoader.load(IExecuteCommand.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
-
 
     public List<IMonitorStatus> getIMonitorStatusImplementationsList () {
         System.out.println(ServiceLoader.load(IMonitorStatus.class));

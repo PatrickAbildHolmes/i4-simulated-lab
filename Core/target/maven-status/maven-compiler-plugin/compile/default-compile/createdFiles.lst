@@ -7,7 +7,9 @@ dk\g4\st25\core\uicontrollers\HomepageController.class
 dk\g4\st25\core\uicontrollers\SceneController.class
 dk\g4\st25\core\Configuration.class
 module-info.class
+
 dk\g4\st25\core\uicontrollers\BacklogController.class
 dk\g4\st25\core\uicontrollers\MonitoringController$SystemItem.class
 dk\g4\st25\core\App.class
 dk\g4\st25\core\uicontrollers\InventoryItem.class
+

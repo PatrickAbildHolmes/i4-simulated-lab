@@ -97,6 +97,7 @@ public class SetParametersController {
         ProductionQueue productionQueue = ProductionQueue.getInstance();
         productionQueue.add(order);
         if (!productionQueue.isProductionStarted()) {
+            showAlert("Success", "Production started.");
             productionQueue.start();
         }
     }

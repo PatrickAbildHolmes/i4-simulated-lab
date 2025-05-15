@@ -1,31 +1,34 @@
 package dk.g4.st25.warehouse;
 
 import com.google.gson.JsonObject;
+import dk.g4.st25.common.machine.Machine;
 import dk.g4.st25.common.machine.MachineSPI;
-import dk.g4.st25.common.protocol.ProtocolSPI;
 import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
-import dk.g4.st25.soap.SoapService;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ServiceLoader;
 
-import static java.util.stream.Collectors.toList;
-
-public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
+public class Warehouse extends Machine implements MachineSPI, IExecuteCommand, IMonitorStatus {
     // SOAP service object for interacting with the warehouse system
-    private final SoapService soapTest = new SoapService();
     // Counter to track the number of items successfully fetched
     private int itemsFetched = 0;
     private final String endpoint = "http://localhost:8081/Service.asmx";
+    public enum systemStatus {
+        IDLE,
+        EXECUTING,
+        ERROR,
+        UNKNOWN
+    }
+//    public Warehouse() {
+//        this.protocol = new SOAP();
+//    }
 
     @Override
     public int taskCompletion() {
         try {
             // Attempt to fetch an item from tray 1
-            soapTest.pickItem(1, endpoint);
+            String message = "{\"action\":\"pick\",\"trayId\":1}";
+            protocol.writeTo(message, endpoint);
 
             // Increment the counter if no exception is thrown
             itemsFetched++;
@@ -72,20 +75,36 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
                 return implementation.readFrom(endpoint, commandParam);
             }
         }*/
-        if (commandType.equalsIgnoreCase("readFrom")) {
-            for (ProtocolSPI implementation : getProtocolSPIImplementationsList()) {
-                if (implementation.getClass().getModule().getName().equals("SOAP")) {
-                    return implementation.readFrom(endpoint, commandParam);
-                }
-            }
-        }
+//        if (commandType.equalsIgnoreCase("readFrom")) {
+//            for (ProtocolSPI implementation : getProtocolSPIImplementationsList()) {
+//                if (implementation.getClass().getModule().getName().equals("SOAP")) {
+//                    return implementation.readFrom(endpoint, commandParam);
+//                }
+//            }
+//        }
         return null;
     }
 
     @Override
     public String getCurrentSystemStatus() {
         // Create a list to store system status messages
-        return "OPERATING";
+        String status = protocol.readFrom(endpoint, "GetInventory").get("State").getAsString();
+        System.out.println(status);
+        String stateDesc;
+        switch (status) {
+            case "0":
+                stateDesc = "Idle";
+                return stateDesc;
+            case "1":
+                stateDesc = "Executing";
+                return stateDesc;
+            case "2":
+                stateDesc = "Error";
+                return stateDesc;
+            default:
+                stateDesc = "Unknown";
+                return stateDesc;
+        }
     }
 
     @Override
@@ -94,7 +113,10 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus {
         return "Soap Active";
     }
 
-    public Collection<? extends ProtocolSPI> getProtocolSPIImplementationsList() {
-        return ServiceLoader.load(ProtocolSPI.class).stream().map(ServiceLoader.Provider::get).collect(toList());
-    }
+
+//    public static void main(String[] args) {
+//        SOAP soap = new SOAP();
+//        Warehouse warehouse = new Warehouse();
+//        warehouse.getCurrentSystemStatus();
+//    }
 }

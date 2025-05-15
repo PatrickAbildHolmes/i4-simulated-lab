@@ -10,4 +10,5 @@ module AGV {
     requires com.google.gson;
     requires REST;
     provides IExecuteCommand with dk.g4.st25.agv.AGV;
+//    provides IMonitorStatus with dk.g4.st25.agv.AGV;
 }

@@ -108,6 +108,11 @@ public class AGV implements MachineSPI, IExecuteCommand, IMonitorStatus {
     }
 
     @Override
+    public String getInventory() {
+        return "";
+    }
+
+    @Override
     public String getCurrentSystemStatus() {
         return null;
     }

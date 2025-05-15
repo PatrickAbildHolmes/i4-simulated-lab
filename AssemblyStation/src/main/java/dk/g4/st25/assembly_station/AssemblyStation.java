@@ -183,6 +183,11 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
     }
 
     @Override
+    public String getInventory() {
+        return "";
+    }
+
+    @Override
     public String getCurrentSystemStatus() {
         /**
          * Returns either "Idle", "Executing", "Error" or "Unknown"

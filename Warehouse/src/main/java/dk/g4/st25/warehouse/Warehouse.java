@@ -5,7 +5,7 @@ import dk.g4.st25.common.machine.Machine;
 import dk.g4.st25.common.machine.MachineSPI;
 import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
-
+import dk.g4.st25.soap.SOAP;
 
 
 public class Warehouse extends Machine implements MachineSPI, IExecuteCommand, IMonitorStatus {
@@ -83,6 +83,11 @@ public class Warehouse extends Machine implements MachineSPI, IExecuteCommand, I
 //            }
 //        }
         return null;
+    }
+
+    @Override
+    public String getInventory() {
+        return protocol.readFrom(endpoint, "GetInventory").toString();
     }
 
     @Override

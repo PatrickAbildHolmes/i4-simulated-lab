@@ -1,9 +1,9 @@
 package dk.g4.st25.core.uicontrollers;
 
+import dk.g4.st25.common.util.Order;
+import dk.g4.st25.core.App;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -18,7 +18,7 @@ public class StatusController {
     private Parent root;
 
     @FXML
-    private TextField curProdIdStat;
+    private TextField curProdNameStat;
     @FXML
     private TextField prodTypeStat;
     @FXML
@@ -30,14 +30,20 @@ public class StatusController {
 
 
     // Production tracking variables (These are to be redundant, when we call the final code)
-    private String productionId;
-    private String droneType;
+    private String productionName;
+    private String productType;
     private int producedAmount;
     private int totalAmount;
     private String state;
+    private Thread statusThread;
+    private volatile boolean running = true;
 
     // Method for switching back to the "Homepage" site
     public void switchToHomepage(ActionEvent event) throws IOException {
+        running = false;
+        if (statusThread != null) {
+            statusThread.interrupt();
+        }
         new SceneController().switchToHomepage(event);
     }
 
@@ -47,22 +53,36 @@ public class StatusController {
         UIEffects.applyHoverEffect(backBtnStat);
 
         // Initialize fields with default values
-        updateStatus("N/A", "N/A", 0, 0, "Idle");
+        updateStatus();
     }
 
     // Updating the current status
-    public void updateStatus(String productionId, String droneType, int producedAmount, int totalAmount, String state) {
-        this.productionId = productionId;
-        this.droneType = droneType;
+    public void updateStatus(Order order) {
+        this.productionName = productionName;
+        this.productType = order.getProduct().getType();
         this.producedAmount = producedAmount;
         this.totalAmount = totalAmount;
         this.state = state;
-
-        // Update UI fields
-        curProdIdStat.setText(productionId);
-        prodTypeStat.setText(droneType);
-        amountStat.setText(producedAmount + "/" + totalAmount);
-        stateStat.setText(state);
+        App app = App.getAppContext();
+        statusThread = new Thread(() -> {
+            while (running) {
+                try {
+                    
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    break;
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
+//        statusThread.setDaemon(true);
+//        statusThread.start();
+//        // Update UI fields
+//        curProdIdStat.setText(productionId);
+//        prodTypeStat.setText(droneType);
+//        amountStat.setText(producedAmount + "/" + totalAmount);
+//        stateStat.setText(state);
     }
 
     // Method to call each time a drone is finished in production (Don't know if it is needed)

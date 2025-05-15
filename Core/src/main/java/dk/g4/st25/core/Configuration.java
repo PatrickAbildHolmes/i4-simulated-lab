@@ -15,13 +15,6 @@ public class Configuration {
 
     public Configuration() {}
 
-    public List<IExecuteCommand> getIExecuteCommandImplementationsList() {
-        System.out.println(ServiceLoader.load(IExecuteCommand.class));
-        System.out.println("Count " + ServiceLoader.load(IExecuteCommand.class).stream().count());
-        return ServiceLoader.load(IExecuteCommand.class).stream().map(ServiceLoader.Provider::get).collect(toList());
-    }
-
-
     public List<IMonitorStatus> getIMonitorStatusImplementationsList () {
         System.out.println(ServiceLoader.load(IMonitorStatus.class));
         return ServiceLoader.load(IMonitorStatus.class).stream().map(ServiceLoader.Provider::get).collect(toList());

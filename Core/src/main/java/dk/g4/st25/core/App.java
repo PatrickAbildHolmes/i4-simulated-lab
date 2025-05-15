@@ -17,7 +17,6 @@ public class App extends Application {
     private final Configuration configuration = new Configuration();
 
     private final List<ICoordinate> ICoordinateImplementations = configuration.getICoordinateImplementationsList();
-    private final List<IExecuteCommand> IExecuteCommandImplementations = configuration.getIExecuteCommandImplementationsList();
     private final List<IMonitorStatus> IMonitorStatusImplementations = configuration.getIMonitorStatusImplementationsList();
 
     public static void main(String[] args) {
@@ -44,10 +43,6 @@ public class App extends Application {
 
     public List<ICoordinate> getICoordinateImplementations() {
         return ICoordinateImplementations;
-    }
-
-    public List<IExecuteCommand> getIExecuteCommandImplementations() {
-        return IExecuteCommandImplementations;
     }
 
     public List<IMonitorStatus> getIMonitorStatusImplementations() {

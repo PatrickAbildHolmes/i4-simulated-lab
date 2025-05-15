@@ -19,9 +19,11 @@ public class App extends Application {
     private final List<ICoordinate> ICoordinateImplementations = configuration.getICoordinateImplementationsList();
     private final List<IMonitorStatus> IMonitorStatusImplementations = configuration.getIMonitorStatusImplementationsList();
 
+
     public static void main(String[] args) {
         launch(args);
     }
+
     public void start(Stage stage) {
         try {
             Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("homepage.fxml")));
@@ -48,4 +50,5 @@ public class App extends Application {
     public List<IMonitorStatus> getIMonitorStatusImplementations() {
         return IMonitorStatusImplementations;
     }
+
 }

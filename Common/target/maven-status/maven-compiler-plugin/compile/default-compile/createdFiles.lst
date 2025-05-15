@@ -1,9 +1,7 @@
 dk\g4\st25\common\services\ICoordinate.class
 dk\g4\st25\common\util\Part.class
 module-info.class
-dk\g4\st25\common\util\Order$Status.class
-dk\g4\st25\common\util\Product.class
-dk\g4\st25\common\services\IMonitorStatus.class
-dk\g4\st25\common\util\Connection.class
-dk\g4\st25\common\util\Order.class
-dk\g4\st25\common\services\IExecuteCommand.class
+dk/g4/st25/common/util/Order$Status.class
+dk/g4/st25/common/util/Product.class
+dk/g4/st25/common/services/ICoordinate.class
+

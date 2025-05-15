@@ -6,4 +6,7 @@ public interface ICoordinate {
     // Icoordinate interface for the coordinator class
     // Starts production from core
     int startProduction(Order order);
+
+    int getProduced();
+
 }

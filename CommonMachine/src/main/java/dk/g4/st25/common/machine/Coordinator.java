@@ -4,13 +4,14 @@ import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.util.Order;
 import java.util.ServiceLoader;
 
-public class Coordinator implements ICoordinate {
+public class Coordinator implements ICoordinate{
     private MachineSPI warehouse;
     private MachineSPI agvMachine;
     private MachineSPI assemblyMachine;
     private boolean warehouseFlag = false;
     private boolean agvFlag = false;
     private boolean assemblyFlag = false;
+    private int produced = 0; // Initialize to 0 to avoid errors
 
     public Coordinator(){ // Constructor must be public because of ServiceLoader
         /**
@@ -21,6 +22,7 @@ public class Coordinator implements ICoordinate {
          * Flags must be checked every production cycle during runtime,
          * since components can/may be added or removed during runtime.
          */
+
         ServiceLoader<MachineSPI> loader = ServiceLoader.load(MachineSPI.class);
         for (MachineSPI machine : loader) {
             String name = machine.getClass().getSimpleName().toLowerCase();
@@ -42,6 +44,13 @@ public class Coordinator implements ICoordinate {
         if (!this.agvFlag) {System.err.println("AGV module is missing.");}
         if (!this.assemblyFlag) {System.err.println("AssemblyStation module is missing.");}
     }
+    @Override
+    public int getProduced(){
+        /**
+         * Returns the number of produced items in the current Order. Used in Core, to view status of current order.
+         * */
+        return this.produced;
+    }
 
     @Override
     public int startProduction(Order order) {
@@ -53,13 +62,15 @@ public class Coordinator implements ICoordinate {
          * 2 - Deliver product to Warehouse upon completion
          * 1 - Present new component for pickup if 2-or-more trays empty
          */
+
         Coordinator coordinator = new Coordinator();
         order.setStatus(Order.Status.BEING_PROCESSED);
+
 
         // Amount of products needed to be assembled, and parts needed for each product
         int amountOfProductsToAssemble = order.getAmount();
         int amountOfPartsNeeded = order.getProduct().getParts().length;
-
+        this.produced = 0; // Reset to 0 at start of Order production cycle
         // Initial sequence
         // Put each inside a check for component availability, AND don't continue until it returns YES
         for (int k = 0; k < amountOfPartsNeeded; k++) {
@@ -73,6 +84,7 @@ public class Coordinator implements ICoordinate {
             coordinator.step3_AssemblyAssembleProduct();
             coordinator.step4_AGVDeliverProductToWarehouse();
             coordinator.step5_WarehouseDepositProduct();
+            this.produced++;
             if(i == amountOfProductsToAssemble - 1){ // Don't prepare more components for assembly once enough drones have been produced
                 break;
             }
@@ -83,13 +95,13 @@ public class Coordinator implements ICoordinate {
         }
 
         order.setStatus(Order.Status.FINISHED);
+
         // Returns 1 for success: All products produced.
         // Returns 0 for partial success: Only some products were produced.
         // Returns -1 for failure: No products were produced.
         return 1;
     }
-
-    public boolean step1_WarehouseWithdrawComponent(){
+    public void step1_WarehouseWithdrawComponent(){
         /**
          * Runs through the actions described in Part 1 of the production sequence
          * 1.1) Warehouse receives "start production" command signal
@@ -99,19 +111,18 @@ public class Coordinator implements ICoordinate {
          * 1.3) Warehouse sends task completion signal with item id
          */
 
-         // 1.1) Warehouse receives "start production" command signal
+        // 1.1) Warehouse receives "start production" command signal
 
-         // 1.2) Warehouse checks at least 2 trays available
+        // 1.2) Warehouse checks at least 2 trays available
 
-         // 1.2) Warehouse places requested component into a tray
+        // 1.2) Warehouse places requested component into a tray
 
-         // 1.3) Warehouse moves the tray to the pickup area
+        // 1.3) Warehouse moves the tray to the pickup area
 
-         // 1.3) Warehouse sends task completion signal with item id
-
-        return true;
+        // 1.3) Warehouse sends task completion signal with item id
+        
     }
-    public boolean step2_AGVDeliverComponentToAssembly(){
+    public void step2_AGVDeliverComponentToAssembly(){
         /**
          * Runs through the actions described in Part 2 of the production sequence
          * 2.1) AGV receives 'component pick-up' command signal
@@ -160,9 +171,8 @@ public class Coordinator implements ICoordinate {
         // 2.11) AGV sends task completion signal
 
 
-        return true;
     }
-    public boolean step3_AssemblyAssembleProduct(){
+    public void step3_AssemblyAssembleProduct(){
         /**
          * Runs through the actions described in Part 3 of the production sequence
          * 3.1) AssemblyLine receives "execute assembly" command signal
@@ -174,25 +184,50 @@ public class Coordinator implements ICoordinate {
          * 3.7) AssemblyLine places product for pick-up
          * 3.8) AssemblyLine sends task completion signal
          */
-
-        // 3.1-3.2) AssemblyLine confirms correct item is delivered
-        boolean correctItem = this.assemblyMachine.confirmItemDelivery();
-        if (!correctItem){
-            // If it is not the correct item delivered
-            return false;
+        // 3.1-3.3) AssemblyLine confirms correct item is delivered (Instant)
+        for (int i = 0; i < 5; i++) {
+            if(this.assemblyMachine.confirmItemDelivery()){
+                break;
+            }else{
+                try{
+                    Thread.sleep(1000); // Wait 1 second between each attempt
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
-        // 3.4-3.6) AssemblyLine confirms enough items have been delivered, and executes the assembly instructions
-        this.assemblyMachine.sendCommand("assemble"); // Returns JsonObject().getAsJsonObject("Success!")
-
-        // 3.7) AssemblyLine places product for pick-up
-        this.assemblyMachine.getCurrentSystemStatus(); //if (systemStatus == SystemStatus.ASSEMBLING) {this.systemStatus = SystemStatus.AWAITING_PICKUP;}
-
-        // 3.8) AssemblyLine sends task completion signal
-        this.assemblyMachine.taskCompletion();
-
-        return true;
+        // 3.4-3.6) AssemblyLine confirms enough items have been delivered, and executes the assembly instructions (Instant)
+        for (int i = 0; i < 5; i++) { // Attempt 5 times
+            if (this.assemblyMachine.sendCommand("assemble").has("Success!")){break;}
+            else {
+                try{
+                    Thread.sleep(1000); // Wait 1 second between each attempt if unsuccessful
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        // 3.7) AssemblyLine places product for pick-up (Waiting time)
+        for (int i = 0; i < 5; i++) { // Attempt 5 times
+            String assemblyState = this.assemblyMachine.getCurrentSystemStatus(); // if (systemStatus == SystemStatus.ASSEMBLING) {this.systemStatus = SystemStatus.AWAITING_PICKUP;}
+            if (assemblyState.equals("Idle")) {
+                return;
+            }else if (assemblyState.equals("Error") || assemblyState.equals("Unknown")) {
+                System.out.println("An Error occurred while assembling the product");
+                return;
+            }else {
+                try{
+                    Thread.sleep(5000); // Wait 5 seconds between each attempt
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        // 3.8) AssemblyLine sends task completion signal (Instant)
+        // .taskCompletion() returns 0 or 1, but it is not needed, since the previous step will leave AssemblyStation in the correct state
     }
-    public boolean step4_AGVDeliverProductToWarehouse(){
+
+    public void step4_AGVDeliverProductToWarehouse(){
         /**
          * Runs through the actions described in Part 4 of the production sequence
          * 4.1) Warehouse receives “prepare” command signal
@@ -246,9 +281,8 @@ public class Coordinator implements ICoordinate {
         // 4.10) AGV sends task completion signal
 
 
-        return true;
     }
-    public boolean step5_WarehouseDepositProduct(){
+    public void step5_WarehouseDepositProduct(){
         /**
          * Runs through the actions described in Part 5 of the production sequence
          * 5.1) Warehouse receives "deposit" command signal
@@ -272,7 +306,6 @@ public class Coordinator implements ICoordinate {
 
         // 5.4) Warehouse sends task completion signal
 
-        return true;
     }
 }
 

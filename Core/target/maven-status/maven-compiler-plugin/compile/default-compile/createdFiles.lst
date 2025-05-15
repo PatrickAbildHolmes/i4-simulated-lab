@@ -7,6 +7,7 @@ dk/g4/st25/core/uicontrollers/StatusController.class
 module-info.class
 dk/g4/st25/core/uicontrollers/MonitoringController.class
 dk/g4/st25/core/uicontrollers/InventoryController.class
+dk/g4/st25/core/ProductionQueue.class
 dk/g4/st25/core/Configuration.class
 dk/g4/st25/core/uicontrollers/SetParametersController.class
 dk/g4/st25/core/uicontrollers/HomepageController.class

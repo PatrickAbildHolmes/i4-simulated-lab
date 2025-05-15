@@ -111,6 +111,11 @@ public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonito
         return 0;
     }
 
+    @Override
+    public void setMostRecentlyReceived(Object mostRecentlyReceived) {
+
+    }
+
 
     @Override
     public JsonObject sendCommand(String commandType) {
@@ -136,5 +141,10 @@ public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonito
     @Override
     public String getCurrentConnectionStatus() {
         return null;
+    }
+
+    @Override
+    public boolean confirmItemDelivery() {
+        return false;
     }
 }

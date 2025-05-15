@@ -104,6 +104,11 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus, I
     }
 
     @Override
+    public void setMostRecentlyReceived(Object mostRecentlyReceived) {
+
+    }
+
+    @Override
     public JsonObject sendCommand(String commandType) {
         return null;
     }

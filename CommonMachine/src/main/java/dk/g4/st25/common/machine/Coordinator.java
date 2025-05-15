@@ -5,7 +5,6 @@ import dk.g4.st25.common.util.Order;
 import java.util.ServiceLoader;
 
 public class Coordinator implements ICoordinate {
-
     private MachineSPI warehouse;
     private MachineSPI agvMachine;
     private MachineSPI assemblyMachine;
@@ -60,6 +59,7 @@ public class Coordinator implements ICoordinate {
         // Amount of products needed to be assembled, and parts needed for each product
         int amountOfProductsToAssemble = order.getAmount();
         int amountOfPartsNeeded = order.getProduct().getParts().length;
+
         // Initial sequence
         // Put each inside a check for component availability, AND don't continue until it returns YES
         for (int k = 0; k < amountOfPartsNeeded; k++) {
@@ -67,6 +67,7 @@ public class Coordinator implements ICoordinate {
             coordinator.step2_AGVDeliverComponentToAssembly();
         }
         coordinator.step1_WarehouseWithdrawComponent();
+
         // Afterwards, loops steps '3-4-5-2-1' for every product
         for (int i = 0; i < amountOfProductsToAssemble; i++) {
             coordinator.step3_AssemblyAssembleProduct();
@@ -98,7 +99,16 @@ public class Coordinator implements ICoordinate {
          * 1.3) Warehouse sends task completion signal with item id
          */
 
-        this.warehouse.taskCompletion();
+         // 1.1) Warehouse receives "start production" command signal
+
+         // 1.2) Warehouse checks at least 2 trays available
+
+         // 1.2) Warehouse places requested component into a tray
+
+         // 1.3) Warehouse moves the tray to the pickup area
+
+         // 1.3) Warehouse sends task completion signal with item id
+
         return true;
     }
     public boolean step2_AGVDeliverComponentToAssembly(){
@@ -116,6 +126,40 @@ public class Coordinator implements ICoordinate {
          * 2.10) AGV delivers item to AssemblyLine
          * 2.11) AGV sends task completion signal
          */
+
+        // 2.1) AGV receives 'component pick-up' command signal
+
+
+        // 2.2) AGV moves to warehouse position
+
+
+        // 2.3) AGV sends 'movement complete' signal
+
+
+        // 2.4) AGV receives pick-up signal
+
+
+        // 2.5) AGV picks up item
+
+
+        // 2.6) AGV sends 'confirm pick-up' signal
+
+
+        // 2.7) AGV receives movement instruction signal
+
+
+        // 2.8) AGV moves to AssemblyLine position
+
+
+        // 2.9) AGV sends 'movement complete' signal
+
+
+        // 2.10) AGV delivers item to AssemblyLine
+        this.assemblyMachine.setMostRecentlyReceived(new DroneComponent());
+
+        // 2.11) AGV sends task completion signal
+
+
         return true;
     }
     public boolean step3_AssemblyAssembleProduct(){
@@ -130,6 +174,22 @@ public class Coordinator implements ICoordinate {
          * 3.7) AssemblyLine places product for pick-up
          * 3.8) AssemblyLine sends task completion signal
          */
+
+        // 3.1-3.2) AssemblyLine confirms correct item is delivered
+        boolean correctItem = this.assemblyMachine.confirmItemDelivery();
+        if (!correctItem){
+            // If it is not the correct item delivered
+            return false;
+        }
+        // 3.4-3.6) AssemblyLine confirms enough items have been delivered, and executes the assembly instructions
+        this.assemblyMachine.sendCommand("assemble"); // Returns JsonObject().getAsJsonObject("Success!")
+
+        // 3.7) AssemblyLine places product for pick-up
+        this.assemblyMachine.getCurrentSystemStatus(); //if (systemStatus == SystemStatus.ASSEMBLING) {this.systemStatus = SystemStatus.AWAITING_PICKUP;}
+
+        // 3.8) AssemblyLine sends task completion signal
+        this.assemblyMachine.taskCompletion();
+
         return true;
     }
     public boolean step4_AGVDeliverProductToWarehouse(){
@@ -148,6 +208,44 @@ public class Coordinator implements ICoordinate {
          * 4.9) AGV delivers item to Warehouse
          * 4.10) AGV sends task completion signal
          */
+
+        // 4.1) Warehouse receives “prepare” command signal
+
+
+        // 4.2) Warehouse confirms tray available
+
+
+        // 4.3A) Warehouse prepares storage tray
+
+
+        // 4.3A) Warehouse sends 'tray ready' signal
+
+
+        // 4.3B) AGV receives pick-up signal
+
+
+        // 4.4B) AGV moves to AssemblyLine position
+
+
+        // 4.5B) AGV sends 'movement complete' signal
+
+
+        // 4.6B) AGV picks up item
+        this.assemblyMachine.getCurrentSystemStatus(); // else if (systemStatus == SystemStatus.AWAITING_PICKUP) {this.systemStatus = SystemStatus.IDLE;this.exitTray.setContent(null);this.exitTray.setAvailable(true);}
+
+
+        // 4.7B) AGV receives movement instructions
+
+
+        // 4.8B) AGV moves to Warehouse
+
+
+        // 4.9) AGV delivers item to Warehouse
+
+
+        // 4.10) AGV sends task completion signal
+
+
         return true;
     }
     public boolean step5_WarehouseDepositProduct(){
@@ -159,6 +257,21 @@ public class Coordinator implements ICoordinate {
          * 5.3) Warehouse stores item
          * 5.4) Warehouse sends task completion signal
          */
+
+        // 5.1) Warehouse receives "deposit" command signal
+
+
+        // 5.1) Warehouse confirms correct item is delivered
+
+
+        // 5.2) Warehouse sends confirmation signal
+
+
+        // 5.3) Warehouse stores item
+
+
+        // 5.4) Warehouse sends task completion signal
+
         return true;
     }
 }

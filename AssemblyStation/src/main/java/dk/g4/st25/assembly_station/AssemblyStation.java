@@ -20,7 +20,8 @@ public class AssemblyStation extends Machine implements MachineSPI{
         ERROR
     }
 
-    private Tray[] trays; // Trays for delivery and pick-up. Fixed number
+    private Tray entryTray; // Trays for delivery and pick-up. Fixed number
+    private Tray exitTray; // Trays for delivery and pick-up. Fixed number
     private boolean needsMoreComponents;
     private boolean productReadyForPickup;
     private Object mostRecentlyReceived;
@@ -32,7 +33,8 @@ public class AssemblyStation extends Machine implements MachineSPI{
         this.command = "";
         this.inventory = new HashMap<>();
         this.inventory.put("DroneComponents",0);
-        this.trays = new Tray[2]; // Two trays?
+        this.entryTray = new Tray();
+        this.exitTray = new Tray();
         this.needsMoreComponents = true;
         this.productReadyForPickup = false;
     }
@@ -110,24 +112,23 @@ public class AssemblyStation extends Machine implements MachineSPI{
          * checks that it is a DroneComponent, and then either puts it into inventory or discards it
          */
         this.systemStatus = SystemStatus.AWAITING_PARTS;
-        for (Tray tray : trays) {
-            if (tray.isAvailable()) {
-                tray.setContent(new DroneComponent()); // Adds received item to tray. Placeholder statement until AGV can transfer object
-                tray.setAvailable(false);
+            if (this.entryTray.isAvailable()) {
+                this.entryTray.setContent(new DroneComponent()); // Adds received item to tray. Placeholder statement until AGV can transfer object
+                this.entryTray.setAvailable(false);
                 if (mostRecentlyReceived instanceof DroneComponent) {
                     // Add it to inventory
                     this.inventory.put("DroneComponents", this.inventory.get("DroneComponents") + 1); // Placeholder statement. Increases the V of K,V-pair DroneComponents
                     return true;
                 } else {
-                    tray.setContent(null); // remove the incorrect item
-                    tray.setAvailable(true);
+                    this.entryTray.setContent(null); // remove the incorrect item
+                    this.entryTray.setAvailable(true);
                     return false;
                 }
             }
-        }
         return false;
     }
 
+    @Override
     public void setMostRecentlyReceived(Object mostRecentlyReceived) {
         /**
          * Used by Coordinator when AGV hands off item
@@ -135,17 +136,15 @@ public class AssemblyStation extends Machine implements MachineSPI{
         this.mostRecentlyReceived = mostRecentlyReceived;
     }
 
-    public boolean confirmItemQuantity() {
+    public void confirmItemQuantity() {
         /**
          * How many Drone components to make a Drone?
          */
         int componentsNeeded = 1;
         if (this.inventory.get("DroneComponents")>=componentsNeeded){
             this.systemStatus = SystemStatus.READY;
-            return true;
         }else{
             System.out.println("Not enough components received for production yet");
-            return false;
         }
     }
 
@@ -157,7 +156,8 @@ public class AssemblyStation extends Machine implements MachineSPI{
          *     "checkhealth": check machine health
          */
         if (commandType.equals("assemble")) {
-            if (this.systemStatus == SystemStatus.READY) {
+            this.confirmItemQuantity(); // this will set SystemStatus.READY if enough components in inventory
+            if (this.systemStatus == SystemStatus.READY && this.exitTray.isAvailable()) { // AStation must have received components, and have an available exit tray
                 this.command = commandType; // Set latest received command
                 String actualMessage = "\"ProcessID\": "+this.processNumber;
                 this.protocol.writeTo(actualMessage,"emulator/operation");
@@ -167,6 +167,8 @@ public class AssemblyStation extends Machine implements MachineSPI{
                     this.processNumber++;
                 }
                 this.systemStatus = SystemStatus.ASSEMBLING;
+                this.entryTray.setContent(null); // Clears the entry tray
+                this.entryTray.setAvailable(true);
                 return new JsonObject().getAsJsonObject("Success!"); // Success
             } else
                 return null; // Assemble command sent, but machine not ready
@@ -207,8 +209,12 @@ public class AssemblyStation extends Machine implements MachineSPI{
                 stateDesc = "Idle";
                 if (systemStatus == SystemStatus.ASSEMBLING) {
                     this.systemStatus = SystemStatus.AWAITING_PICKUP;
+                    this.exitTray.setContent(new Drone("Insert_Drone_ID")); // Placeholder-statement. Implement method to generate actual Drone ID here.
+                    this.exitTray.setAvailable(false);
                 } else if (systemStatus == SystemStatus.AWAITING_PICKUP) {
                     this.systemStatus = SystemStatus.IDLE;
+                    this.exitTray.setContent(null);
+                    this.exitTray.setAvailable(true);
                 }
             case 1:
                 stateDesc = "Executing";

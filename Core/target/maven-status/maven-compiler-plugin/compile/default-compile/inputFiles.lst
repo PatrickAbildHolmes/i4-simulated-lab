@@ -1,5 +1,6 @@
 /home/silas/Documents/i4-simulated-lab/Core/src/main/java/dk/g4/st25/core/App.java
 /home/silas/Documents/i4-simulated-lab/Core/src/main/java/dk/g4/st25/core/Configuration.java
+/home/silas/Documents/i4-simulated-lab/Core/src/main/java/dk/g4/st25/core/ProductionQueue.java
 /home/silas/Documents/i4-simulated-lab/Core/src/main/java/dk/g4/st25/core/uicontrollers/BacklogController.java
 /home/silas/Documents/i4-simulated-lab/Core/src/main/java/dk/g4/st25/core/uicontrollers/HomepageController.java
 /home/silas/Documents/i4-simulated-lab/Core/src/main/java/dk/g4/st25/core/uicontrollers/InventoryController.java
@@ -10,4 +11,3 @@
 /home/silas/Documents/i4-simulated-lab/Core/src/main/java/dk/g4/st25/core/uicontrollers/StatusController.java
 /home/silas/Documents/i4-simulated-lab/Core/src/main/java/dk/g4/st25/core/uicontrollers/UIEffects.java
 /home/silas/Documents/i4-simulated-lab/Core/src/main/java/module-info.java
-

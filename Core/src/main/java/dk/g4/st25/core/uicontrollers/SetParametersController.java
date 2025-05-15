@@ -1,7 +1,7 @@
 package dk.g4.st25.core.uicontrollers;
 
-import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.util.Order;
+import dk.g4.st25.core.ProductionQueue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ServiceLoader;
 import dk.g4.st25.common.util.Product;
 
 
@@ -68,15 +67,16 @@ public class SetParametersController {
     // Method for starting production
     private void startProduction() {
         String productionName = prodNamePara.getText();
-        String amountText = amountPara.getText();
         String productType = (String) prodTypePara.getValue();
+        String amountText = amountPara.getText();
 
-        // Validate input from user
+        // Assert not null
         if (productionName.isEmpty() || amountText.isEmpty() || productType == null) {
             showAlert("Error", "All fields must be filled in.");
             return;
         }
-        // Creates an amount
+
+        // Validate amount
         int amount;
         try {
             amount = Integer.parseInt(amountText);
@@ -85,22 +85,20 @@ public class SetParametersController {
                 return;
             }
         } catch (NumberFormatException e) {
-            showAlert("Error", "Amount must be a valid integer.");
+            showAlert("Error", "Amount not a number.");
             return;
         }
 
-        try {
-            // Makes a product with a type
-            Product product = new Product(productType);
-            // Creates an order, which is to be sent to the coordinator through the serviceLoader
-            Order order = new Order(productionName, product, amount);
-            int result = coordinatorLoader.startProduction(order);
-            // Success alert
-            showAlert("Success", "Production started for " + amount + " " + productType + "(s). Response code: " + result);
+        // Create new order
+        Product product = new Product(productType);
+        Order order = new Order(productionName, product, amount);
 
-        } catch (Exception e) {
-            // Error alert
-            showAlert("Error", "Error starting production: " + e.getMessage());
+        // Add order to queue
+        ProductionQueue productionQueue = ProductionQueue.getInstance();
+        productionQueue.add(order);
+        if (!productionQueue.isProductionStarted()) {
+            showAlert("Success", "Production started.");
+            productionQueue.start();
         }
     }
 
@@ -112,9 +110,5 @@ public class SetParametersController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-    // ServiceLoader for coordinator
-    private final ICoordinate coordinatorLoader = ServiceLoader.load(ICoordinate.class)
-            .findFirst().orElseThrow(()-> new IllegalStateException("No implementation found for coordinator"));
 
 }

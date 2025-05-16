@@ -12,7 +12,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="/home/silas/.jdks/openjdk-23.0.2/lib"/>
-    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter /home/silas/Documents/i4-simulated-lab/Common/target/surefire 2025-05-15T11-30-55_864-jvmRun1 surefire-20250515113056164_1tmp surefire_0-20250515113056164_2tmp"/>
+    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter /home/silas/Documents/i4-simulated-lab/Common/target/surefire 2025-05-16T14-52-03_558-jvmRun1 surefire-20250516145203832_1tmp surefire_0-20250516145203832_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/home/silas/Documents/i4-simulated-lab/Common/target/test-classes:/home/silas/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -34,14 +34,14 @@
     <property name="user.name" value="silas"/>
     <property name="stdout.encoding" value="UTF-8"/>
     <property name="path.separator" value=":"/>
-    <property name="os.version" value="6.11.0-19-generic"/>
+    <property name="os.version" value="6.11.0-24-generic"/>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="file.encoding" value="UTF-8"/>
     <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
     <property name="localRepository" value="/home/silas/.m2/repository"/>
     <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
     <property name="java.io.tmpdir" value="/tmp"/>
-    <property name="idea.version" value="2025.1"/>
+    <property name="idea.version" value="2025.1.1.1"/>
     <property name="java.version" value="23.0.2"/>
     <property name="user.dir" value="/home/silas/Documents/i4-simulated-lab/Common"/>
     <property name="os.arch" value="amd64"/>
@@ -55,5 +55,5 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="67.0"/>
   </properties>
-  <testcase name="testApp" classname="dk.anfra22.cbse.common.AppTest" time="0.003"/>
+  <testcase name="testApp" classname="dk.anfra22.cbse.common.AppTest" time="0.002"/>
 </testsuite>

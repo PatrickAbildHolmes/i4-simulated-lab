@@ -2,13 +2,14 @@ package dk.g4.st25.core;
 
 import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.util.Order;
+import dk.g4.st25.database.Database;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class ProductionQueue {
-    private static ProductionQueue productionQueue = new ProductionQueue();
-    private Queue<Order> orders = new LinkedList<>();
+    private static final ProductionQueue productionQueue = new ProductionQueue();
     private boolean productionStarted = false;
 
     private ProductionQueue() {}
@@ -16,18 +17,26 @@ public class ProductionQueue {
     public void start() {
         productionStarted = true;
 
+        // Get coordinator
         Configuration conf = Configuration.get();
         ICoordinate coordinator = conf.coordinatorLoader();
 
+        // Database
+        Database db = Database.getDB();
+
+        List<Order> orders = db.getOrders();
         while (!orders.isEmpty()) {
-            Order nextItem = orders.remove(); // retrieves and removes head of queue
+            // Start next order
+            Order nextItem = orders.get(0);
             coordinator.startProduction(nextItem);
+
+            // Delete order from db
+            db.deleteOrder(nextItem.getId());
+
+            // Update Orders (other orders might have been added)
+            orders = db.getOrders();
         }
         productionStarted = false;
-    }
-
-    public void add(Order order) {
-        orders.add(order);
     }
 
     public boolean isProductionStarted() {

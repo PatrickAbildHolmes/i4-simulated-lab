@@ -10,6 +10,7 @@ module Core {
     requires com.google.gson;
     requires java.sql;
     requires kotlin.stdlib;
+    requires Database;
 
     exports dk.g4.st25.core;
 

@@ -1,7 +1,8 @@
 package dk.g4.st25.common.util;
 
 public class Order {
-    private String id;
+    private int id;
+    private String name;
     private int amount;
     private Product product;
     private Status status;
@@ -10,14 +11,15 @@ public class Order {
         BEING_PROCESSED,
         FINISHED
     }
-    public Order(String id, Product product, int amount) {
+    public Order(int id, String name, Product product, int amount) {
         this.id = id;
+        this.name = name;
         this.product = product;
         this.amount = amount;
         this.status = Status.IN_QUEUE;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
@@ -27,6 +29,10 @@ public class Order {
 
     public Product getProduct() {
         return product;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Status getStatus() {

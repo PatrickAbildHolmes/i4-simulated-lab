@@ -17,11 +17,13 @@ public class ProductionQueue {
         productionStarted = true;
 
         Configuration conf = Configuration.get();
-        ICoordinate coordinator = conf.coordinatorLoader();
+        ICoordinate coordinate = App.getAppContext().getICoordinateImplementations().stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No ICoordinate implementations found"));
 
         while (!orders.isEmpty()) {
             Order nextItem = orders.remove(); // retrieves and removes head of queue
-            coordinator.startProduction(nextItem);
+            coordinate.startProduction(nextItem);
         }
         productionStarted = false;
     }

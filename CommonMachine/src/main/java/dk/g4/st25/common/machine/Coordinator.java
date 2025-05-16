@@ -103,129 +103,132 @@ public class Coordinator implements ICoordinate{
         return 1;
     }
     public void step1_WarehouseWithdrawComponent(){
+        int stepCount = 1;
+        try {
+            // 1.1 - 1.3) Warehouse places requested component into a tray
+            if (machineCommand(this.warehouse, "pickItem")){stepCount++;}else{throw new Exception("Error handling warehouse command");}
 
-        // 1.1 - 1.3) Warehouse places requested component into a tray
-        machineCommand(this.warehouse, "pickItem");
-        for( int i = 0; i < 5; i++){ // Tries 5 times to pick an item
-            if(this.warehouse.sendCommand("pickItem").has("errorMessage")){
-                //If the 'pick' action fails
-                try{
-                    Thread.sleep(3000); // Waits 3 seconds before continuing with another attempt
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }else{
-                // If the 'pick' action is successful
-                break;
+            // 1.4) Warehouse moves the tray to the pickup area
+            if (getMachineStatus(this.warehouse)) {stepCount++;}else{throw new Exception("Error getting warehouse state");}
+            if (this.warehouse.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
+        }catch (Exception e) {
+                System.out.println("Failed at Step 4, action: "+stepCount);
+                e.printStackTrace();
             }
-        }
-
-        // 1.4) Warehouse moves the tray to the pickup area
-        if(getMachineStatus(this.warehouse)){
-            this.warehouse.taskCompletion();
-        }else{
-            System.out.println("Something went wrong with the Warehouse");
-        }
     }
     
     public void step2_AGVDeliverComponentToAssembly(){
+        int stepCount = 1;
+        try {
+            // 2.1-2.2) AGV receives 'component pick-up' command signal and moves to Warehouse
+            if(machineCommand(this.agvMachine, "MoveToStorageOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
 
-        // 2.1-2.2) AGV receives 'component pick-up' command signal and moves to Warehouse
-        machineCommand(this.agvMachine,"MoveToStorageOperation");
+            // 2.3) AGV sends 'movement complete' signal
+            // Confirm position Warehouse
+            if(agvMinorTaskComplete()){stepCount++;}else{throw new Exception("Error completing task");}
 
-        // 2.3) AGV sends 'movement complete' signal
-        agvMinorTaskComplete(); // Confirm position Warehouse
+            // 2.4-2.5) AGV receives pick-up signal
+            //Load program and execute
+            if(machineCommand(this.agvMachine, "PickWarehouseOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
+            this.agvMachine.setMostRecentlyReceived(new DroneComponent());
 
-        // 2.4-2.5) AGV receives pick-up signal
-        machineCommand(this.agvMachine,"PickWarehouseOperation"); //Load program and execute
-        this.agvMachine.setMostRecentlyReceived(new DroneComponent());
+            // 2.6) AGV sends 'confirm pick-up' signal
+            // Confirm carrying item
+            if(agvMinorTaskComplete()){stepCount++;}else{throw new Exception("Error completing task");}
 
-        // 2.6) AGV sends 'confirm pick-up' signal
-        agvMinorTaskComplete(); // Confirm carrying item
+            // 2.7-2.8) AGV receives movement instruction signal and moves to Assembly
+            if(machineCommand(this.agvMachine, "MoveToAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
+            // 2.9) AGV sends 'movement complete' signal
+            // Confirm position Assembly
+            if(agvMinorTaskComplete()){stepCount++;}else{throw new Exception("Error completing task");}
 
-        // 2.7-2.8) AGV receives movement instruction signal and moves to Assembly
-        machineCommand(this.agvMachine,"MoveToAssemblyOperation");
-        // 2.9) AGV sends 'movement complete' signal
-        agvMinorTaskComplete(); // Confirm position Assembly
+            // 2.10) AGV delivers item to AssemblyLine
+            //Load program and execute
+            if(machineCommand(this.agvMachine, "PutAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
+            this.assemblyMachine.setMostRecentlyReceived(new DroneComponent());
 
-        // 2.10) AGV delivers item to AssemblyLine
-        machineCommand(this.agvMachine,"PutAssemblyOperation"); //Load program and execute
-        this.assemblyMachine.setMostRecentlyReceived(new DroneComponent());
-
-        // 2.11) AGV sends task completion signal
-        this.agvMachine.taskCompletion(); // Confirm not carrying item
-
+            // 2.11) AGV sends task completion signal
+            // Confirm not carrying item
+            if(this.agvMachine.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
+        }catch (Exception e){
+            System.out.println("Failed at Step 2, action: "+stepCount);
+            e.printStackTrace();
+        }
     }
     public void step3_AssemblyAssembleProduct(){
-        // 3.1-3.3) AssemblyLine confirms correct item is delivered (Instant)
-        confirmItemDelivery(this.assemblyMachine);
-
-        // 3.4-3.6) AssemblyLine confirms enough items have been delivered, and executes the assembly instructions (Instant)
-        machineCommand(this.assemblyMachine, "assemble");
-
-        // 3.7 - 3.8) AssemblyLine places product for pick-up (Waiting time)
-        if (getMachineStatus(this.assemblyMachine)){
+        int stepCount = 1;
+        try {
+            // 3.1-3.3) AssemblyLine confirms correct item is delivered (Instant)
+            if (confirmItemDelivery(this.assemblyMachine)) {stepCount++;}else{throw new Exception("Error confirming item delivery");}
+            // 3.4-3.6) AssemblyLine confirms enough items have been delivered, and executes the assembly instructions (Instant)
+            if (machineCommand(this.assemblyMachine, "assemble")){stepCount++;}else{throw new Exception("Error handling assembly station command");}
+            // 3.7 - 3.8) AssemblyLine places product for pick-up (Waiting time)
+            if(getMachineStatus(this.assemblyMachine)){stepCount++;}else{throw new Exception("Error getting machine status");}
             // 3.8) AssemblyLine sends task completion signal (Instant)
-            this.assemblyMachine.taskCompletion();
-        }else{
-            System.out.println("Something went wrong with the Assembly Station");
+            // .taskCompletion() returns 0 or 1, but it is not needed, since the previous step will leave AssemblyStation in the correct state
+            if(this.assemblyMachine.taskCompletion()!=1){throw new Exception("Error completing task");}
+
+        } catch (Exception e){
+            System.out.println("Failed at Step 3, action: "+stepCount);
+            e.printStackTrace();
         }
-        // .taskCompletion() returns 0 or 1, but it is not needed, since the previous step will leave AssemblyStation in the correct state
+
     }
 
     public void step4_AGVDeliverProductToWarehouse(){
+        int stepCount = 1;
+        try {
+            // 4.1 - 4.3A) Warehouse sends 'tray ready' signal
+            if(getMachineStatus(this.warehouse)){stepCount++;}else{throw new Exception("Error fetching warehouse status");}
 
-        // 4.1) Warehouse receives “prepare” command signal
+            // 4.3B-4B) AGV receives pick-up signal and moves to AssemblyLine
+            if(machineCommand(this.agvMachine, "MoveToAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling AGV command");}
 
+            // 4.5B) AGV sends 'movement complete' signal
+            // Confirm position Assembly
+            if(agvMinorTaskComplete()){stepCount++;}else{throw new Exception("Error completing task");}
 
-        // 4.2) Warehouse confirms tray available
+            // 4.6B) AGV picks up item
+            if(getMachineStatus(this.assemblyMachine)){stepCount++;}else{throw new Exception("Error getting machine status");}
+            if(machineCommand(this.agvMachine, "PickAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling AGV command");}
+            Drone newDrone = new Drone(generateUnboundedRandomHexUsingRandomNextInt());
+            this.agvMachine.setMostRecentlyReceived(newDrone);
+            // Confirm carrying item
+            if(agvMinorTaskComplete()){stepCount++;}else{throw new Exception("Error completing task");}
 
+            // 4.7B) AGV receives movement instructions and moves to Warehouse
+            if(machineCommand(this.agvMachine, "MoveToStorageOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
 
-        // 4.3A) Warehouse prepares storage tray
+            // 4.8B) AGV sends 'movement complete' signal
+            // Confirm position Warehouse
+            if(agvMinorTaskComplete()){stepCount++;}else{throw new Exception("Error completing task");}
 
+            // 4.9) AGV delivers item to Warehouse
+            if(machineCommand(this.agvMachine, "PutWarehouseOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
+            this.warehouse.setMostRecentlyReceived(newDrone);
 
-        // 4.1 - 4.3A) Warehouse sends 'tray ready' signal
-        getMachineStatus(this.warehouse);
-
-        // 4.3B-4B) AGV receives pick-up signal and moves to AssemblyLine
-        machineCommand(this.agvMachine,"MoveToAssemblyOperation");
-
-        // 4.5B) AGV sends 'movement complete' signal
-        agvMinorTaskComplete(); // Confirm position Assembly
-
-        // 4.6B) AGV picks up item
-        this.assemblyMachine.getCurrentSystemStatus(); // else if (systemStatus == SystemStatus.AWAITING_PICKUP) {this.systemStatus = SystemStatus.IDLE;this.exitTray.setContent(null);this.exitTray.setAvailable(true);}
-        machineCommand(this.agvMachine,"PickAssemblyOperation");
-        Drone newDrone = new Drone(generateUnboundedRandomHexUsingRandomNextInt());
-        this.agvMachine.setMostRecentlyReceived(newDrone);
-        agvMinorTaskComplete(); // Confirm carrying item
-;
-        // 4.7B) AGV receives movement instructions and moves to Warehouse
-        machineCommand(this.agvMachine,"MoveToStorageOperation");
-
-        // 4.8B) AGV sends 'movement complete' signal
-        agvMinorTaskComplete(); // Confirm position Warehouse
-
-        // 4.9) AGV delivers item to Warehouse
-        machineCommand(this.agvMachine,"PutWarehouseOperation");
-        this.warehouse.setMostRecentlyReceived(newDrone);
-
-        // 4.10) AGV sends task completion signal
-        this.agvMachine.taskCompletion();
+            // 4.10) AGV sends task completion signal
+            if(this.agvMachine.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
+        } catch (Exception e) {
+            System.out.println("Failed at Step 4, action: "+stepCount);
+            e.printStackTrace();
+        }
     }
     public void step5_WarehouseDepositProduct(){
+        int stepCount = 1;
+        try {
+            // 5.1 - 5.2) Warehouse confirms correct item is delivered
+            if (confirmItemDelivery(this.warehouse)) {stepCount++;}else{throw new Exception("Error confirming item delivery");}
 
-        // 5.1 - 5.2) Warehouse confirms correct item is delivered
-        confirmItemDelivery(this.warehouse);
+            // 5.3) Warehouse stores item
+            if (machineCommand(this.warehouse, "insertItem")){stepCount++;}else{throw new Exception("Error handling warehouse command");}
 
-        // 5.3) Warehouse stores item
-        machineCommand(this.warehouse, "insertItem");
-
-        // 5.4) Warehouse sends task completion signal
-        if(getMachineStatus(this.warehouse)){
-            this.warehouse.taskCompletion();
-        } else{
-            System.out.println("Something went wrong with the warehouse.");
+            // 5.4) Warehouse sends task completion signal
+            if (getMachineStatus(this.warehouse)) {stepCount++;}else{throw new Exception("Error getting machine status");}
+            if (this.warehouse.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
+        }catch (Exception e) {
+            System.out.println("Failed at Step 5, action: "+stepCount);
+            e.printStackTrace();
         }
     }
 

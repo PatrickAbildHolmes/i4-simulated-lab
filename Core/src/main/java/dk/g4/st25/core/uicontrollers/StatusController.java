@@ -44,6 +44,7 @@ public class StatusController {
 
     // Method for switching back to the "Homepage" site
     public void switchToHomepage(ActionEvent event) throws IOException {
+        // Stopping thread
         running = false;
         if (statusThread != null) {
             statusThread.interrupt();
@@ -56,7 +57,7 @@ public class StatusController {
         // Applies hovering effect to increase size
         UIEffects.applyHoverEffect(backBtnStat);
 
-        // Initialize fields with default values
+        // Checks if a production is active, and if not, alert
         if (ProductionQueue.getInstance().getOrders().peek() != null) {
             updateStatus(ProductionQueue.getInstance().getOrders().peek());
         } else {
@@ -66,6 +67,7 @@ public class StatusController {
 
     // Updating the current status
     public void updateStatus(Order order) {
+        // Default values
         ICoordinate coordinate = app.getICoordinateImplementations().stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No ICoordinate implementations found"));
@@ -76,7 +78,7 @@ public class StatusController {
         this.state = "Executing";
 
 
-
+        // Thread for constantly updating
         App app = App.getAppContext();
         statusThread = new Thread(() -> {
             while (running) {
@@ -89,11 +91,13 @@ public class StatusController {
                     amountStat.setText(producedAmount + "/" + totalAmount);
                     stateStat.setText(state);
 
+                    // If production is finished, run initialize again, to check if theres a production
                     if (producedAmount == totalAmount) {
                         state = "Finished!";
                         wait(2000);
                         initialize();
                     }
+                    // Check every 2 seconds
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -107,18 +111,7 @@ public class StatusController {
         statusThread.start();
     }
 
-    // Method to call each time a drone is finished in production (Don't know if it is needed)
-    public void incrementProduction() {
-        if (producedAmount < totalAmount) {
-            producedAmount++;
-            amountStat.setText(producedAmount + "/" + totalAmount);
-
-            if (producedAmount == totalAmount) {
-                state = "Completed";
-                stateStat.setText(state);
-            }
-        }
-    }
+ 
     // Method for showing the alert (Used elsewhere in this class)
     private void showAlert(String title, String message) throws IOException {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

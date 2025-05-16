@@ -1,11 +1,14 @@
 package dk.g4.st25.core.uicontrollers;
 
+import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.util.Order;
 import dk.g4.st25.core.App;
+import dk.g4.st25.core.ProductionQueue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -37,6 +40,7 @@ public class StatusController {
     private String state;
     private Thread statusThread;
     private volatile boolean running = true;
+    private App app = App.getAppContext();
 
     // Method for switching back to the "Homepage" site
     public void switchToHomepage(ActionEvent event) throws IOException {
@@ -48,26 +52,49 @@ public class StatusController {
     }
 
     // Initializes all functionalities when the scene is opened
-    public void initialize(){
+    public void initialize() throws IOException {
         // Applies hovering effect to increase size
         UIEffects.applyHoverEffect(backBtnStat);
 
         // Initialize fields with default values
-        updateStatus();
+        if (ProductionQueue.getInstance().getOrders().peek() != null) {
+            updateStatus(ProductionQueue.getInstance().getOrders().peek());
+        } else {
+            showAlert("ERROR!","No production has been started, or queue empty!");
+        }
     }
 
     // Updating the current status
     public void updateStatus(Order order) {
-        this.productionName = productionName;
+        ICoordinate coordinate = app.getICoordinateImplementations().stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No ICoordinate implementations found"));
+        this.productionName = order.getName();
         this.productType = order.getProduct().getType();
-        this.producedAmount = producedAmount;
-        this.totalAmount = totalAmount;
-        this.state = state;
+        this.producedAmount = 0;
+        this.totalAmount = order.getAmount();
+        this.state = "Executing";
+
+
+
         App app = App.getAppContext();
         statusThread = new Thread(() -> {
             while (running) {
                 try {
-                    
+                    //producedAmount = coordinate.getProduced();
+
+                    // Update UI fields
+                    curProdNameStat.setText(productionName);
+                    prodTypeStat.setText(productType);
+                    amountStat.setText(producedAmount + "/" + totalAmount);
+                    stateStat.setText(state);
+
+                    if (producedAmount == totalAmount) {
+                        state = "Finished!";
+                        wait(2000);
+                        initialize();
+                    }
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     break;
@@ -76,13 +103,8 @@ public class StatusController {
                 }
             }
         });
-//        statusThread.setDaemon(true);
-//        statusThread.start();
-//        // Update UI fields
-//        curProdIdStat.setText(productionId);
-//        prodTypeStat.setText(droneType);
-//        amountStat.setText(producedAmount + "/" + totalAmount);
-//        stateStat.setText(state);
+        statusThread.setDaemon(true);
+        statusThread.start();
     }
 
     // Method to call each time a drone is finished in production (Don't know if it is needed)
@@ -96,5 +118,13 @@ public class StatusController {
                 stateStat.setText(state);
             }
         }
+    }
+    // Method for showing the alert (Used elsewhere in this class)
+    private void showAlert(String title, String message) throws IOException {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

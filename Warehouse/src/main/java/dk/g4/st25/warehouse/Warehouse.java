@@ -1,5 +1,6 @@
 package dk.g4.st25.warehouse;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dk.g4.st25.common.machine.Machine;
 import dk.g4.st25.common.machine.MachineSPI;
@@ -82,7 +83,38 @@ public class Warehouse extends Machine implements MachineSPI, IExecuteCommand, I
 //                }
 //            }
 //        }
-        return null;
+        JsonObject result = new JsonObject();
+        JsonArray tempInventory = this.protocol.readFrom("getInventory",endpoint).get("Inventory").getAsJsonArray();
+        switch (commandType.toLowerCase()) {
+            case "refresh":
+                refreshInventory(commandParam);
+                result.addProperty("status","Success");
+                result.addProperty("message","Inventory refreshed for warehouse");
+                return result;
+            // Forslag til måden at måske håndtere det på
+            case "pickitem":
+                for (int i = 0; i>tempInventory.size(); i++) {
+                    if (tempInventory.get(i).getAsString().equals("Drone component")) {
+                        String pickMessage = "{\"action\":\"pick\",\"trayId\":" + i +"}";
+                        this.protocol.writeTo(pickMessage,endpoint);
+                        result.addProperty("status","Success");
+                        result.addProperty("message","Success! Picked item from slot: " + i);
+                    }
+                }
+            case "insertitem":
+                for (int i = 0; i>tempInventory.size();i++) {
+                    if (tempInventory.get(i).getAsString().equals("")) {
+                        String insertMessage = "{\"action\":\"insert\", \"trayId\":"+ i +", \"itemName\":\"Finished drone\"}";
+                        this.protocol.writeTo(insertMessage,endpoint);
+                        result.addProperty("status","Success");
+                        result.addProperty("message","Success! Inserted an item at slot: " + i);
+                    }
+                }
+            default:
+                result.addProperty("status", "error");
+                result.addProperty("message", "Unknown command type.");
+                return result;
+        }
     }
 
     @Override
@@ -113,7 +145,16 @@ public class Warehouse extends Machine implements MachineSPI, IExecuteCommand, I
         return "Soap Active";
     }
 
-
+    public void refreshInventory(String endpoint) {
+        for (int i = 0; i<10; i++) {
+            String pickMessage = "{\"action\":\"pick\",\"trayId\":" + i +"}";
+            this.protocol.writeTo(pickMessage, endpoint);
+            for (int j = 0; j<8; j++){
+                String insertMessage = "{\"action\":\"insert\", \"trayId\":"+ i +", \"itemName\":\"Drone component\"}";
+                this.protocol.writeTo(insertMessage,endpoint);
+            }
+        }
+    }
 //    public static void main(String[] args) {
 //        SOAP soap = new SOAP();
 //        Warehouse warehouse = new Warehouse();

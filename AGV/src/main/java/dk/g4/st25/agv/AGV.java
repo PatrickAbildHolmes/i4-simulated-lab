@@ -134,6 +134,11 @@ public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonito
 
 
     @Override
+    public String getInventory() {
+        return "";
+    }
+
+    @Override
     public String getCurrentSystemStatus() {
         return null;
     }

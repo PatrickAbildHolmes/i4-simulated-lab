@@ -2,7 +2,9 @@ package dk.g4.st25.core.uicontrollers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dk.g4.st25.common.services.IExecuteCommand;
+import dk.g4.st25.common.services.IMonitorStatus;
 import dk.g4.st25.core.App;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -63,14 +65,12 @@ public class InventoryController {
 
         JsonObject response = new JsonObject();
 
-        System.out.println(app.getConfiguration().getIExecuteCommandImplementationsList());
-
-        for (IExecuteCommand implementation : app.getConfiguration().getIExecuteCommandImplementationsList()) {
+        for (IMonitorStatus implementation : app.getIMonitorStatusImplementations()) {
             System.out.println("Got run");
-            System.out.println(app.getConfiguration().getIExecuteCommandImplementationsList().stream().findAny());
             if (implementation.getClass().getModule().getName().equals("Warehouse")) {
                 System.out.println("TEST");
-                response = implementation.sendCommand("readFrom", "GetInventory");
+                String responseString = implementation.getInventory();
+                response = JsonParser.parseString(responseString).getAsJsonObject();
             }
         }
 

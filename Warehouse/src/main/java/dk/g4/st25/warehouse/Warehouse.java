@@ -2,6 +2,7 @@ package dk.g4.st25.warehouse;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import dk.g4.st25.common.machine.Machine;
 import dk.g4.st25.common.machine.DroneComponent;
 import dk.g4.st25.common.machine.ItemConfirmationI;
 import dk.g4.st25.common.machine.MachineSPI;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ServiceLoader;
 
+public class Warehouse extends Machine implements MachineSPI, IExecuteCommand, IMonitorStatus {
 import static java.util.stream.Collectors.toList;
 
 public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus, ItemConfirmationI {
@@ -25,6 +27,15 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus, I
     // Counter to track the number of items successfully fetched
     private int itemsFetched = 0;
     private final String endpoint = "http://localhost:8081/Service.asmx";
+    public enum systemStatus {
+        IDLE,
+        EXECUTING,
+        ERROR,
+        UNKNOWN
+    }
+//    public Warehouse() {
+//        this.protocol = new SOAP();
+//    }
     private Tray[] trays; // Trays for delivery and pick-up. Fixed number
     private Object mostRecentlyReceived;
 
@@ -131,13 +142,13 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus, I
                 return implementation.readFrom(endpoint, commandParam);
             }
         }*/
-        if (commandType.equalsIgnoreCase("readFrom")) {
-            for (ProtocolSPI implementation : getProtocolSPIImplementationsList()) {
-                if (implementation.getClass().getModule().getName().equals("SOAP")) {
-                    return implementation.readFrom(endpoint, commandParam);
-                }
-            }
-        }
+//        if (commandType.equalsIgnoreCase("readFrom")) {
+//            for (ProtocolSPI implementation : getProtocolSPIImplementationsList()) {
+//                if (implementation.getClass().getModule().getName().equals("SOAP")) {
+//                    return implementation.readFrom(endpoint, commandParam);
+//                }
+//            }
+//        }
         return null;
     }
 
@@ -147,9 +158,30 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus, I
     }
 
     @Override
+    public String getInventory() {
+        return protocol.readFrom(endpoint, "GetInventory").toString();
+    }
+
+    @Override
     public String getCurrentSystemStatus() {
         // Create a list to store system status messages
-        return "OPERATING";
+        String status = protocol.readFrom(endpoint, "GetInventory").get("State").getAsString();
+        System.out.println(status);
+        String stateDesc;
+        switch (status) {
+            case "0":
+                stateDesc = "Idle";
+                return stateDesc;
+            case "1":
+                stateDesc = "Executing";
+                return stateDesc;
+            case "2":
+                stateDesc = "Error";
+                return stateDesc;
+            default:
+                stateDesc = "Unknown";
+                return stateDesc;
+        }
     }
 
     @Override

@@ -26,7 +26,7 @@ public class AssemblyStation extends Machine implements MachineSPI{
     private boolean productReadyForPickup;
     private Object mostRecentlyReceived;
 
-    AssemblyStation(Protocol protocol) {
+    public AssemblyStation() {
         this.protocol = protocol;
         this.systemStatus = SystemStatus.IDLE;
         this.processNumber = 1;
@@ -191,6 +191,11 @@ public class AssemblyStation extends Machine implements MachineSPI{
     @Override
     public JsonObject sendCommand(String commandType, String commandName, String commandParam) {
         return null;
+    }
+
+    @Override
+    public String getInventory() {
+        return "";
     }
 
     @Override

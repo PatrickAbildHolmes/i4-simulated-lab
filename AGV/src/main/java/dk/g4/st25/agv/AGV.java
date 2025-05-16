@@ -1,21 +1,18 @@
 package dk.g4.st25.agv;
 
-import dk.g4.st25.common.machine.Machine;
-import dk.g4.st25.common.machine.MachineSPI;
+import dk.g4.st25.common.machine.*;
 import com.google.gson.JsonObject;
-import dk.g4.st25.common.machine.Tray;
-import dk.g4.st25.common.protocol.Protocol;
 import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
-import dk.g4.st25.rest.REST;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
 
-public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonitorStatus {
+public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonitorStatus, ItemConfirmationI {
     private String endpoint;
     private SystemStatus systemStatus;
+
     public enum SystemStatus {
         IDLE,
         READY,
@@ -25,11 +22,12 @@ public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonito
     }
 
     private Tray[] trays;
-    private boolean hasProgram = false;
 
     public AGV() {
         this.systemStatus = SystemStatus.IDLE;
-        this.trays = new Tray[1]; // One tray as the arm can only have 1 item in it
+        this.trays = new Tray[1];// One tray as the arm can only have 1 item in it
+        this.command = "";
+        this.inventory = new HashMap<>();
 
         try {
             this.endpoint = Dotenv.load().get("AGV_ENDPOINT");
@@ -57,52 +55,6 @@ public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonito
     public int getBattery() {
         return getStatus().get("battery").getAsInt();
     }
-
-//    public JsonObject execute() {
-//        if (hasProgram) return null; // else AGV will freeze
-//        Map<String, Object> requestBody = new HashMap<>();
-//        requestBody.put("State", 2);
-//        JsonObject res = this.protocol.writeTo("requestBody", null);
-//        hasProgram = true;
-//        return res;
-//    }
-//
-//    private JsonObject executeOperation(String programName) {
-//        Map<String, Object> requestBody = new HashMap<>();
-//        requestBody.put("Program name", programName);
-//        requestBody.put("State", 1);
-//        JsonObject res = protocol.writeTo(requestBody);
-//        hasProgram = true;
-//        return res;
-//    }
-
-//    public JsonObject chargeBattery() {
-//        return executeOperation("MoveToChargerOperation");
-//    }
-//
-//    public JsonObject moveToAssembly() {
-//        return executeOperation("MoveToAssemblyOperation");
-//    }
-//
-//    public JsonObject moveToStorage() {
-//        return executeOperation("MoveToStorageOperation");
-//    }
-//
-//    public JsonObject putAssembly() {
-//        return executeOperation("PutAssemblyOperation");
-//    }
-//
-//    public JsonObject pickAssembly() {
-//        return executeOperation("PickAssemblyOperation");
-//    }
-//
-//    public JsonObject pickWarehouse() {
-//        return executeOperation("PickWarehouseOperation");
-//    }
-//
-//    public JsonObject putWarehouse() {
-//        return executeOperation("PutWarehouseOperation");
-//    }
 
     @Override
     public int taskCompletion() {
@@ -143,34 +95,105 @@ public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonito
                         break;
                 }
         }
-        return 0;
+        return taskCompletion;
     }
 
     @Override
     public int productionCompletion() {
         /**
-         * Signals the "Movement Complete" signal
+         * Signals the "Movement Complete" and "confirm pick up"
          */
         int productionCompletion = 0;
-        if (this.systemStatus.equals(SystemStatus.IDLE)) {
-            productionCompletion = 1;
-        }
+        if (!this.command.equalsIgnoreCase(AGVCommands.PUTWAREHOUSE.getCommandString()) ||
+                !(this.command.equalsIgnoreCase(AGVCommands.PUTASSEMBLY.getCommandString())))
+            switch (this.systemStatus) {
+                case IDLE:
+                    productionCompletion = 0;
+                case MOVING:
+                    productionCompletion = 0;
+                case EXECUTING:
+                    productionCompletion = 0;
+                case READY:
+                    productionCompletion = 1;
+                case ERROR:
+                    productionCompletion = 0;
+                default:
+                    break;
+            }
         return productionCompletion;
     }
 
     @Override
-    public JsonObject sendCommand(String commandType, String commandParam) {
-        if (commandType.equals("writeTo")) {
-            if (this.systemStatus == SystemStatus.READY) {
-                protocol.writeTo(commandParam, endpoint);
-
-                this.systemStatus = SystemStatus.MOVING;
-                return new JsonObject().getAsJsonObject("Success!");
+    public boolean confirmItemDelivery() {
+        this.systemStatus = SystemStatus.READY; // When AGV has delivered item to either AssemblyStation or Warehouse it becomes ready
+        for (Tray tray : trays) {
+            if (tray.isAvailable() && (this.command.equalsIgnoreCase(AGVCommands.PICKWAREHOUSE.getCommandString()) ||
+                            (this.command.equalsIgnoreCase(AGVCommands.PICKASSEMBLY.getCommandString())))) {
+                tray.setContent(new DroneComponent()); // Placeholder until Coordinator can transfer objects
+                tray.setAvailable(false);
+                return true;
+            } else {
+                // If the last command is not a pick operation, it means that the agv delivers the item to either the warehouse or the assemblystation
+                // and therefore removes it's item
+                tray.setContent(null);
+                tray.setAvailable(true);
+                return false;
             }
-        } else if (commandType.equals("readFrom")) {
-            return protocol.readFrom(endpoint, commandParam);
+
         }
-        System.out.println("Wrong CommandType!");
+        return false;
+    }
+
+    @Override
+    public JsonObject sendCommand(String commandType, String commandParam) {
+        /**
+         * Sends the given command through AGV's given protocol, and handles which states should be set based
+         * on which operation is run
+         */
+        this.command = commandType; // We set the command to be latest recieved command
+        switch (commandType.toLowerCase()) {
+            case "movetochargeroperation":
+                if (protocol.writeTo(AGVCommands.MOVECHARGER.getCommandString(), endpoint) == 1) {
+                    this.systemStatus = SystemStatus.MOVING;
+                    return new JsonObject().getAsJsonObject("Success moving to Charger!");
+                }
+            case "movetoassemblyoperation":
+                if (protocol.writeTo(AGVCommands.MOVEASSEMBLY.getCommandString(), endpoint) == 1) {
+                    this.systemStatus = SystemStatus.MOVING;
+                    return new JsonObject().getAsJsonObject("Success moving to Assembly!");
+                }
+            case "movetostorageoperation":
+                if (protocol.writeTo(AGVCommands.MOVESTORAGE.getCommandString(), endpoint) == 1) {
+                    this.systemStatus = SystemStatus.MOVING;
+                    return new JsonObject().getAsJsonObject("Success moving to Storage!");
+                }
+            case "putassemblyoperation":
+                if (protocol.writeTo(AGVCommands.PUTASSEMBLY.getCommandString(), endpoint) == 1) {
+                    this.systemStatus = SystemStatus.EXECUTING;
+                    return new JsonObject().getAsJsonObject("Success delivering to Assembly!");
+                }
+            case "pickassemblyoperation":
+                if (protocol.writeTo(AGVCommands.PICKASSEMBLY.getCommandString(), endpoint) == 1) {
+                    this.systemStatus = SystemStatus.EXECUTING;
+                    confirmItemDelivery();
+                    return new JsonObject().getAsJsonObject("Success picking from Assembly!");
+                }
+            case "pickwarehouseoperation":
+                if (protocol.writeTo(AGVCommands.PICKWAREHOUSE.getCommandString(), endpoint) == 1) {
+                    this.systemStatus = SystemStatus.EXECUTING;
+                    confirmItemDelivery();
+                    return new JsonObject().getAsJsonObject("Success picking from Storage!");
+                }
+            case "putstorageoperation":
+                if (protocol.writeTo(AGVCommands.PUTWAREHOUSE.getCommandString(), endpoint) == 1) {
+                    this.systemStatus = SystemStatus.EXECUTING;
+                    return new JsonObject().getAsJsonObject("Success delivering to Storage!");
+                }
+            default:
+                System.out.println("No Operation of that name found!");
+                break;
+        }
+        System.out.println("Wrong CommandType! It should be the name of the operation");
         return null;
     }
 

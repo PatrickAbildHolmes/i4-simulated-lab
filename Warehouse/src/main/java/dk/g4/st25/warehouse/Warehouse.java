@@ -7,7 +7,6 @@ import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
 
 
-
 public class Warehouse extends Machine implements MachineSPI, IExecuteCommand, IMonitorStatus {
     // SOAP service object for interacting with the warehouse system
     // Counter to track the number of items successfully fetched
@@ -83,6 +82,11 @@ public class Warehouse extends Machine implements MachineSPI, IExecuteCommand, I
 //            }
 //        }
         return null;
+    }
+
+    @Override
+    public String getInventory() {
+        return protocol.readFrom(endpoint, "GetInventory").toString();
     }
 
     @Override

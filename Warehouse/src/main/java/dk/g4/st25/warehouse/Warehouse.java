@@ -17,11 +17,10 @@ import dk.g4.st25.soap.SOAP;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ServiceLoader;
-
-public class Warehouse extends Machine implements MachineSPI, IExecuteCommand, IMonitorStatus {
 import static java.util.stream.Collectors.toList;
 
-public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus, ItemConfirmationI {
+public class Warehouse extends Machine implements MachineSPI {
+
     // SOAP service object for interacting with the warehouse system
     private final SOAP soapTest = new SOAP();
     // Counter to track the number of items successfully fetched
@@ -38,8 +37,6 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus, I
 //    }
     private Tray[] trays; // Trays for delivery and pick-up. Fixed number
     private Object mostRecentlyReceived;
-
-
 
     @Override
     public int taskCompletion() {
@@ -116,7 +113,7 @@ public class Warehouse implements MachineSPI, IExecuteCommand, IMonitorStatus, I
 
     @Override
     public void setMostRecentlyReceived(Object mostRecentlyReceived) {
-
+        this.mostRecentlyReceived = mostRecentlyReceived;
     }
 
     @Override

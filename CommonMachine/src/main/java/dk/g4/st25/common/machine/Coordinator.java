@@ -2,6 +2,8 @@ package dk.g4.st25.common.machine;
 
 import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.util.Order;
+
+import java.util.Random;
 import java.util.ServiceLoader;
 
 public class Coordinator implements ICoordinate{
@@ -65,8 +67,7 @@ public class Coordinator implements ICoordinate{
 
         Coordinator coordinator = new Coordinator();
         order.setStatus(Order.Status.BEING_PROCESSED);
-
-
+        
         // Amount of products needed to be assembled, and parts needed for each product
         int amountOfProductsToAssemble = order.getAmount();
         int amountOfPartsNeeded = order.getProduct().getParts().length;
@@ -102,147 +103,77 @@ public class Coordinator implements ICoordinate{
         return 1;
     }
     public void step1_WarehouseWithdrawComponent(){
-        /**
-         * Runs through the actions described in Part 1 of the production sequence
-         * 1.1) Warehouse receives "start production" command signal
-         * 1.2) Warehouse checks at least 2 trays available
-         * 1.2) Warehouse places requested component into a tray
-         * 1.3) Warehouse moves the tray to the pickup area
-         * 1.3) Warehouse sends task completion signal with item id
-         */
 
-        // 1.1) Warehouse receives "start production" command signal
+        // 1.1 - 1.3) Warehouse places requested component into a tray
+        machineCommand(this.warehouse, "pickItem");
+        for( int i = 0; i < 5; i++){ // Tries 5 times to pick an item
+            if(this.warehouse.sendCommand("pickItem").has("errorMessage")){
+                //If the 'pick' action fails
+                try{
+                    Thread.sleep(3000); // Waits 3 seconds before continuing with another attempt
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }else{
+                // If the 'pick' action is successful
+                break;
+            }
+        }
 
-        // 1.2) Warehouse checks at least 2 trays available
-
-        // 1.2) Warehouse places requested component into a tray
-
-        // 1.3) Warehouse moves the tray to the pickup area
-
-        // 1.3) Warehouse sends task completion signal with item id
-        
+        // 1.4) Warehouse moves the tray to the pickup area
+        if(getMachineStatus(this.warehouse)){
+            this.warehouse.taskCompletion();
+        }else{
+            System.out.println("Something went wrong with the Warehouse");
+        }
     }
+    
     public void step2_AGVDeliverComponentToAssembly(){
-        /**
-         * Runs through the actions described in Part 2 of the production sequence
-         * 2.1) AGV receives 'component pick-up' command signal
-         * 2.2) AGV moves to warehouse position
-         * 2.3) AGV sends 'movement complete' signal
-         * 2.4) AGV receives pick-up signal
-         * 2.5) AGV picks up item
-         * 2.6) AGV sends 'confirm pick-up' signal
-         * 2.7) AGV receives movement instruction signal
-         * 2.8) AGV moves to AssemblyLine position
-         * 2.9) AGV sends 'movement complete' signal
-         * 2.10) AGV delivers item to AssemblyLine
-         * 2.11) AGV sends task completion signal
-         */
 
-        // 2.1) AGV receives 'component pick-up' command signal
-
-
-        // 2.2) AGV moves to warehouse position
-
+        // 2.1-2.2) AGV receives 'component pick-up' command signal and moves to Warehouse
+        machineCommand(this.agvMachine,"MoveToStorageOperation");
 
         // 2.3) AGV sends 'movement complete' signal
+        agvMinorTaskComplete(); // Confirm position Warehouse
 
-
-        // 2.4) AGV receives pick-up signal
-
-
-        // 2.5) AGV picks up item
-
+        // 2.4-2.5) AGV receives pick-up signal
+        machineCommand(this.agvMachine,"PickWarehouseOperation"); //Load program and execute
+        this.agvMachine.setMostRecentlyReceived(new DroneComponent());
 
         // 2.6) AGV sends 'confirm pick-up' signal
+        agvMinorTaskComplete(); // Confirm carrying item
 
-
-        // 2.7) AGV receives movement instruction signal
-
-
-        // 2.8) AGV moves to AssemblyLine position
-
-
+        // 2.7-2.8) AGV receives movement instruction signal and moves to Assembly
+        machineCommand(this.agvMachine,"MoveToAssemblyOperation");
         // 2.9) AGV sends 'movement complete' signal
-
+        agvMinorTaskComplete(); // Confirm position Assembly
 
         // 2.10) AGV delivers item to AssemblyLine
+        machineCommand(this.agvMachine,"PutAssemblyOperation"); //Load program and execute
         this.assemblyMachine.setMostRecentlyReceived(new DroneComponent());
 
         // 2.11) AGV sends task completion signal
-
+        this.agvMachine.taskCompletion(); // Confirm not carrying item
 
     }
     public void step3_AssemblyAssembleProduct(){
-        /**
-         * Runs through the actions described in Part 3 of the production sequence
-         * 3.1) AssemblyLine receives "execute assembly" command signal
-         * 3.2) AssemblyLine confirms correct item is delivered
-         * 3.3) AssemblyLine sends confirmation signal
-         * 3.4) AssemblyLine confirms enough items have been delivered
-         * 3.5) AssemblyLine sends confirmation signal
-         * 3.6) AssemblyLine executes the assembly instructions
-         * 3.7) AssemblyLine places product for pick-up
-         * 3.8) AssemblyLine sends task completion signal
-         */
         // 3.1-3.3) AssemblyLine confirms correct item is delivered (Instant)
-        for (int i = 0; i < 5; i++) {
-            if(this.assemblyMachine.confirmItemDelivery()){
-                break;
-            }else{
-                try{
-                    Thread.sleep(1000); // Wait 1 second between each attempt
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
+        confirmItemDelivery(this.assemblyMachine);
+
         // 3.4-3.6) AssemblyLine confirms enough items have been delivered, and executes the assembly instructions (Instant)
-        for (int i = 0; i < 5; i++) { // Attempt 5 times
-            if (this.assemblyMachine.sendCommand("assemble").has("Success!")){break;}
-            else {
-                try{
-                    Thread.sleep(1000); // Wait 1 second between each attempt if unsuccessful
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+        machineCommand(this.assemblyMachine, "assemble");
+
+        // 3.7 - 3.8) AssemblyLine places product for pick-up (Waiting time)
+        if (getMachineStatus(this.assemblyMachine)){
+            // 3.8) AssemblyLine sends task completion signal (Instant)
+            this.assemblyMachine.taskCompletion();
+        }else{
+            System.out.println("Something went wrong with the Assembly Station");
         }
-        // 3.7) AssemblyLine places product for pick-up (Waiting time)
-        for (int i = 0; i < 5; i++) { // Attempt 5 times
-            String assemblyState = this.assemblyMachine.getCurrentSystemStatus(); // if (systemStatus == SystemStatus.ASSEMBLING) {this.systemStatus = SystemStatus.AWAITING_PICKUP;}
-            if (assemblyState.equals("Idle")) {
-                return;
-            }else if (assemblyState.equals("Error") || assemblyState.equals("Unknown")) {
-                System.out.println("An Error occurred while assembling the product");
-                return;
-            }else {
-                try{
-                    Thread.sleep(5000); // Wait 5 seconds between each attempt
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        // 3.8) AssemblyLine sends task completion signal (Instant)
         // .taskCompletion() returns 0 or 1, but it is not needed, since the previous step will leave AssemblyStation in the correct state
     }
 
     public void step4_AGVDeliverProductToWarehouse(){
-        /**
-         * Runs through the actions described in Part 4 of the production sequence
-         * 4.1) Warehouse receives “prepare” command signal
-         * 4.2) Warehouse confirms tray available
-         * 4.3A) Warehouse prepares storage tray
-         * 4.3A) Warehouse sends 'tray ready' signal
-         * 4.3B) AGV receives pick-up signal
-         * 4.4B) AGV moves to AssemblyLine position
-         * 4.5B) AGV sends 'movement complete' signal
-         * 4.6B) AGV picks up item
-         * 4.7B) AGV receives movement instructions
-         * 4.8B) AGV moves to Warehouse
-         * 4.9) AGV delivers item to Warehouse
-         * 4.10) AGV sends task completion signal
-         */
 
         // 4.1) Warehouse receives “prepare” command signal
 
@@ -253,59 +184,119 @@ public class Coordinator implements ICoordinate{
         // 4.3A) Warehouse prepares storage tray
 
 
-        // 4.3A) Warehouse sends 'tray ready' signal
+        // 4.1 - 4.3A) Warehouse sends 'tray ready' signal
+        getMachineStatus(this.warehouse);
 
-
-        // 4.3B) AGV receives pick-up signal
-
-
-        // 4.4B) AGV moves to AssemblyLine position
-
+        // 4.3B-4B) AGV receives pick-up signal and moves to AssemblyLine
+        machineCommand(this.agvMachine,"MoveToAssemblyOperation");
 
         // 4.5B) AGV sends 'movement complete' signal
-
+        agvMinorTaskComplete(); // Confirm position Assembly
 
         // 4.6B) AGV picks up item
         this.assemblyMachine.getCurrentSystemStatus(); // else if (systemStatus == SystemStatus.AWAITING_PICKUP) {this.systemStatus = SystemStatus.IDLE;this.exitTray.setContent(null);this.exitTray.setAvailable(true);}
+        machineCommand(this.agvMachine,"PickAssemblyOperation");
+        Drone newDrone = new Drone(generateUnboundedRandomHexUsingRandomNextInt());
+        this.agvMachine.setMostRecentlyReceived(newDrone);
+        agvMinorTaskComplete(); // Confirm carrying item
+;
+        // 4.7B) AGV receives movement instructions and moves to Warehouse
+        machineCommand(this.agvMachine,"MoveToStorageOperation");
 
-
-        // 4.7B) AGV receives movement instructions
-
-
-        // 4.8B) AGV moves to Warehouse
-
+        // 4.8B) AGV sends 'movement complete' signal
+        agvMinorTaskComplete(); // Confirm position Warehouse
 
         // 4.9) AGV delivers item to Warehouse
-
+        machineCommand(this.agvMachine,"PutWarehouseOperation");
+        this.warehouse.setMostRecentlyReceived(newDrone);
 
         // 4.10) AGV sends task completion signal
-
-
+        this.agvMachine.taskCompletion();
     }
     public void step5_WarehouseDepositProduct(){
-        /**
-         * Runs through the actions described in Part 5 of the production sequence
-         * 5.1) Warehouse receives "deposit" command signal
-         * 5.1) Warehouse confirms correct item is delivered
-         * 5.2) Warehouse sends confirmation signal
-         * 5.3) Warehouse stores item
-         * 5.4) Warehouse sends task completion signal
-         */
 
-        // 5.1) Warehouse receives "deposit" command signal
-
-
-        // 5.1) Warehouse confirms correct item is delivered
-
-
-        // 5.2) Warehouse sends confirmation signal
-
+        // 5.1 - 5.2) Warehouse confirms correct item is delivered
+        confirmItemDelivery(this.warehouse);
 
         // 5.3) Warehouse stores item
-
+        machineCommand(this.warehouse, "insertItem");
 
         // 5.4) Warehouse sends task completion signal
+        if(getMachineStatus(this.warehouse)){
+            this.warehouse.taskCompletion();
+        } else{
+            System.out.println("Something went wrong with the warehouse.");
+        }
+    }
 
+
+    // helper-methods:
+    String generateUnboundedRandomHexUsingRandomNextInt() { // Used to generate drone ID/names
+        Random random = new Random();
+        int randomInt = random.nextInt();
+        return Integer.toHexString(randomInt);
+    }
+    public boolean machineCommand(MachineSPI machine,String command){
+        for (int i = 0; i < 5; i++) { // Attempt 5 times
+            if (machine.sendCommand(command)         //Load program and execute
+                    .has("Success!")){   // and if it returns success
+                return true;                         // Then move on
+            }
+            else {
+                try{
+                    Thread.sleep(5000); // Wait 5 seconds between each attempt if unsuccessful
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return false;
+    }
+    public boolean agvMinorTaskComplete(){
+        for (int i = 0; i < 5; i++) { // Confirm position Assembly
+            if(this.agvMachine.productionCompletion() == 1){
+                return true;
+            }else{
+                try{
+                    Thread.sleep(2000); // Wait 2 seconds between each attempt if unsuccessful
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return false;
+    }
+    public boolean confirmItemDelivery(MachineSPI machine){
+        for (int i = 0; i < 5; i++) {
+            if(machine.confirmItemDelivery()){
+                return true;
+            }else{
+                try{
+                    Thread.sleep(1000); // Wait 1 second between each attempt
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return false;
+    }
+    public boolean getMachineStatus(MachineSPI machine){
+        for (int i = 0; i < 5; i++) { // Attempt 5 times
+            String machineState = machine.getCurrentSystemStatus();
+            if (machineState.equals("Idle")) {
+                return true;
+            }else if (machineState.equals("Error") || machineState.equals("Unknown")) {
+                System.out.println("An Error occurred while assembling the product");
+                return false;
+            }else {
+                try{
+                    Thread.sleep(5000); // Wait 5 seconds between each attempt
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return false;
     }
 }
 

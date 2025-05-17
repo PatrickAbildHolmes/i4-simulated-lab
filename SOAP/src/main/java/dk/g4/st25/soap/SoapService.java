@@ -91,25 +91,8 @@ public class SoapService {
             System.out.println(response.getStatusText());
         }
     }
-    public void refreshInventory(String endpoint) {
-        SoapService soapService = new SoapService();
-        for (int i = 0; i<10; i++){
-            soapService.pickItem(i+1, endpoint);
-        }
-        String[] newItems = {"Rollade" , "Trøffel", "Cupcake", "Lagkage", "Chokolade kage",
-                "Cookie dough", "Ben and Jerry's", "Frysepizza", "Chips", "Brunsviger"};
-        for (int i = 0; i< newItems.length; i++){
-            soapService.insertItem(i + 1,newItems[i], endpoint);
-        }
-    }
+
 
     public static void main(String[] args) {
-        SoapService soaptestforsoeg = new SoapService();
-        String endpoint = "http://localhost:8081/Service.asmx";
-        soaptestforsoeg.refreshInventory(endpoint);
-        System.out.println(soaptestforsoeg.getInventory(endpoint));
-        //soaptestforsoeg.pickItem(2);
-        //soaptestforsoeg.insertItem(2, "TOM");
-        //System.out.println(soaptestforsoeg.getInventory(endpoint));
     }
 }

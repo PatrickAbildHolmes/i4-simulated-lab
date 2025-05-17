@@ -27,7 +27,6 @@ public class AssemblyStation extends Machine implements MachineSPI{
     private Object mostRecentlyReceived;
 
     public AssemblyStation() {
-        this.protocol = protocol;
         this.systemStatus = SystemStatus.IDLE;
         this.processNumber = 1;
         this.command = "";

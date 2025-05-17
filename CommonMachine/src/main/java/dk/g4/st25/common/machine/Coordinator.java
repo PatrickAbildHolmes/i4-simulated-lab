@@ -5,8 +5,12 @@ import dk.g4.st25.common.util.Order;
 
 import java.util.Random;
 import java.util.ServiceLoader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Coordinator implements ICoordinate{
+
+    private final List<Object> objectList = new ArrayList<Object>();
     private MachineSPI warehouse;
     private MachineSPI agvMachine;
     private MachineSPI assemblyMachine;
@@ -54,6 +58,7 @@ public class Coordinator implements ICoordinate{
         return this.produced;
     }
 
+
     @Override
     public int startProduction(Order order) {
         /**
@@ -67,7 +72,7 @@ public class Coordinator implements ICoordinate{
 
         Coordinator coordinator = new Coordinator();
         order.setStatus(Order.Status.BEING_PROCESSED);
-        
+
         // Amount of products needed to be assembled, and parts needed for each product
         int amountOfProductsToAssemble = order.getAmount();
         int amountOfPartsNeeded = order.getProduct().getParts().length;
@@ -112,11 +117,11 @@ public class Coordinator implements ICoordinate{
             if (getMachineStatus(this.warehouse)) {stepCount++;}else{throw new Exception("Error getting warehouse state");}
             if (this.warehouse.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
         }catch (Exception e) {
-                System.out.println("Failed at Step 4, action: "+stepCount);
-                e.printStackTrace();
-            }
+            System.out.println("Failed at Step 4, action: "+stepCount);
+            e.printStackTrace();
+        }
     }
-    
+
     public void step2_AGVDeliverComponentToAssembly(){
         int stepCount = 1;
         try {
@@ -301,5 +306,8 @@ public class Coordinator implements ICoordinate{
         }
         return false;
     }
+    @Override
+    public List<Object> getObjectList() {
+        return objectList;
+    }
 }
-

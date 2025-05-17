@@ -26,7 +26,6 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
     private Object mostRecentlyReceived;
 
     public AssemblyStation() {
-        this.protocol = protocol;
         this.systemStatus = SystemStatus.IDLE;
         this.processNumber = 1;
         this.command = "";
@@ -180,6 +179,11 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
         } else {
             return null;
         }
+    }
+
+    @Override
+    public String getInventory() {
+        return "";
     }
 
     @Override

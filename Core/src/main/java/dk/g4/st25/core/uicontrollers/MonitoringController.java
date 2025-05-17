@@ -1,5 +1,6 @@
 package dk.g4.st25.core.uicontrollers;
 
+
 import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.services.IMonitorStatus;
 import dk.g4.st25.core.App;
@@ -15,7 +16,6 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
-
 
 public class MonitoringController {
     private Stage stage;

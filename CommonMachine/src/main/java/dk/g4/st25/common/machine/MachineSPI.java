@@ -4,7 +4,11 @@ public interface MachineSPI {
     enum systemState{
 
     }
-    // Signals that a task is complete
+
+    /**
+     * Signals if a task from a machine has been completed
+     * @return is of integer, for expansion, as the coordinator could be able to interpret further codes
+     */
     int taskCompletion();
 
 

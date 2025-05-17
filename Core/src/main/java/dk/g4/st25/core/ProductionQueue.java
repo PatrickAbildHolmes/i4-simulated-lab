@@ -4,10 +4,11 @@ import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.util.Order;
 
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Queue;
 
 public class ProductionQueue {
-    private static ProductionQueue productionQueue = new ProductionQueue();
+    private final static ProductionQueue productionQueue = new ProductionQueue();
     private Queue<Order> orders = new LinkedList<>();
     private boolean productionStarted = false;
 
@@ -34,6 +35,10 @@ public class ProductionQueue {
 
     public boolean isProductionStarted() {
         return productionStarted;
+    }
+
+    public Queue<Order> getOrders() {
+        return orders;
     }
 
     static public ProductionQueue getInstance() {

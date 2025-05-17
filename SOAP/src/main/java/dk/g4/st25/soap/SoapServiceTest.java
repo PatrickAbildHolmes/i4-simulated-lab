@@ -19,12 +19,12 @@ public class SoapServiceTest {
         System.out.println("Pick Status: " + pickStatus);
 
         // Insert a new item into tray 2
-        JSONObject insertJson = new JSONObject();
-        insertJson.put("action", "insert");
-        insertJson.put("trayId", 2);
-        insertJson.put("itemName", "Skildpadde");
-        int insertStatus = protocol.writeTo(insertJson.toString(), "http://localhost:8081/Service.asmx");
-        System.out.println("Insert Status: " + insertStatus);
+//        JSONObject insertJson = new JSONObject();
+//        insertJson.put("action", "insert");
+//        insertJson.put("trayId", 2);
+//        insertJson.put("itemName", "Skildpadde");
+//        int insertStatus = protocol.writeTo(insertJson.toString(), "http://localhost:8081/Service.asmx");
+//        System.out.println("Insert Status: " + insertStatus);
 
         // Read inventory
         JsonObject inventory = protocol.readFrom("http://localhost:8081/Service.asmx", "getInventory");

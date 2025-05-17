@@ -57,8 +57,10 @@ public class Coordinator implements ICoordinate{
          * */
         return this.produced;
     }
-
-
+    @Override
+    public List<Object> getObjectList() {
+        return objectList;
+    }
     @Override
     public int startProduction(Order order) {
         /**
@@ -130,27 +132,28 @@ public class Coordinator implements ICoordinate{
 
             // 2.3) AGV sends 'movement complete' signal
             // Confirm position Warehouse
-            if(agvMinorTaskComplete()){stepCount++;}else{throw new Exception("Error completing task");}
+            if(actionCompletion(this.agvMachine)){stepCount++;}else{throw new Exception("Error completing task");}
 
             // 2.4-2.5) AGV receives pick-up signal
             //Load program and execute
             if(machineCommand(this.agvMachine, "PickWarehouseOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
-            this.agvMachine.setMostRecentlyReceived(new DroneComponent());
+//            this.agvMachine.setMostRecentlyReceived(new DroneComponent());
 
             // 2.6) AGV sends 'confirm pick-up' signal
             // Confirm carrying item
-            if(agvMinorTaskComplete()){stepCount++;}else{throw new Exception("Error completing task");}
+            if (confirmItemDelivery(this.agvMachine)) {stepCount++;}else{throw new Exception("Error confirming item delivery");}
+            if(actionCompletion(this.agvMachine)){stepCount++;}else{throw new Exception("Error completing task");}
 
             // 2.7-2.8) AGV receives movement instruction signal and moves to Assembly
             if(machineCommand(this.agvMachine, "MoveToAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
             // 2.9) AGV sends 'movement complete' signal
             // Confirm position Assembly
-            if(agvMinorTaskComplete()){stepCount++;}else{throw new Exception("Error completing task");}
+            if(actionCompletion(this.agvMachine)){stepCount++;}else{throw new Exception("Error completing task");}
 
             // 2.10) AGV delivers item to AssemblyLine
             //Load program and execute
             if(machineCommand(this.agvMachine, "PutAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
-            this.assemblyMachine.setMostRecentlyReceived(new DroneComponent());
+//            this.assemblyMachine.setMostRecentlyReceived(new DroneComponent());
 
             // 2.11) AGV sends task completion signal
             // Confirm not carrying item
@@ -191,26 +194,26 @@ public class Coordinator implements ICoordinate{
 
             // 4.5B) AGV sends 'movement complete' signal
             // Confirm position Assembly
-            if(agvMinorTaskComplete()){stepCount++;}else{throw new Exception("Error completing task");}
+            if(actionCompletion(this.agvMachine)){stepCount++;}else{throw new Exception("Error completing task");}
 
             // 4.6B) AGV picks up item
             if(getMachineStatus(this.assemblyMachine)){stepCount++;}else{throw new Exception("Error getting machine status");}
             if(machineCommand(this.agvMachine, "PickAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling AGV command");}
             Drone newDrone = new Drone(generateUnboundedRandomHexUsingRandomNextInt());
-            this.agvMachine.setMostRecentlyReceived(newDrone);
+//            this.agvMachine.setMostRecentlyReceived(newDrone);
             // Confirm carrying item
-            if(agvMinorTaskComplete()){stepCount++;}else{throw new Exception("Error completing task");}
+            if(actionCompletion(this.agvMachine)){stepCount++;}else{throw new Exception("Error completing task");}
 
             // 4.7B) AGV receives movement instructions and moves to Warehouse
             if(machineCommand(this.agvMachine, "MoveToStorageOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
 
             // 4.8B) AGV sends 'movement complete' signal
             // Confirm position Warehouse
-            if(agvMinorTaskComplete()){stepCount++;}else{throw new Exception("Error completing task");}
+            if(actionCompletion(this.agvMachine)){stepCount++;}else{throw new Exception("Error completing task");}
 
             // 4.9) AGV delivers item to Warehouse
             if(machineCommand(this.agvMachine, "PutWarehouseOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
-            this.warehouse.setMostRecentlyReceived(newDrone);
+//            this.warehouse.setMostRecentlyReceived(newDrone);
 
             // 4.10) AGV sends task completion signal
             if(this.agvMachine.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
@@ -260,9 +263,9 @@ public class Coordinator implements ICoordinate{
         }
         return false;
     }
-    public boolean agvMinorTaskComplete(){
+    public boolean actionCompletion(MachineSPI machine){
         for (int i = 0; i < 5; i++) { // Confirm position Assembly
-            if(this.agvMachine.productionCompletion() == 1){
+            if(machine.actionCompletion() == 1){
                 return true;
             }else{
                 try{
@@ -305,9 +308,5 @@ public class Coordinator implements ICoordinate{
             }
         }
         return false;
-    }
-    @Override
-    public List<Object> getObjectList() {
-        return objectList;
     }
 }

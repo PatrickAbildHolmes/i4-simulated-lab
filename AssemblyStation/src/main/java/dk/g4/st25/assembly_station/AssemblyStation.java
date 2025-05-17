@@ -2,9 +2,6 @@ package dk.g4.st25.assembly_station;
 
 import com.google.gson.JsonObject;
 import dk.g4.st25.common.machine.*;
-import dk.g4.st25.common.protocol.Protocol;
-import dk.g4.st25.common.services.IExecuteCommand;
-import dk.g4.st25.common.services.IMonitorStatus;
 
 import java.util.HashMap;
 
@@ -22,8 +19,6 @@ public class AssemblyStation extends Machine implements MachineSPI{
 
     private Tray entryTray; // Trays for delivery and pick-up. Fixed number
     private Tray exitTray; // Trays for delivery and pick-up. Fixed number
-    private boolean needsMoreComponents;
-    private boolean productReadyForPickup;
     private Object mostRecentlyReceived;
 
     public AssemblyStation() {
@@ -34,8 +29,6 @@ public class AssemblyStation extends Machine implements MachineSPI{
         this.inventory.put("DroneComponents",0);
         this.entryTray = new Tray();
         this.exitTray = new Tray();
-        this.needsMoreComponents = true;
-        this.productReadyForPickup = false;
     }
     // From README section: 'Sequence (actions) with checks'
     //3) Assembly assemble product
@@ -52,6 +45,7 @@ public class AssemblyStation extends Machine implements MachineSPI{
     public int taskCompletion() {
         /**
          * Signals whether a product is ready for pickup
+         * (This method is used to verify that the sequence of actions within the (Coordinator/production) step is complete)
          */
         int taskCompletion = 0;
         switch (command) {
@@ -73,16 +67,17 @@ public class AssemblyStation extends Machine implements MachineSPI{
                         break;
                 }
             case "checkhealth":
-                return productionCompletion(); // "checkhealth" and productionCompletion() both checks whether systemStatus is IDLE.
+                return actionCompletion(); // "checkhealth" and actionCompletion() both checks whether systemStatus is IDLE.
         }
         return taskCompletion;
     }
 
     @Override
-    public int productionCompletion() {
+    public int actionCompletion() {
         /**
          * Signals when all tasks relating to a production are complete
          * Use it to check that AssemblyStation is no longer AWAITING_PICKUP
+         * (This method is used to verify that the latest action (move, pick up, present object) is finished)
          */
         int productionCompletion = 0;
         switch (this.systemStatus) {
@@ -131,6 +126,7 @@ public class AssemblyStation extends Machine implements MachineSPI{
     public void setMostRecentlyReceived(Object mostRecentlyReceived) {
         /**
          * Used by Coordinator when AGV hands off item
+         * (This method is used to handle object drop-off, since an object can be passed (in Coordinator) through this method)
          */
         this.mostRecentlyReceived = mostRecentlyReceived;
     }
@@ -180,16 +176,6 @@ public class AssemblyStation extends Machine implements MachineSPI{
         } else {
             return null;
         }
-    }
-
-    @Override
-    public JsonObject sendCommand(String commandType, String commandName) {
-        return null;
-    }
-
-    @Override
-    public JsonObject sendCommand(String commandType, String commandName, String commandParam) {
-        return null;
     }
 
     @Override

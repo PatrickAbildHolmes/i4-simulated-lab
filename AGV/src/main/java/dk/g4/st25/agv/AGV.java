@@ -2,14 +2,11 @@ package dk.g4.st25.agv;
 
 import dk.g4.st25.common.machine.*;
 import com.google.gson.JsonObject;
-import dk.g4.st25.common.services.IExecuteCommand;
-import dk.g4.st25.common.services.IMonitorStatus;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.HashMap;
-import java.util.Locale;
 
-public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonitorStatus, ItemConfirmationI {
+public class AGV extends Machine implements MachineSPI {
     private String endpoint;
     private SystemStatus systemStatus;
 
@@ -40,30 +37,14 @@ public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonito
         return protocol.readFrom(endpoint, AGVCommands.GETSTATUS.getCommandString());
     }
 
-    public String getTimestamp() {
-        return getStatus().get("timestamp").toString();
-    }
-
-    public int getState() {
-        return getStatus().get("state").getAsInt();
-    }
-
-    public String getProgramName() {
-        return getStatus().get("program name").toString();
-    }
-
-    public int getBattery() {
-        return getStatus().get("battery").getAsInt();
-    }
-
     @Override
     public int taskCompletion() {
         /**
-         * Signals whether a Drone/Drone Part has been moved
+         * Signals whether a Drone/Drone Part has been moved.
+         * (This method is used to verify that the sequence of actions within the (Coordinator/production) step is complete)
         */
         int taskCompletion = 0;
-        AGVCommands.MOVEASSEMBLY.getCommandString();
-        switch (command) {
+        switch (this.command) {
             case "PutAssemblyOperation":
                 switch (this.systemStatus) {
                     case IDLE:
@@ -99,9 +80,11 @@ public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonito
     }
 
     @Override
-    public int productionCompletion() {
+    public int actionCompletion() {
         /**
          * Signals the "Movement Complete" and "confirm pick up"
+         * This method is used to verify that the latest action (move, pick up, present object) is finished,
+         * as opposed to taskCompletion that verifies that the sequence of actions within the (Coordinator/production) step is complete
          */
         int productionCompletion = 0;
         if (!this.command.equalsIgnoreCase(AGVCommands.PUTWAREHOUSE.getCommandString()) ||
@@ -124,7 +107,19 @@ public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonito
     }
 
     @Override
+    public void setMostRecentlyReceived(Object mostRecentlyReceived) {
+        /**
+         * Ideally this method is used to handle object drop-off, since an object can be passed (in Coordinator) through this method,
+         * I.E. from Warehouse->AGV->Assembly->AGV->Warehouse
+         * */
+    }
+
+    @Override
     public boolean confirmItemDelivery() {
+        /**
+         * This method verifies that the correct item was delivered *To* this machine.
+         * Should be checking that object was instanceof DroneComponent or Drone
+         * */
         this.systemStatus = SystemStatus.READY; // When AGV has delivered item to either AssemblyStation or Warehouse it becomes ready
         for (Tray tray : trays) {
             if (tray.isAvailable() && (this.command.equalsIgnoreCase(AGVCommands.PICKWAREHOUSE.getCommandString()) ||
@@ -133,19 +128,18 @@ public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonito
                 tray.setAvailable(false);
                 return true;
             } else {
-                // If the last command is not a pick operation, it means that the agv delivers the item to either the warehouse or the assemblystation
+                // If the last command is not a pick operation, it means that the agv delivers the item to either the warehouse or the assembly station
                 // and therefore removes it's item
                 tray.setContent(null);
                 tray.setAvailable(true);
                 return false;
             }
-
         }
         return false;
     }
 
     @Override
-    public JsonObject sendCommand(String commandType, String commandParam) {
+    public JsonObject sendCommand(String commandType) {
         /**
          * Sends the given command through AGV's given protocol, and handles which states should be set based
          * on which operation is run

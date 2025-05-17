@@ -17,7 +17,6 @@ public class ProductionQueue {
     public void start() {
         productionStarted = true;
 
-        Configuration conf = Configuration.get();
         ICoordinate coordinate = App.getAppContext().getICoordinateImplementations().stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No ICoordinate implementations found"));

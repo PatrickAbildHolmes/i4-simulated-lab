@@ -3,9 +3,8 @@ package dk.g4.st25.common.services;
 import com.google.gson.JsonObject;
 
 public interface IExecuteCommand {
-
+    /**
+     * Primary method to order a machine to "do something", e.g.: "assemble" to AssemblyStation, or "MoveToWarehouse" to AGV.
+     */
     JsonObject sendCommand(String commandType);
-    JsonObject sendCommand(String commandType, String commandName);
-    JsonObject sendCommand(String commandType, String commandName, String commandParam);
-    // endpoint (where the command is sent, that is, the "physical" machine) is found in the instance of Protocol
 }

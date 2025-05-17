@@ -25,7 +25,7 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
     private boolean productReadyForPickup;
     private Object mostRecentlyReceived;
 
-    AssemblyStation() {
+    public AssemblyStation() {
         this.systemStatus = SystemStatus.IDLE;
         this.processNumber = 1;
         this.command = "";
@@ -179,6 +179,11 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
         } else {
             return null;
         }
+    }
+
+    @Override
+    public String getInventory() {
+        return "";
     }
 
     @Override

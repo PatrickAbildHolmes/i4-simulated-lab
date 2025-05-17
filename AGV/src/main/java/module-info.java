@@ -11,4 +11,5 @@ module AGV {
     requires REST;
     requires java.dotenv;
     provides IExecuteCommand with dk.g4.st25.agv.AGV;
+//    provides IMonitorStatus with dk.g4.st25.agv.AGV;
 }

@@ -87,7 +87,7 @@ public class Warehouse extends Machine implements MachineSPI, IExecuteCommand, I
         JsonArray tempInventory = this.protocol.readFrom("getInventory",endpoint).get("Inventory").getAsJsonArray();
         switch (commandType.toLowerCase()) {
             case "refresh":
-                refreshInventory(commandParam);
+                refreshInventory(endpoint);
                 result.addProperty("status","Success");
                 result.addProperty("message","Inventory refreshed for warehouse");
                 return result;

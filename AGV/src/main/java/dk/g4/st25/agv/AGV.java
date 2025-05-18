@@ -9,20 +9,20 @@ import java.util.HashMap;
 public class AGV extends Machine implements MachineSPI {
     private String endpoint;
     private SystemStatus systemStatus;
-
+    private Object mostRecentlyReceived;
+    private final Tray holding_tray; // "Can't receive a 'new' Tray, hence final"
     public enum SystemStatus {
         IDLE,
         READY,
         MOVING,
         EXECUTING,
         ERROR
-    }
 
-    private Tray[] trays;
+    }
 
     public AGV() {
         this.systemStatus = SystemStatus.IDLE;
-        this.trays = new Tray[1];// One tray as the arm can only have 1 item in it
+        this.holding_tray = new Tray();// One tray as the arm can only have 1 item in it
         this.command = "";
         this.inventory = new HashMap<>();
 
@@ -112,6 +112,7 @@ public class AGV extends Machine implements MachineSPI {
          * Ideally this method is used to handle object drop-off, since an object can be passed (in Coordinator) through this method,
          * I.E. from Warehouse->AGV->Assembly->AGV->Warehouse
          * */
+        this.mostRecentlyReceived = mostRecentlyReceived;
     }
 
     @Override
@@ -121,21 +122,18 @@ public class AGV extends Machine implements MachineSPI {
          * Should be checking that object was instanceof DroneComponent or Drone
          * */
         this.systemStatus = SystemStatus.READY; // When AGV has delivered item to either AssemblyStation or Warehouse it becomes ready
-        for (Tray tray : trays) {
-            if (tray.isAvailable() && (this.command.equalsIgnoreCase(AGVCommands.PICKWAREHOUSE.getCommandString()) ||
-                            (this.command.equalsIgnoreCase(AGVCommands.PICKASSEMBLY.getCommandString())))) {
-                tray.setContent(new DroneComponent()); // Placeholder until Coordinator can transfer objects
-                tray.setAvailable(false);
+            if (this.holding_tray.isAvailable() && // Holding tray must be available AND the latest command must be a pick-up operation
+                    (this.command.equalsIgnoreCase(AGVCommands.PICKWAREHOUSE.getCommandString()) || (this.command.equalsIgnoreCase(AGVCommands.PICKASSEMBLY.getCommandString())))) {
+                this.holding_tray.setContent(this.mostRecentlyReceived); // Grips the item that the Coordinator conjures up for it
+                this.holding_tray.setAvailable(false);
                 return true;
             } else {
                 // If the last command is not a pick operation, it means that the agv delivers the item to either the warehouse or the assembly station
                 // and therefore removes it's item
-                tray.setContent(null);
-                tray.setAvailable(true);
+                this.holding_tray.setContent(null);
+                this.holding_tray.setAvailable(true);
                 return false;
-            }
         }
-        return false;
     }
 
     @Override
@@ -144,7 +142,7 @@ public class AGV extends Machine implements MachineSPI {
          * Sends the given command through AGV's given protocol, and handles which states should be set based
          * on which operation is run
          */
-        this.command = commandType; // We set the command to be latest recieved command
+        this.command = commandType; // We set the command to be latest received command
         switch (commandType.toLowerCase()) {
             case "movetochargeroperation":
                 if (protocol.writeTo(AGVCommands.MOVECHARGER.getCommandString(), endpoint) == 1) {
@@ -193,7 +191,8 @@ public class AGV extends Machine implements MachineSPI {
 
     @Override
     public String getInventory() {
-        return "";
+        // Converts the item held in its Tray to String and returns it
+        return this.holding_tray.getContent().toString();
     }
 
     @Override

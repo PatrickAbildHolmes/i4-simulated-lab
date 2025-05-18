@@ -13,7 +13,7 @@ public class Warehouse extends Machine implements MachineSPI {
     private int itemsFetched = 0;
     private final String endpoint = "http://localhost:8081/Service.asmx";
     private SystemStatus systemStatus;
-
+    private Object mostRecentlyReceived;
     public enum SystemStatus {
         IDLE,
         EXECUTING,
@@ -73,6 +73,7 @@ public class Warehouse extends Machine implements MachineSPI {
          * Ideally this method is used to handle object drop-off, since an object can be passed (in Coordinator) through this method,
          * I.E. from Warehouse->AGV->Assembly->AGV->Warehouse
         * */
+        this.mostRecentlyReceived = mostRecentlyReceived;
     }
 
     @Override

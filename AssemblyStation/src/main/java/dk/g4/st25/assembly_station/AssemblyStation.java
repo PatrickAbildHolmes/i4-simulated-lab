@@ -8,6 +8,9 @@ import java.util.HashMap;
 public class AssemblyStation extends Machine implements MachineSPI{
     private SystemStatus systemStatus; // What it is currently doing (producing, idle, etc.)
     private int processNumber; // Increasing integer starting at 1 that logs what process nr. it is at. '9999' is not allowed.
+    private final Tray entryTray; // Trays for delivery and pick-up. Fixed number. "Can't receive a 'new' Tray, hence final"
+    private final Tray exitTray; // Trays for delivery and pick-up. Fixed number. "Can't receive a 'new' Tray, hence final"
+    private Object mostRecentlyReceived;
     public enum SystemStatus {
         IDLE,
         AWAITING_PARTS,
@@ -16,10 +19,6 @@ public class AssemblyStation extends Machine implements MachineSPI{
         AWAITING_PICKUP,
         ERROR
     }
-
-    private Tray entryTray; // Trays for delivery and pick-up. Fixed number
-    private Tray exitTray; // Trays for delivery and pick-up. Fixed number
-    private Object mostRecentlyReceived;
 
     public AssemblyStation() {
         this.systemStatus = SystemStatus.IDLE;
@@ -30,29 +29,20 @@ public class AssemblyStation extends Machine implements MachineSPI{
         this.entryTray = new Tray();
         this.exitTray = new Tray();
     }
-    // From README section: 'Sequence (actions) with checks'
-    //3) Assembly assemble product
-    //3.1) AssemblyLine receives "execute assembly" command signal-----
-    //3.2) AssemblyLine confirms correct item is delivered
-    //3.3) AssemblyLine sends confirmation signal to coordinator
-    //3.4) AssemblyLine confirms enough items have been delivered
-    //3.5) AssemblyLine sends confirmation signal to coordinator
-    //3.6) AssemblyLine executes the assembly instructions
-    //3.7) AssemblyLine places product for pick-up
-    //3.8) AssemblyLine sends task completion signal
 
     @Override
     public int taskCompletion() {
         /**
-         * Signals whether a product is ready for pickup
+         * Signals when all tasks relating to a production are complete (Step 3 is complete)
+         * Use it to check that AssemblyStation is no longer AWAITING_PICKUP
          * (This method is used to verify that the sequence of actions within the (Coordinator/production) step is complete)
          */
         int taskCompletion = 0;
-        switch (command) {
+        switch (this.command) {
             case "assemble":
                 switch (this.systemStatus) {
                     case IDLE:
-                        taskCompletion = 0;
+                        taskCompletion = 1;
                     case AWAITING_PARTS:
                         taskCompletion = 0;
                     case READY:
@@ -60,7 +50,7 @@ public class AssemblyStation extends Machine implements MachineSPI{
                     case ASSEMBLING:
                         taskCompletion = 0;
                     case AWAITING_PICKUP:
-                        taskCompletion = 1;
+                        taskCompletion = 0;
                     case ERROR:
                         taskCompletion = 0;
                     default:
@@ -75,14 +65,13 @@ public class AssemblyStation extends Machine implements MachineSPI{
     @Override
     public int actionCompletion() {
         /**
-         * Signals when all tasks relating to a production are complete
-         * Use it to check that AssemblyStation is no longer AWAITING_PICKUP
+         * Signals whether a product is ready for pickup (action "assembling" is complete"
          * (This method is used to verify that the latest action (move, pick up, present object) is finished)
          */
         int productionCompletion = 0;
         switch (this.systemStatus) {
             case IDLE:
-                productionCompletion = 1;
+                productionCompletion = 0;
             case AWAITING_PARTS:
                 productionCompletion = 0;
             case READY:
@@ -90,7 +79,7 @@ public class AssemblyStation extends Machine implements MachineSPI{
             case ASSEMBLING:
                 productionCompletion = 0;
             case AWAITING_PICKUP:
-                productionCompletion = 0;
+                productionCompletion = 1;
             case ERROR:
                 productionCompletion = 0;
             default:
@@ -180,7 +169,11 @@ public class AssemblyStation extends Machine implements MachineSPI{
 
     @Override
     public String getInventory() {
-        return "";
+        // Returns the content of the two trays using '\newline'.
+        // Calling .toString() on a null object safely returns "null"
+        String entryTrayContent = "Entry tray: " + this.entryTray.getContent().toString();
+        String exitTrayContent = "Exit tray: " + this.exitTray.getContent().toString();
+        return entryTrayContent + "\n" + exitTrayContent;
     }
 
     @Override

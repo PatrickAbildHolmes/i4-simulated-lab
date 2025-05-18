@@ -118,49 +118,45 @@ public class Coordinator implements ICoordinate{
             // 1.4) Warehouse moves the tray to the pickup area
             if (getMachineStatus(this.warehouse)) {stepCount++;}else{throw new Exception("Error getting warehouse state");}
             if (this.warehouse.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
+
         }catch (Exception e) {
-            System.out.println("Failed at Step 4, action: "+stepCount);
-            e.printStackTrace();
+            System.out.println("Failed at Step 4, action: "+stepCount); e.printStackTrace();
         }
     }
-
     public void step2_AGVDeliverComponentToAssembly(){
         int stepCount = 1;
         try {
             // 2.1-2.2) AGV receives 'component pick-up' command signal and moves to Warehouse
             if(machineCommand(this.agvMachine, "MoveToStorageOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
 
-            // 2.3) AGV sends 'movement complete' signal
-            // Confirm position Warehouse
+            // 2.3) AGV sends 'movement complete' signal. Confirm position Warehouse
             if(actionCompletion(this.agvMachine)){stepCount++;}else{throw new Exception("Error completing task");}
 
-            // 2.4-2.5) AGV receives pick-up signal
-            //Load program and execute
+            // 2.4-2.5) AGV receives pick-up signal. Load the program and execute
             if(machineCommand(this.agvMachine, "PickWarehouseOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
-//            this.agvMachine.setMostRecentlyReceived(new DroneComponent());
 
-            // 2.6) AGV sends 'confirm pick-up' signal
-            // Confirm carrying item
+            DroneComponent droneComponent = new DroneComponent(); // Create the withdrawn DroneComponent. Parameterless because no id
+            this.agvMachine.setMostRecentlyReceived(droneComponent); // Give the withdrawn DroneComponent to the AGV. Needed for agvMachine.confirmItemDelivery()
+
+            // 2.6) AGV sends 'confirm pick-up' signal. Confirm carrying item
             if (confirmItemDelivery(this.agvMachine)) {stepCount++;}else{throw new Exception("Error confirming item delivery");}
             if(actionCompletion(this.agvMachine)){stepCount++;}else{throw new Exception("Error completing task");}
 
             // 2.7-2.8) AGV receives movement instruction signal and moves to Assembly
             if(machineCommand(this.agvMachine, "MoveToAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
-            // 2.9) AGV sends 'movement complete' signal
-            // Confirm position Assembly
+
+            // 2.9) AGV sends 'movement complete' signal. Confirm position Assembly
             if(actionCompletion(this.agvMachine)){stepCount++;}else{throw new Exception("Error completing task");}
 
-            // 2.10) AGV delivers item to AssemblyLine
-            //Load program and execute
+            // 2.10) AGV delivers item to AssemblyLine. Load program and execute
             if(machineCommand(this.agvMachine, "PutAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
-//            this.assemblyMachine.setMostRecentlyReceived(new DroneComponent());
+            this.assemblyMachine.setMostRecentlyReceived(droneComponent); // Pass the DroneComponent to the AssemblyLine
 
-            // 2.11) AGV sends task completion signal
-            // Confirm not carrying item
+            // 2.11) AGV sends task completion signal. Confirm not carrying item
             if(this.agvMachine.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
+
         }catch (Exception e){
-            System.out.println("Failed at Step 2, action: "+stepCount);
-            e.printStackTrace();
+            System.out.println("Failed at Step 2, action: "+stepCount); e.printStackTrace();
         }
     }
     public void step3_AssemblyAssembleProduct(){
@@ -168,19 +164,20 @@ public class Coordinator implements ICoordinate{
         try {
             // 3.1-3.3) AssemblyLine confirms correct item is delivered (Instant)
             if (confirmItemDelivery(this.assemblyMachine)) {stepCount++;}else{throw new Exception("Error confirming item delivery");}
+
             // 3.4-3.6) AssemblyLine confirms enough items have been delivered, and executes the assembly instructions (Instant)
             if (machineCommand(this.assemblyMachine, "assemble")){stepCount++;}else{throw new Exception("Error handling assembly station command");}
+
             // 3.7 - 3.8) AssemblyLine places product for pick-up (Waiting time)
             if(getMachineStatus(this.assemblyMachine)){stepCount++;}else{throw new Exception("Error getting machine status");}
+
             // 3.8) AssemblyLine sends task completion signal (Instant)
             // .taskCompletion() returns 0 or 1, but it is not needed, since the previous step will leave AssemblyStation in the correct state
             if(this.assemblyMachine.taskCompletion()!=1){throw new Exception("Error completing task");}
 
         } catch (Exception e){
-            System.out.println("Failed at Step 3, action: "+stepCount);
-            e.printStackTrace();
+            System.out.println("Failed at Step 3, action: "+stepCount); e.printStackTrace();
         }
-
     }
 
     public void step4_AGVDeliverProductToWarehouse(){
@@ -192,34 +189,34 @@ public class Coordinator implements ICoordinate{
             // 4.3B-4B) AGV receives pick-up signal and moves to AssemblyLine
             if(machineCommand(this.agvMachine, "MoveToAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling AGV command");}
 
-            // 4.5B) AGV sends 'movement complete' signal
-            // Confirm position Assembly
+            // 4.5B) AGV sends 'movement complete' signal. Confirm position Assembly
             if(actionCompletion(this.agvMachine)){stepCount++;}else{throw new Exception("Error completing task");}
 
             // 4.6B) AGV picks up item
             if(getMachineStatus(this.assemblyMachine)){stepCount++;}else{throw new Exception("Error getting machine status");}
             if(machineCommand(this.agvMachine, "PickAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling AGV command");}
-            Drone newDrone = new Drone(generateUnboundedRandomHexUsingRandomNextInt());
-//            this.agvMachine.setMostRecentlyReceived(newDrone);
+
+            Drone newDrone = new Drone(generateUnboundedRandomHexUsingRandomNextInt()); // Generate a random String-hex id for the created drone
+            this.agvMachine.setMostRecentlyReceived(newDrone); // And give the drone to the AGV
+
             // Confirm carrying item
             if(actionCompletion(this.agvMachine)){stepCount++;}else{throw new Exception("Error completing task");}
 
             // 4.7B) AGV receives movement instructions and moves to Warehouse
             if(machineCommand(this.agvMachine, "MoveToStorageOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
 
-            // 4.8B) AGV sends 'movement complete' signal
-            // Confirm position Warehouse
+            // 4.8B) AGV sends 'movement complete' signal. Confirm position Warehouse
             if(actionCompletion(this.agvMachine)){stepCount++;}else{throw new Exception("Error completing task");}
 
             // 4.9) AGV delivers item to Warehouse
             if(machineCommand(this.agvMachine, "PutWarehouseOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
-//            this.warehouse.setMostRecentlyReceived(newDrone);
+            this.warehouse.setMostRecentlyReceived(newDrone); // Pass the created drone on to Warehouse
 
             // 4.10) AGV sends task completion signal
             if(this.agvMachine.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
+
         } catch (Exception e) {
-            System.out.println("Failed at Step 4, action: "+stepCount);
-            e.printStackTrace();
+            System.out.println("Failed at Step 4, action: "+stepCount); e.printStackTrace();
         }
     }
     public void step5_WarehouseDepositProduct(){
@@ -234,14 +231,13 @@ public class Coordinator implements ICoordinate{
             // 5.4) Warehouse sends task completion signal
             if (getMachineStatus(this.warehouse)) {stepCount++;}else{throw new Exception("Error getting machine status");}
             if (this.warehouse.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
+
         }catch (Exception e) {
-            System.out.println("Failed at Step 5, action: "+stepCount);
-            e.printStackTrace();
+            System.out.println("Failed at Step 5, action: "+stepCount); e.printStackTrace();
         }
     }
 
-
-    // helper-methods:
+    // Helper-methods:
     String generateUnboundedRandomHexUsingRandomNextInt() { // Used to generate drone ID/names
         Random random = new Random();
         int randomInt = random.nextInt();
@@ -264,7 +260,7 @@ public class Coordinator implements ICoordinate{
         return false;
     }
     public boolean actionCompletion(MachineSPI machine){
-        for (int i = 0; i < 5; i++) { // Confirm position Assembly
+        for (int i = 0; i < 5; i++) { // Try the I/O operation 5 times
             if(machine.actionCompletion() == 1){
                 return true;
             }else{
@@ -278,7 +274,7 @@ public class Coordinator implements ICoordinate{
         return false;
     }
     public boolean confirmItemDelivery(MachineSPI machine){
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 5; i++) { // Try the I/O operation 5 times
             if(machine.confirmItemDelivery()){
                 return true;
             }else{
@@ -292,7 +288,7 @@ public class Coordinator implements ICoordinate{
         return false;
     }
     public boolean getMachineStatus(MachineSPI machine){
-        for (int i = 0; i < 5; i++) { // Attempt 5 times
+        for (int i = 0; i < 5; i++) { // Try the I/O operation 5 times
             String machineState = machine.getCurrentSystemStatus();
             if (machineState.equals("Idle")) {
                 return true;

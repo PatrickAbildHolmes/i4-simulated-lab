@@ -17,15 +17,13 @@ public class AGV extends Machine implements MachineSPI {
         MOVING,
         EXECUTING,
         ERROR
-
     }
 
     public AGV() {
         this.systemStatus = SystemStatus.IDLE;
-        this.holding_tray = new Tray();// One tray as the arm can only have 1 item in it
+        this.holding_tray = new Tray();// One tray as the arm can only hold 1 item
         this.command = "";
         this.inventory = new HashMap<>();
-
         try {
             this.endpoint = Dotenv.load().get("AGV_ENDPOINT");
         } catch (Exception e) {
@@ -45,35 +43,16 @@ public class AGV extends Machine implements MachineSPI {
         */
         int taskCompletion = 0;
         switch (this.command) {
-            case "PutAssemblyOperation":
+            case "PutAssemblyOperation": // Return 1 if idle after either of these two commands
+            case "PutStorageOperation":  // If latest command was not one of these when taskCompletion is called, something went wrong
                 switch (this.systemStatus) {
                     case IDLE:
                         taskCompletion = 1;
                     case READY:
                         taskCompletion = 0;
                     case MOVING:
-                        taskCompletion = 0;
                     case EXECUTING:
-                        taskCompletion = 0;
                     case ERROR:
-                        taskCompletion = 0;
-                    default:
-                        break;
-                }
-            case "PutStorageOperation":
-                switch (this.systemStatus) {
-                    case IDLE:
-                        taskCompletion = 1;
-                    case READY:
-                        taskCompletion = 0;
-                    case MOVING:
-                        taskCompletion = 0;
-                    case EXECUTING:
-                        taskCompletion = 0;
-                    case ERROR:
-                        taskCompletion = 0;
-                    default:
-                        break;
                 }
         }
         return taskCompletion;
@@ -90,18 +69,13 @@ public class AGV extends Machine implements MachineSPI {
         if (!this.command.equalsIgnoreCase(AGVCommands.PUTWAREHOUSE.getCommandString()) ||
                 !(this.command.equalsIgnoreCase(AGVCommands.PUTASSEMBLY.getCommandString())))
             switch (this.systemStatus) {
-                case IDLE:
-                    productionCompletion = 0;
+                case IDLE: // Default value is 0
                 case MOVING:
-                    productionCompletion = 0;
                 case EXECUTING:
-                    productionCompletion = 0;
                 case READY:
                     productionCompletion = 1;
                 case ERROR:
                     productionCompletion = 0;
-                default:
-                    break;
             }
         return productionCompletion;
     }
@@ -191,16 +165,14 @@ public class AGV extends Machine implements MachineSPI {
 
     @Override
     public String getInventory() {
-        // Converts the item held in its Tray to String and returns it
+        // Converts the item held in its Tray to String and returns it, since that is the AGV "inventory"
         return this.holding_tray.getContent().toString();
     }
 
     @Override
     public String getCurrentSystemStatus() {
         int stateNumber = getStatus().getAsInt();
-
         String stateDesc;
-
         switch (stateNumber) {
             case 1:
                 stateDesc = SystemStatus.IDLE.name();

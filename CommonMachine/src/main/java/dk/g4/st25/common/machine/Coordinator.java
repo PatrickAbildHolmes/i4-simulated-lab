@@ -101,13 +101,12 @@ public class Coordinator implements ICoordinate{
                 coordinator.step1_WarehouseWithdrawComponent();
             }
         }
-
         order.setStatus(Order.Status.FINISHED);
 
         // Returns 1 for success: All products produced.
         // Returns 0 for partial success: Only some products were produced.
         // Returns -1 for failure: No products were produced.
-        return 1;
+        return (this.produced == amountOfProductsToAssemble) ? 1 : (this.produced > 0 ? 0: -1);
     }
     public void step1_WarehouseWithdrawComponent(){
         int stepCount = 1;
@@ -116,7 +115,7 @@ public class Coordinator implements ICoordinate{
             if (machineCommand(this.warehouse, "pickItem")){stepCount++;}else{throw new Exception("Error handling warehouse command");}
 
             // 1.4) Warehouse moves the tray to the pickup area
-            if (getMachineStatus(this.warehouse)) {stepCount++;}else{throw new Exception("Error getting warehouse state");}
+            if (isMachineIdle(this.warehouse)) {stepCount++;}else{throw new Exception("Error getting warehouse state");}
             if (this.warehouse.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
 
         }catch (Exception e) {
@@ -169,7 +168,7 @@ public class Coordinator implements ICoordinate{
             if (machineCommand(this.assemblyMachine, "assemble")){stepCount++;}else{throw new Exception("Error handling assembly station command");}
 
             // 3.7 - 3.8) AssemblyLine places product for pick-up (Waiting time)
-            if(getMachineStatus(this.assemblyMachine)){stepCount++;}else{throw new Exception("Error getting machine status");}
+            if(actionCompletion(this.assemblyMachine)){stepCount++;}else{throw new Exception("Error completing task");}
 
             // 3.8) AssemblyLine sends task completion signal (Instant)
             // .taskCompletion() returns 0 or 1, but it is not needed, since the previous step will leave AssemblyStation in the correct state
@@ -184,7 +183,7 @@ public class Coordinator implements ICoordinate{
         int stepCount = 1;
         try {
             // 4.1 - 4.3A) Warehouse sends 'tray ready' signal
-            if(getMachineStatus(this.warehouse)){stepCount++;}else{throw new Exception("Error fetching warehouse status");}
+            if(isMachineIdle(this.warehouse)){stepCount++;}else{throw new Exception("Error fetching warehouse status");}
 
             // 4.3B-4B) AGV receives pick-up signal and moves to AssemblyLine
             if(machineCommand(this.agvMachine, "MoveToAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling AGV command");}
@@ -193,14 +192,17 @@ public class Coordinator implements ICoordinate{
             if(actionCompletion(this.agvMachine)){stepCount++;}else{throw new Exception("Error completing task");}
 
             // 4.6B) AGV picks up item
-            if(getMachineStatus(this.assemblyMachine)){stepCount++;}else{throw new Exception("Error getting machine status");}
+            if(isMachineIdle(this.assemblyMachine)){stepCount++;}else{throw new Exception("Error getting machine status");}
             if(machineCommand(this.agvMachine, "PickAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling AGV command");}
 
             Drone newDrone = new Drone(generateUnboundedRandomHexUsingRandomNextInt()); // Generate a random String-hex id for the created drone
             this.agvMachine.setMostRecentlyReceived(newDrone); // And give the drone to the AGV
 
             // Confirm carrying item
-            if(actionCompletion(this.agvMachine)){stepCount++;}else{throw new Exception("Error completing task");}
+            if(actionCompletion(this.agvMachine)){
+                stepCount++;
+                this.assemblyMachine.actionCompletion(); // needed to clear exit tray. Think of it as "hand-off complete".
+            }else{throw new Exception("Error completing task");}
 
             // 4.7B) AGV receives movement instructions and moves to Warehouse
             if(machineCommand(this.agvMachine, "MoveToStorageOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
@@ -229,7 +231,7 @@ public class Coordinator implements ICoordinate{
             if (machineCommand(this.warehouse, "insertItem")){stepCount++;}else{throw new Exception("Error handling warehouse command");}
 
             // 5.4) Warehouse sends task completion signal
-            if (getMachineStatus(this.warehouse)) {stepCount++;}else{throw new Exception("Error getting machine status");}
+            if (isMachineIdle(this.warehouse)) {stepCount++;}else{throw new Exception("Error getting machine status");}
             if (this.warehouse.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
 
         }catch (Exception e) {
@@ -287,7 +289,7 @@ public class Coordinator implements ICoordinate{
         }
         return false;
     }
-    public boolean getMachineStatus(MachineSPI machine){
+    public boolean isMachineIdle(MachineSPI machine){
         for (int i = 0; i < 5; i++) { // Try the I/O operation 5 times
             String machineState = machine.getCurrentSystemStatus();
             if (machineState.equals("Idle")) {

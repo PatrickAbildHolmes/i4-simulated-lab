@@ -38,26 +38,15 @@ public class AssemblyStation extends Machine implements MachineSPI{
          * (This method is used to verify that the sequence of actions within the (Coordinator/production) step is complete)
          */
         int taskCompletion = 0;
-        switch (this.command) {
-            case "assemble":
-                switch (this.systemStatus) {
-                    case IDLE:
-                        taskCompletion = 1;
-                    case AWAITING_PARTS:
-                        taskCompletion = 0;
-                    case READY:
-                        taskCompletion = 0;
-                    case ASSEMBLING:
-                        taskCompletion = 0;
-                    case AWAITING_PICKUP:
-                        taskCompletion = 0;
-                    case ERROR:
-                        taskCompletion = 0;
-                    default:
-                        break;
-                }
-            case "checkhealth":
-                return actionCompletion(); // "checkhealth" and actionCompletion() both checks whether systemStatus is IDLE.
+        switch (this.systemStatus) {
+            case IDLE:
+                taskCompletion = 1;
+            case AWAITING_PARTS:
+                taskCompletion = 0;
+            case READY:
+            case ASSEMBLING:
+            case AWAITING_PICKUP:
+            case ERROR:
         }
         return taskCompletion;
     }
@@ -65,27 +54,45 @@ public class AssemblyStation extends Machine implements MachineSPI{
     @Override
     public int actionCompletion() {
         /**
-         * Signals whether a product is ready for pickup (action "assembling" is complete"
+         * Signals whether a product is ready for pickup (action "assembling" is complete"),
+         * or health was checked with "checkhealth"
          * (This method is used to verify that the latest action (move, pick up, present object) is finished)
          */
-        int productionCompletion = 0;
-        switch (this.systemStatus) {
-            case IDLE:
-                productionCompletion = 0;
-            case AWAITING_PARTS:
-                productionCompletion = 0;
-            case READY:
-                productionCompletion = 0;
-            case ASSEMBLING:
-                productionCompletion = 0;
-            case AWAITING_PICKUP:
-                productionCompletion = 1;
-            case ERROR:
-                productionCompletion = 0;
-            default:
-                break;
+        int actionCompletion = 0;
+        switch(this.command){
+            case "assemble":
+                switch (this.systemStatus) {
+                    case IDLE: // init value is 0
+                    case AWAITING_PARTS:
+                    case READY:
+                    case ASSEMBLING: // If command was "assemble",
+                        if (this.getCurrentSystemStatus().equals("Idle")) { // and the machine is now "Idle",
+                            this.systemStatus = SystemStatus.AWAITING_PICKUP; // that means it is now awaiting pick-up
+                            this.exitTray.setContent(this.mostRecentlyReceived); // Make sure Coordinator has generated a new Drone
+                            this.exitTray.setAvailable(false);
+                            actionCompletion = 1;
+                        }
+                        actionCompletion = 0;
+                    case AWAITING_PICKUP: // And if command was "assemble", and the machine was awaiting pick-up,
+                        this.systemStatus = SystemStatus.IDLE;  // this method is called after the AGV has picked it up,
+                        this.exitTray.setContent(null);         // and so resets the system state and exit-tray
+                        this.exitTray.setAvailable(true);
+                        actionCompletion = 1;
+                    case ERROR:
+                        actionCompletion = 0;
+                }
+            case "checkhealth": // if "checkhealth" was the latest command, we want to ensure the machine is in idle state
+                switch (this.systemStatus) {
+                    case IDLE:
+                        actionCompletion = 1;
+                    case AWAITING_PARTS:
+                    case READY:
+                    case ASSEMBLING:
+                    case AWAITING_PICKUP:
+                    case ERROR:
+                }
         }
-        return productionCompletion;
+        return actionCompletion;
     }
 
     @Override
@@ -183,30 +190,26 @@ public class AssemblyStation extends Machine implements MachineSPI{
          * If called after (successful) sendCommand(assemble), will set AssemblyStation as AWAITING_PICKUP.
          * If called while AssemblyStation is AWAITING_PICKUP, will set system status to IDLE (do it after AGV picks up Drone)
          */
-        JsonObject systemState = this.protocol.readFrom("emulator/status", "unused");
-        // Retrieve number from State, and convert to description as seen on pg. 11:
-        int stateNumber = systemState.get("State").getAsInt();
-        String stateDesc;
-        switch (stateNumber) {
-            case 0:
-                stateDesc = "Idle";
-                if (systemStatus == SystemStatus.ASSEMBLING) {
-                    this.systemStatus = SystemStatus.AWAITING_PICKUP;
-                    this.exitTray.setContent(new Drone("Insert_Drone_ID")); // Placeholder-statement. Implement method to generate actual Drone ID here.
-                    this.exitTray.setAvailable(false);
-                } else if (systemStatus == SystemStatus.AWAITING_PICKUP) {
-                    this.systemStatus = SystemStatus.IDLE;
-                    this.exitTray.setContent(null);
-                    this.exitTray.setAvailable(true);
-                }
-            case 1:
-                stateDesc = "Executing";
-            case 2:
-                stateDesc = "Error";
-            default:
-                stateDesc = "Unknown";
+        try {
+            JsonObject systemState = this.protocol.readFrom("emulator/status", "unused");
+            // Retrieve number from State, and convert to description as seen on pg. 11 in Technical Documentation:
+            int stateNumber = systemState.get("State").getAsInt();
+            String stateDesc;
+            switch (stateNumber) {
+                case 0:
+                    stateDesc = "Idle";
+                case 1:
+                    stateDesc = "Executing";
+                case 2:
+                    stateDesc = "Error";
+                default:
+                    stateDesc = "Unknown";
+            }
+            return stateDesc;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error getting Assembly Station status";
         }
-        return stateDesc;
     }
 
     @Override

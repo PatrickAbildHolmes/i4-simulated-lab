@@ -4,27 +4,35 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dk.g4.st25.common.machine.Machine;
 import dk.g4.st25.common.machine.MachineSPI;
-import dk.g4.st25.common.services.IExecuteCommand;
-import dk.g4.st25.common.services.IMonitorStatus;
 
+import java.util.HashMap;
 
-public class Warehouse extends Machine implements MachineSPI, IExecuteCommand, IMonitorStatus {
+public class Warehouse extends Machine implements MachineSPI {
     // SOAP service object for interacting with the warehouse system
     // Counter to track the number of items successfully fetched
     private int itemsFetched = 0;
     private final String endpoint = "http://localhost:8081/Service.asmx";
-    public enum systemStatus {
+    private SystemStatus systemStatus;
+    private Object mostRecentlyReceived;
+    public enum SystemStatus {
         IDLE,
         EXECUTING,
         ERROR,
         UNKNOWN
     }
-//    public Warehouse() {
-//        this.protocol = new SOAP();
-//    }
+    public Warehouse() { // There must be a parameterless, public constructor for service-loaders to work
+        this.systemStatus = SystemStatus.IDLE;
+        this.command = "";
+        this.inventory = new HashMap<>();
+        // Possibly add the use of Tray objects to simulate the 10 trays Warehouse has
+        // Add Dotenv endpoint similar to implementation in AGV.java?
+    }
 
     @Override
     public int taskCompletion() {
+        /**
+         * This method is used to verify that the sequence of actions within the (Coordinator/production) step is complete
+         * */
         try {
             // Attempt to fetch an item from tray 1
             String message = "{\"action\":\"pick\",\"trayId\":1}";
@@ -43,45 +51,33 @@ public class Warehouse extends Machine implements MachineSPI, IExecuteCommand, I
     }
 
     @Override
-    public int productionCompletion() {
-//        // Fetch the current inventory from the SOAP service
-//        JsonObject inventory = soapTest.getInventory();
-//        // Check if the number of fetched items matches the inventory size
-//        if (inventory != null && inventory.size() == itemsFetched) {
-//            System.out.println("All requested items have been fetched.");
-//            return 1; // Success
-//        } else {
-//            System.out.println("Not all items have been fetched yet.");
-//            return 0; // Incomplete
-//        }
+    public int actionCompletion() {
+        /**
+         * This method is used to verify that the latest action (move, pick up, present object) is finished,
+         * as opposed to taskCompletion that verifies that the sequence of actions within the (Coordinator/production) step is complete
+         * */
         return 0;
+    }
+    @Override
+    public boolean confirmItemDelivery() {
+        /**
+         * This method verifies that the correct item was delivered *To* this machine.
+         * Should be checking that object was instanceof DroneComponent or Drone
+         * */
+        return false;
     }
 
     @Override
-    public JsonObject sendCommand(String commandType, String commandParam) {
-//        // Handle the "refresh" command to refresh the inventory
-//        if ("refresh".equalsIgnoreCase(commandType)) {
-//            soapTest.refreshInventory();
-//            return null; // Success
-//        }
-//        // Return -1 for unknown commands
-//        return null;
+    public void setMostRecentlyReceived(Object mostRecentlyReceived) {
+        /**
+         * Ideally this method is used to handle object drop-off, since an object can be passed (in Coordinator) through this method,
+         * I.E. from Warehouse->AGV->Assembly->AGV->Warehouse
+        * */
+        this.mostRecentlyReceived = mostRecentlyReceived;
+    }
 
-        /*System.out.println("PROTOCOLS: " + getProtocolSPIImplementationsList());
-        for (ProtocolSPI implementation : getProtocolSPIImplementationsList()) {
-            System.out.println("Inside protocol loop");
-            if (implementation.getClass().getModule().getName().equals("SOAP")) {
-                System.out.println("SOAP found!!");
-                return implementation.readFrom(endpoint, commandParam);
-            }
-        }*/
-//        if (commandType.equalsIgnoreCase("readFrom")) {
-//            for (ProtocolSPI implementation : getProtocolSPIImplementationsList()) {
-//                if (implementation.getClass().getModule().getName().equals("SOAP")) {
-//                    return implementation.readFrom(endpoint, commandParam);
-//                }
-//            }
-//        }
+    @Override
+    public JsonObject sendCommand(String commandType) {
         JsonObject result = new JsonObject();
         JsonArray tempInventory = this.protocol.readFrom("getInventory",endpoint).get("Inventory").getAsJsonArray();
         switch (commandType.toLowerCase()) {
@@ -159,9 +155,4 @@ public class Warehouse extends Machine implements MachineSPI, IExecuteCommand, I
             }
         }
     }
-//    public static void main(String[] args) {
-//        SOAP soap = new SOAP();
-//        Warehouse warehouse = new Warehouse();
-//        warehouse.getCurrentSystemStatus();
-//    }
 }

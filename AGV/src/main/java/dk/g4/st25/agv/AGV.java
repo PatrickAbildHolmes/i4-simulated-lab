@@ -2,17 +2,15 @@ package dk.g4.st25.agv;
 
 import dk.g4.st25.common.machine.*;
 import com.google.gson.JsonObject;
-import dk.g4.st25.common.services.IExecuteCommand;
-import dk.g4.st25.common.services.IMonitorStatus;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.HashMap;
-import java.util.Locale;
 
-public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonitorStatus, ItemConfirmationI {
+public class AGV extends Machine implements MachineSPI {
     private String endpoint;
     private SystemStatus systemStatus;
-
+    private Object mostRecentlyReceived;
+    private final Tray holding_tray; // "Can't receive a 'new' Tray, hence final"
     public enum SystemStatus {
         IDLE,
         READY,
@@ -21,14 +19,11 @@ public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonito
         ERROR
     }
 
-    private Tray[] trays;
-
     public AGV() {
         this.systemStatus = SystemStatus.IDLE;
-        this.trays = new Tray[1];// One tray as the arm can only have 1 item in it
+        this.holding_tray = new Tray();// One tray as the arm can only hold 1 item
         this.command = "";
         this.inventory = new HashMap<>();
-
         try {
             this.endpoint = Dotenv.load().get("AGV_ENDPOINT");
         } catch (Exception e) {
@@ -40,117 +35,88 @@ public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonito
         return protocol.readFrom(endpoint, AGVCommands.GETSTATUS.getCommandString());
     }
 
-    public String getTimestamp() {
-        return getStatus().get("timestamp").toString();
-    }
-
-    public int getState() {
-        return getStatus().get("state").getAsInt();
-    }
-
-    public String getProgramName() {
-        return getStatus().get("program name").toString();
-    }
-
-    public int getBattery() {
-        return getStatus().get("battery").getAsInt();
-    }
-
     @Override
     public int taskCompletion() {
         /**
-         * Signals whether a Drone/Drone Part has been moved
+         * Signals whether a Drone/Drone Part has been moved.
+         * (This method is used to verify that the sequence of actions within the (Coordinator/production) step is complete)
         */
         int taskCompletion = 0;
-        AGVCommands.MOVEASSEMBLY.getCommandString();
-        switch (command) {
-            case "PutAssemblyOperation":
+        switch (this.command) {
+            case "PutAssemblyOperation": // Return 1 if idle after either of these two commands
+            case "PutStorageOperation":  // If latest command was not one of these when taskCompletion is called, something went wrong
                 switch (this.systemStatus) {
                     case IDLE:
                         taskCompletion = 1;
                     case READY:
                         taskCompletion = 0;
                     case MOVING:
-                        taskCompletion = 0;
                     case EXECUTING:
-                        taskCompletion = 0;
                     case ERROR:
-                        taskCompletion = 0;
-                    default:
-                        break;
-                }
-            case "PutStorageOperation":
-                switch (this.systemStatus) {
-                    case IDLE:
-                        taskCompletion = 1;
-                    case READY:
-                        taskCompletion = 0;
-                    case MOVING:
-                        taskCompletion = 0;
-                    case EXECUTING:
-                        taskCompletion = 0;
-                    case ERROR:
-                        taskCompletion = 0;
-                    default:
-                        break;
                 }
         }
         return taskCompletion;
     }
 
     @Override
-    public int productionCompletion() {
+    public int actionCompletion() {
         /**
          * Signals the "Movement Complete" and "confirm pick up"
+         * This method is used to verify that the latest action (move, pick up, present object) is finished,
+         * as opposed to taskCompletion that verifies that the sequence of actions within the (Coordinator/production) step is complete
          */
         int productionCompletion = 0;
         if (!this.command.equalsIgnoreCase(AGVCommands.PUTWAREHOUSE.getCommandString()) ||
                 !(this.command.equalsIgnoreCase(AGVCommands.PUTASSEMBLY.getCommandString())))
             switch (this.systemStatus) {
-                case IDLE:
-                    productionCompletion = 0;
+                case IDLE: // Default value is 0
                 case MOVING:
-                    productionCompletion = 0;
                 case EXECUTING:
-                    productionCompletion = 0;
                 case READY:
                     productionCompletion = 1;
                 case ERROR:
                     productionCompletion = 0;
-                default:
-                    break;
             }
         return productionCompletion;
     }
 
     @Override
-    public boolean confirmItemDelivery() {
-        this.systemStatus = SystemStatus.READY; // When AGV has delivered item to either AssemblyStation or Warehouse it becomes ready
-        for (Tray tray : trays) {
-            if (tray.isAvailable() && (this.command.equalsIgnoreCase(AGVCommands.PICKWAREHOUSE.getCommandString()) ||
-                            (this.command.equalsIgnoreCase(AGVCommands.PICKASSEMBLY.getCommandString())))) {
-                tray.setContent(new DroneComponent()); // Placeholder until Coordinator can transfer objects
-                tray.setAvailable(false);
-                return true;
-            } else {
-                // If the last command is not a pick operation, it means that the agv delivers the item to either the warehouse or the assemblystation
-                // and therefore removes it's item
-                tray.setContent(null);
-                tray.setAvailable(true);
-                return false;
-            }
-
-        }
-        return false;
+    public void setMostRecentlyReceived(Object mostRecentlyReceived) {
+        /**
+         * Ideally this method is used to handle object drop-off, since an object can be passed (in Coordinator) through this method,
+         * I.E. from Warehouse->AGV->Assembly->AGV->Warehouse
+         * */
+        this.mostRecentlyReceived = mostRecentlyReceived;
     }
 
     @Override
-    public JsonObject sendCommand(String commandType, String commandParam) {
+    public boolean confirmItemDelivery() {
+        /**
+         * This method verifies that the correct item was delivered *To* this machine.
+         * Should be checking that object was instanceof DroneComponent or Drone
+         * */
+        this.systemStatus = SystemStatus.READY; // When AGV has delivered item to either AssemblyStation or Warehouse it becomes ready
+            if (this.holding_tray.isAvailable() && // Holding tray must be available AND the latest command must be a pick-up operation
+                    (this.command.equalsIgnoreCase(AGVCommands.PICKWAREHOUSE.getCommandString()) || (this.command.equalsIgnoreCase(AGVCommands.PICKASSEMBLY.getCommandString())))) {
+                this.holding_tray.setContent(this.mostRecentlyReceived); // Grips the item that the Coordinator conjures up for it
+                this.holding_tray.setAvailable(false);
+                return true;
+            } else {
+                // If the last command is not a pick operation, it means that the agv delivers the item to either the warehouse or the assembly station
+                // and therefore removes it's item
+                this.holding_tray.setContent(null);
+                this.holding_tray.setAvailable(true);
+                return false;
+        }
+    }
+
+    @Override
+    public JsonObject sendCommand(String commandType) {
         /**
          * Sends the given command through AGV's given protocol, and handles which states should be set based
          * on which operation is run
          */
-        this.command = commandType; // We set the command to be latest recieved command
+        this.command = commandType; // We set the command to be latest received command
         switch (commandType.toLowerCase()) {
             case "movetochargeroperation":
                 if (protocol.writeTo(AGVCommands.MOVECHARGER.getCommandString(), endpoint) == 1) {
@@ -199,15 +165,14 @@ public class AGV extends Machine implements MachineSPI, IExecuteCommand, IMonito
 
     @Override
     public String getInventory() {
-        return "";
+        // Converts the item held in its Tray to String and returns it, since that is the AGV "inventory"
+        return this.holding_tray.getContent().toString();
     }
 
     @Override
     public String getCurrentSystemStatus() {
         int stateNumber = getStatus().getAsInt();
-
         String stateDesc;
-
         switch (stateNumber) {
             case 1:
                 stateDesc = SystemStatus.IDLE.name();

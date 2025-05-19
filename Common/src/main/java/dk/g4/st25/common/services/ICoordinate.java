@@ -10,4 +10,7 @@ public interface ICoordinate {
     int startProduction(Order order);
 
     List<Object> getObjectList();
+
+    int getProduced();
+
 }

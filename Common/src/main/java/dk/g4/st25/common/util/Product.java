@@ -1,11 +1,15 @@
 package dk.g4.st25.common.util;
 
+import java.lang.reflect.Array;
+
 public class Product {
     private String id;
     private String type;
-    public Product(String id, String type) {
+    private Part[] parts;
+    public Product(String id, String type, Part[] parts) {
         this.id = id;
         this.type = type;
+        this.parts = parts;
     }
 
     public Product(String type) {
@@ -17,5 +21,5 @@ public class Product {
     public String getType() {
         return type;
     }
-
+    public Part[] getParts() { return parts; }
 }

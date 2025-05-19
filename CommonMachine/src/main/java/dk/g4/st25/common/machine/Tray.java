@@ -3,7 +3,7 @@ package dk.g4.st25.common.machine;
 public class Tray {
     private boolean available;
     private Object content; // Can be Product or Part
-    Tray() {
+    public Tray() {
         this.available = true;
         this.content = null;
     }

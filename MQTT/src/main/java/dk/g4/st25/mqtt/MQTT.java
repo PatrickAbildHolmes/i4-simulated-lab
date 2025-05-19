@@ -7,7 +7,7 @@ import org.eclipse.paho.client.mqttv3.*;
 import com.google.gson.JsonObject;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-public class MQTT extends Protocol implements ProtocolSPI {
+public class MQTT extends Protocol {
 
     private MqttClient client;
 

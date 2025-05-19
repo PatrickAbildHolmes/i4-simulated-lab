@@ -9,7 +9,7 @@ import kong.unirest.Unirest;
 import kong.unirest.json.JSONObject;
 //import kong.unirest.json.JsonObject;
 
-public class SOAP extends Protocol implements ProtocolSPI {
+public class SOAP extends Protocol {
 
     private final SoapService soapService = new SoapService();
     @Override

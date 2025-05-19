@@ -18,8 +18,9 @@ public class ProductionQueue {
         productionStarted = true;
 
         // Get coordinator
-        Configuration conf = Configuration.get();
-        ICoordinate coordinator = conf.coordinatorLoader();
+        ICoordinate coordinator = App.getAppContext().getICoordinateImplementations().stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No ICoordinate implementations found"));
 
         // Database
         Database db = Database.getDB();

@@ -1,15 +1,15 @@
 package dk.g4.st25.common.machine;
 
+import dk.g4.st25.common.protocol.ProtocolSPI;
 import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.util.Order;
+import io.github.cdimascio.dotenv.Dotenv;
 
-import java.util.Random;
-import java.util.ServiceLoader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+import static java.util.stream.Collectors.toList;
 
 public class Coordinator implements ICoordinate{
-
     private final List<Object> objectList = new ArrayList<Object>();
     private MachineSPI warehouse;
     private MachineSPI agvMachine;
@@ -29,23 +29,58 @@ public class Coordinator implements ICoordinate{
          * since components can/may be added or removed during runtime.
          */
 
-        ServiceLoader<MachineSPI> loader = ServiceLoader.load(MachineSPI.class);
-        for (MachineSPI machine : loader) {
-            String name = machine.getClass().getSimpleName().toLowerCase();
-            switch (name) {
-                case "warehouse":
-                    this.warehouse = machine;
-                    this.warehouseFlag = true;
-                case "agv":
-                    this.agvMachine = machine;
-                    this.agvFlag = true;
-                case "assembly":
-                    this.assemblyMachine = machine;
-                    this.assemblyFlag = true;
-                default:
-                    break;
+        // Streams the protocol implementations here if any is found
+        List<ProtocolSPI> protocolLoaderList = ServiceLoader.load(ProtocolSPI.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+        System.out.println("LIST: " + protocolLoaderList);
+
+        // Streams the machine implementations here if any is found
+        List<MachineSPI> machineLoaderList = ServiceLoader.load(MachineSPI.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+        System.out.println("MACHINE LIST: " + machineLoaderList);
+
+        // Loops through all implementations of ProtocolSPI, and inserts into the correct machines
+        for (ProtocolSPI protocol : protocolLoaderList) {
+            String protocolName = protocol.getClass().getSimpleName().toLowerCase();
+            System.out.println("PROTOCOL NAME: " + protocolName);
+            for (MachineSPI machine : machineLoaderList) {
+                String name = machine.getClass().getSimpleName().toLowerCase();
+                System.out.println("NAME: " + name);
+                switch (name) {
+                    case "warehouse":
+                        this.warehouse = machine;
+                        this.warehouseFlag = true;
+                        System.out.println("THING: " + Objects.requireNonNull(Dotenv.load().get("WAREHOUSE_PROTOCOL")).toLowerCase());
+                        // Matches the .env variables to the corresponding protocol classnames, to ensure they exist.
+                        if (protocolName.equals(Objects.requireNonNull(Dotenv.load().get("WAREHOUSE_PROTOCOL")).toLowerCase())) {
+                            this.warehouse.setMachineProtocol(protocol);
+                            System.out.println("Warehouse protocol has been defined!!");
+                            continue;
+                        } else {
+                            System.out.println("Warehouse protocol defined in env, not found!");
+                        }
+                    case "agv":
+                        this.agvMachine = machine;
+                        this.agvFlag = true;
+                        if (protocolName.equals(Objects.requireNonNull(Dotenv.load().get("AGV_PROTOCOL")).toLowerCase())) {
+                            this.warehouse.setMachineProtocol(protocol);
+                            continue;
+                        } else {
+                            System.out.println("AGV protocol defined in env, not found!");
+                        }
+                    case "assembly":
+                        this.assemblyMachine = machine;
+                        this.assemblyFlag = true;
+                        if (protocolName.equals(Objects.requireNonNull(Dotenv.load().get("ASSEMBLY_PROTOCOL")).toLowerCase())) {
+                            this.warehouse.setMachineProtocol(protocol);
+                            continue;
+                        } else {
+                            System.out.println("Assembly protocol defined in env, not found!");
+                        }
+                    default:
+                        break;
+                }
             }
         }
+
         if (!this.warehouseFlag) {System.err.println("Warehouse module is missing.");}
         if (!this.agvFlag) {System.err.println("AGV module is missing.");}
         if (!this.assemblyFlag) {System.err.println("AssemblyStation module is missing.");}

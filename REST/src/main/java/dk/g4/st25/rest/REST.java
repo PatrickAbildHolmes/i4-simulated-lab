@@ -3,9 +3,6 @@ package dk.g4.st25.rest;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dk.g4.st25.common.protocol.Protocol;
-import dk.g4.st25.common.protocol.ProtocolSPI;
-
-import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-public class REST extends Protocol implements ProtocolSPI {
+public class REST extends Protocol {
     private boolean hasProgram = false;
 
     private JsonObject loadProgram(String programName, String endpoint) {

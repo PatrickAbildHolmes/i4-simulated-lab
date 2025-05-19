@@ -2,11 +2,12 @@ package dk.g4.st25.agv;
 
 import dk.g4.st25.common.machine.*;
 import com.google.gson.JsonObject;
+import dk.g4.st25.common.protocol.ProtocolSPI;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.HashMap;
 
-public class AGV extends Machine implements MachineSPI {
+public class AGV extends Machine {
     private String endpoint;
     private SystemStatus systemStatus;
     private Object mostRecentlyReceived;
@@ -29,10 +30,11 @@ public class AGV extends Machine implements MachineSPI {
         } catch (Exception e) {
             this.endpoint = Dotenv.configure().directory("../").load().get("AGV_ENDPOINT");
         }
+
     }
 
     public JsonObject getStatus() {
-        return protocol.readFrom(endpoint, AGVCommands.GETSTATUS.getCommandString());
+        return this.protocol.readFrom(endpoint, AGVCommands.GETSTATUS.getCommandString());
     }
 
     @Override
@@ -90,6 +92,11 @@ public class AGV extends Machine implements MachineSPI {
     }
 
     @Override
+    public void setMachineProtocol(ProtocolSPI protocol) {
+        this.protocol = protocol;
+    }
+
+    @Override
     public boolean confirmItemDelivery() {
         /**
          * This method verifies that the correct item was delivered *To* this machine.
@@ -119,39 +126,39 @@ public class AGV extends Machine implements MachineSPI {
         this.command = commandType; // We set the command to be latest received command
         switch (commandType.toLowerCase()) {
             case "movetochargeroperation":
-                if (protocol.writeTo(AGVCommands.MOVECHARGER.getCommandString(), endpoint) == 1) {
+                if (this.protocol.writeTo(AGVCommands.MOVECHARGER.getCommandString(), endpoint) == 1) {
                     this.systemStatus = SystemStatus.MOVING;
                     return new JsonObject().getAsJsonObject("Success moving to Charger!");
                 }
             case "movetoassemblyoperation":
-                if (protocol.writeTo(AGVCommands.MOVEASSEMBLY.getCommandString(), endpoint) == 1) {
+                if (this.protocol.writeTo(AGVCommands.MOVEASSEMBLY.getCommandString(), endpoint) == 1) {
                     this.systemStatus = SystemStatus.MOVING;
                     return new JsonObject().getAsJsonObject("Success moving to Assembly!");
                 }
             case "movetostorageoperation":
-                if (protocol.writeTo(AGVCommands.MOVESTORAGE.getCommandString(), endpoint) == 1) {
+                if (this.protocol.writeTo(AGVCommands.MOVESTORAGE.getCommandString(), endpoint) == 1) {
                     this.systemStatus = SystemStatus.MOVING;
                     return new JsonObject().getAsJsonObject("Success moving to Storage!");
                 }
             case "putassemblyoperation":
-                if (protocol.writeTo(AGVCommands.PUTASSEMBLY.getCommandString(), endpoint) == 1) {
+                if (this.protocol.writeTo(AGVCommands.PUTASSEMBLY.getCommandString(), endpoint) == 1) {
                     this.systemStatus = SystemStatus.EXECUTING;
                     return new JsonObject().getAsJsonObject("Success delivering to Assembly!");
                 }
             case "pickassemblyoperation":
-                if (protocol.writeTo(AGVCommands.PICKASSEMBLY.getCommandString(), endpoint) == 1) {
+                if (this.protocol.writeTo(AGVCommands.PICKASSEMBLY.getCommandString(), endpoint) == 1) {
                     this.systemStatus = SystemStatus.EXECUTING;
                     confirmItemDelivery();
                     return new JsonObject().getAsJsonObject("Success picking from Assembly!");
                 }
             case "pickwarehouseoperation":
-                if (protocol.writeTo(AGVCommands.PICKWAREHOUSE.getCommandString(), endpoint) == 1) {
+                if (this.protocol.writeTo(AGVCommands.PICKWAREHOUSE.getCommandString(), endpoint) == 1) {
                     this.systemStatus = SystemStatus.EXECUTING;
                     confirmItemDelivery();
                     return new JsonObject().getAsJsonObject("Success picking from Storage!");
                 }
             case "putstorageoperation":
-                if (protocol.writeTo(AGVCommands.PUTWAREHOUSE.getCommandString(), endpoint) == 1) {
+                if (this.protocol.writeTo(AGVCommands.PUTWAREHOUSE.getCommandString(), endpoint) == 1) {
                     this.systemStatus = SystemStatus.EXECUTING;
                     return new JsonObject().getAsJsonObject("Success delivering to Storage!");
                 }
@@ -188,7 +195,7 @@ public class AGV extends Machine implements MachineSPI {
 
     @Override
     public String getCurrentConnectionStatus() {
-        if (protocol.connect(endpoint) == 1) {
+        if (this.protocol.connect(endpoint) == 1) {
             return "AGV is Connected";
         } else {
             return "AGV is NOT Connected";

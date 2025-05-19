@@ -2,6 +2,8 @@ package dk.g4.st25.assembly_station;
 
 import com.google.gson.JsonObject;
 import dk.g4.st25.common.machine.*;
+import dk.g4.st25.common.protocol.Protocol;
+import dk.g4.st25.common.protocol.ProtocolSPI;
 
 import java.util.HashMap;
 
@@ -125,6 +127,11 @@ public class AssemblyStation extends Machine implements MachineSPI{
          * (This method is used to handle object drop-off, since an object can be passed (in Coordinator) through this method)
          */
         this.mostRecentlyReceived = mostRecentlyReceived;
+    }
+
+    @Override
+    public void setMachineProtocol(ProtocolSPI protocol) {
+
     }
 
     public void confirmItemQuantity() {

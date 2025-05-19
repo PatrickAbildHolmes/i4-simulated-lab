@@ -58,17 +58,17 @@ public class StatusController {
         UIEffects.applyHoverEffect(backBtnStat);
 
         // Checks if a production is active, and if not, alert
-        if (ProductionQueue.getInstance().getOrders().peek() != null) {
-            updateStatus(ProductionQueue.getInstance().getOrders().peek());
-        } else {
-            showAlert("ERROR!","No production has been started, or queue empty!");
-        }
+//        if (ProductionQueue.getInstance().getOrders().peek() != null) {
+//            updateStatus(ProductionQueue.getInstance().getOrders().peek());
+//        } else {
+//            showAlert("ERROR!","No production has been started, or queue empty!");
+//        }
     }
 
     // Updating the current status
     public void updateStatus(Order order) {
         // Default values
-        ICoordinate coordinate = app.getICoordinateImplementations().stream()
+        ICoordinate coordinator = app.getICoordinateImplementations().stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No ICoordinate implementations found"));
         this.productionName = order.getName();

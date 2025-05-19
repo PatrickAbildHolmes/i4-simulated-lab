@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dk.g4.st25.common.machine.Machine;
 import dk.g4.st25.common.machine.MachineSPI;
+import dk.g4.st25.common.protocol.Protocol;
+import dk.g4.st25.common.protocol.ProtocolSPI;
 
 import java.util.HashMap;
 
@@ -74,6 +76,11 @@ public class Warehouse extends Machine implements MachineSPI {
          * I.E. from Warehouse->AGV->Assembly->AGV->Warehouse
         * */
         this.mostRecentlyReceived = mostRecentlyReceived;
+    }
+
+    @Override
+    public void setMachineProtocol(ProtocolSPI protocol) {
+        this.protocol = protocol;
     }
 
     @Override

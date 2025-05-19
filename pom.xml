@@ -176,7 +176,7 @@
             <configuration>
               <includeArtifactIds>javafx-controls,javafx-graphics,javafx-base,javafx-fxml,
                 gson,unirest-java,java-dotenv,spring-web,kotlin-stdlib,httpclient,httpcore,httpasyncclient,httpcore-nio,
-                commons-logging,httpmime </includeArtifactIds>
+                commons-logging,httpmime,org.eclipse.paho.client.mqttv3 </includeArtifactIds>
               <outputDirectory>${project.parent.basedir}/mods-mvn</outputDirectory>
             </configuration>
           </execution>

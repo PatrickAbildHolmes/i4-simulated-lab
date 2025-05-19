@@ -5,5 +5,5 @@ module MQTT {
     requires CommonProtocol;
     requires com.google.gson;
     requires org.eclipse.paho.client.mqttv3;
-//    provides ProtocolSPI with dk.g4.st25.mqtt.MQTT;
+    provides ProtocolSPI with dk.g4.st25.mqtt.MQTT;
 }

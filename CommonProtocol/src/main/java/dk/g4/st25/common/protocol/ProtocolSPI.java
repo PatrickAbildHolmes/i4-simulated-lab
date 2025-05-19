@@ -11,5 +11,5 @@ public interface ProtocolSPI {
     int subscribeToTopic(String topic);
 
     // Returns a JSON object of all the requested data through a method lying on the machine
-    JsonObject readFrom(String endpoint, String method);
+    com.google.gson.JsonObject readFrom(String endpoint, String method);
 }

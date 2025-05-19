@@ -2,15 +2,15 @@ package dk.g4.st25.assembly_station;
 
 import com.google.gson.JsonObject;
 import dk.g4.st25.common.machine.*;
-import dk.g4.st25.common.protocol.Protocol;
-import dk.g4.st25.common.services.IExecuteCommand;
-import dk.g4.st25.common.services.IMonitorStatus;
 
 import java.util.HashMap;
 
-public class AssemblyStation extends Machine implements MachineSPI, IMonitorStatus, IExecuteCommand, ItemConfirmationI {
+public class AssemblyStation extends Machine implements MachineSPI{
     private SystemStatus systemStatus; // What it is currently doing (producing, idle, etc.)
     private int processNumber; // Increasing integer starting at 1 that logs what process nr. it is at. '9999' is not allowed.
+    private final Tray entryTray; // Trays for delivery and pick-up. Fixed number. "Can't receive a 'new' Tray, hence final"
+    private final Tray exitTray; // Trays for delivery and pick-up. Fixed number. "Can't receive a 'new' Tray, hence final"
+    private Object mostRecentlyReceived;
     public enum SystemStatus {
         IDLE,
         AWAITING_PARTS,
@@ -20,87 +20,79 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
         ERROR
     }
 
-    private Tray[] trays; // Trays for delivery and pick-up. Fixed number
-    private boolean needsMoreComponents;
-    private boolean productReadyForPickup;
-    private Object mostRecentlyReceived;
-
-    AssemblyStation(Protocol protocol) {
-        this.protocol = protocol;
+    public AssemblyStation() {
         this.systemStatus = SystemStatus.IDLE;
         this.processNumber = 1;
         this.command = "";
         this.inventory = new HashMap<>();
         this.inventory.put("DroneComponents",0);
-        this.trays = new Tray[2]; // Two trays?
-        this.needsMoreComponents = true;
-        this.productReadyForPickup = false;
+        this.entryTray = new Tray();
+        this.exitTray = new Tray();
     }
-    // From README section: 'Sequence (actions) with checks'
-    //3) Assembly assemble product
-    //3.1) AssemblyLine receives "execute assembly" command signal-----
-    //3.2) AssemblyLine confirms correct item is delivered
-    //3.3) AssemblyLine sends confirmation signal to coordinator
-    //3.4) AssemblyLine confirms enough items have been delivered
-    //3.5) AssemblyLine sends confirmation signal to coordinator
-    //3.6) AssemblyLine executes the assembly instructions
-    //3.7) AssemblyLine places product for pick-up
-    //3.8) AssemblyLine sends task completion signal
 
     @Override
     public int taskCompletion() {
         /**
-         * Signals whether a product is ready for pickup
+         * Signals when all tasks relating to a production are complete (Step 3 is complete)
+         * Use it to check that AssemblyStation is no longer AWAITING_PICKUP
+         * (This method is used to verify that the sequence of actions within the (Coordinator/production) step is complete)
          */
         int taskCompletion = 0;
-        switch (command) {
-            case "assemble":
-                switch (this.systemStatus) {
-                    case IDLE:
-                        taskCompletion = 0;
-                    case AWAITING_PARTS:
-                        taskCompletion = 0;
-                    case READY:
-                        taskCompletion = 0;
-                    case ASSEMBLING:
-                        taskCompletion = 0;
-                    case AWAITING_PICKUP:
-                        taskCompletion = 1;
-                    case ERROR:
-                        taskCompletion = 0;
-                    default:
-                        break;
-                }
-            case "checkhealth":
-                return productionCompletion(); // "checkhealth" and productionCompletion() both checks whether systemStatus is IDLE.
+        switch (this.systemStatus) {
+            case IDLE:
+                taskCompletion = 1;
+            case AWAITING_PARTS:
+                taskCompletion = 0;
+            case READY:
+            case ASSEMBLING:
+            case AWAITING_PICKUP:
+            case ERROR:
         }
         return taskCompletion;
     }
 
     @Override
-    public int productionCompletion() {
+    public int actionCompletion() {
         /**
-         * Signals when all tasks relating to a production are complete
-         * Use it to check that AssemblyStation is no longer AWAITING_PICKUP
+         * Signals whether a product is ready for pickup (action "assembling" is complete"),
+         * or health was checked with "checkhealth"
+         * (This method is used to verify that the latest action (move, pick up, present object) is finished)
          */
-        int productionCompletion = 0;
-        switch (this.systemStatus) {
-            case IDLE:
-                productionCompletion = 1;
-            case AWAITING_PARTS:
-                productionCompletion = 0;
-            case READY:
-                productionCompletion = 0;
-            case ASSEMBLING:
-                productionCompletion = 0;
-            case AWAITING_PICKUP:
-                productionCompletion = 0;
-            case ERROR:
-                productionCompletion = 0;
-            default:
-                break;
+        int actionCompletion = 0;
+        switch(this.command){
+            case "assemble":
+                switch (this.systemStatus) {
+                    case IDLE: // init value is 0
+                    case AWAITING_PARTS:
+                    case READY:
+                    case ASSEMBLING: // If command was "assemble",
+                        if (this.getCurrentSystemStatus().equals("Idle")) { // and the machine is now "Idle",
+                            this.systemStatus = SystemStatus.AWAITING_PICKUP; // that means it is now awaiting pick-up
+                            this.exitTray.setContent(this.mostRecentlyReceived); // Make sure Coordinator has generated a new Drone
+                            this.exitTray.setAvailable(false);
+                            actionCompletion = 1;
+                        }
+                        actionCompletion = 0;
+                    case AWAITING_PICKUP: // And if command was "assemble", and the machine was awaiting pick-up,
+                        this.systemStatus = SystemStatus.IDLE;  // this method is called after the AGV has picked it up,
+                        this.exitTray.setContent(null);         // and so resets the system state and exit-tray
+                        this.exitTray.setAvailable(true);
+                        actionCompletion = 1;
+                    case ERROR:
+                        actionCompletion = 0;
+                }
+            case "checkhealth": // if "checkhealth" was the latest command, we want to ensure the machine is in idle state
+                switch (this.systemStatus) {
+                    case IDLE:
+                        actionCompletion = 1;
+                    case AWAITING_PARTS:
+                    case READY:
+                    case ASSEMBLING:
+                    case AWAITING_PICKUP:
+                    case ERROR:
+                }
         }
-        return productionCompletion;
+        return actionCompletion;
     }
 
     @Override
@@ -110,55 +102,53 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
          * checks that it is a DroneComponent, and then either puts it into inventory or discards it
          */
         this.systemStatus = SystemStatus.AWAITING_PARTS;
-        for (Tray tray : trays) {
-            if (tray.isAvailable()) {
-                tray.setContent(new DroneComponent()); // Adds received item to tray. Placeholder statement until AGV can transfer object
-                tray.setAvailable(false);
+            if (this.entryTray.isAvailable()) {
+                this.entryTray.setContent(new DroneComponent()); // Adds received item to tray. Placeholder statement until AGV can transfer object
+                this.entryTray.setAvailable(false);
                 if (mostRecentlyReceived instanceof DroneComponent) {
                     // Add it to inventory
                     this.inventory.put("DroneComponents", this.inventory.get("DroneComponents") + 1); // Placeholder statement. Increases the V of K,V-pair DroneComponents
                     return true;
                 } else {
-                    tray.setContent(null); // remove the incorrect item
-                    tray.setAvailable(true);
+                    this.entryTray.setContent(null); // remove the incorrect item
+                    this.entryTray.setAvailable(true);
                     return false;
                 }
             }
-        }
         return false;
     }
 
+    @Override
     public void setMostRecentlyReceived(Object mostRecentlyReceived) {
         /**
          * Used by Coordinator when AGV hands off item
+         * (This method is used to handle object drop-off, since an object can be passed (in Coordinator) through this method)
          */
         this.mostRecentlyReceived = mostRecentlyReceived;
     }
 
-    public boolean confirmItemQuantity() {
+    public void confirmItemQuantity() {
         /**
          * How many Drone components to make a Drone?
          */
         int componentsNeeded = 1;
         if (this.inventory.get("DroneComponents")>=componentsNeeded){
             this.systemStatus = SystemStatus.READY;
-            return true;
         }else{
             System.out.println("Not enough components received for production yet");
-            return false;
         }
     }
 
     @Override
-    public JsonObject sendCommand(String commandType, String commandParam) {
+    public JsonObject sendCommand(String commandType) {
         /**
          * commandType: whether to:
          *     "assemble": execute operation (assemble)
          *     "checkhealth": check machine health
-         * commandParam: Not used.
          */
         if (commandType.equals("assemble")) {
-            if (this.systemStatus == SystemStatus.READY) {
+            this.confirmItemQuantity(); // this will set SystemStatus.READY if enough components in inventory
+            if (this.systemStatus == SystemStatus.READY && this.exitTray.isAvailable()) { // AStation must have received components, and have an available exit tray
                 this.command = commandType; // Set latest received command
                 String actualMessage = "\"ProcessID\": "+this.processNumber;
                 this.protocol.writeTo(actualMessage,"emulator/operation");
@@ -168,6 +158,8 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
                     this.processNumber++;
                 }
                 this.systemStatus = SystemStatus.ASSEMBLING;
+                this.entryTray.setContent(null); // Clears the entry tray
+                this.entryTray.setAvailable(true);
                 return new JsonObject().getAsJsonObject("Success!"); // Success
             } else
                 return null; // Assemble command sent, but machine not ready
@@ -183,32 +175,41 @@ public class AssemblyStation extends Machine implements MachineSPI, IMonitorStat
     }
 
     @Override
+    public String getInventory() {
+        // Returns the content of the two trays using '\newline'.
+        // Calling .toString() on a null object safely returns "null"
+        String entryTrayContent = "Entry tray: " + this.entryTray.getContent().toString();
+        String exitTrayContent = "Exit tray: " + this.exitTray.getContent().toString();
+        return entryTrayContent + "\n" + exitTrayContent;
+    }
+
+    @Override
     public String getCurrentSystemStatus() {
         /**
          * Returns either "Idle", "Executing", "Error" or "Unknown"
          * If called after (successful) sendCommand(assemble), will set AssemblyStation as AWAITING_PICKUP.
          * If called while AssemblyStation is AWAITING_PICKUP, will set system status to IDLE (do it after AGV picks up Drone)
          */
-        JsonObject systemState = this.protocol.readFrom("emulator/status", "unused");
-        // Retrieve number from State, and convert to description as seen on pg. 11:
-        int stateNumber = systemState.get("State").getAsInt();
-        String stateDesc;
-        switch (stateNumber) {
-            case 0:
-                stateDesc = "Idle";
-                if (systemStatus == SystemStatus.ASSEMBLING) {
-                    this.systemStatus = SystemStatus.AWAITING_PICKUP;
-                } else if (systemStatus == SystemStatus.AWAITING_PICKUP) {
-                    this.systemStatus = SystemStatus.IDLE;
-                }
-            case 1:
-                stateDesc = "Executing";
-            case 2:
-                stateDesc = "Error";
-            default:
-                stateDesc = "Unknown";
+        try {
+            JsonObject systemState = this.protocol.readFrom("emulator/status", "unused");
+            // Retrieve number from State, and convert to description as seen on pg. 11 in Technical Documentation:
+            int stateNumber = systemState.get("State").getAsInt();
+            String stateDesc;
+            switch (stateNumber) {
+                case 0:
+                    stateDesc = "Idle";
+                case 1:
+                    stateDesc = "Executing";
+                case 2:
+                    stateDesc = "Error";
+                default:
+                    stateDesc = "Unknown";
+            }
+            return stateDesc;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error getting Assembly Station status";
         }
-        return stateDesc;
     }
 
     @Override

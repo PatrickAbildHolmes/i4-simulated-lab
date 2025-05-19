@@ -2,9 +2,10 @@ package dk.g4.st25.core.uicontrollers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dk.g4.st25.common.services.IExecuteCommand;
+import dk.g4.st25.common.services.IMonitorStatus;
 import dk.g4.st25.core.App;
-import dk.g4.st25.core.Configuration;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -36,6 +37,9 @@ public class InventoryController {
     private ObservableList<InventoryItem> inventoryItems = FXCollections.observableArrayList();
 
 
+
+
+
     // Method for switching back to the "Homepage" site
     public void switchToHomepage(ActionEvent event) throws IOException {
         new SceneController().switchToHomepage(event);
@@ -53,19 +57,23 @@ public class InventoryController {
         getInventory();
 
         invTable.setItems(inventoryItems);
+
+
     }
     private void getInventory() {
-        Configuration conf = Configuration.get();
-        JsonObject response = null;
+        App app = App.getAppContext();
 
-        for (IExecuteCommand implementation : conf.getIExecuteCommandImplementationsList()) {
+        JsonObject response = new JsonObject();
+
+        for (IMonitorStatus implementation : app.getIMonitorStatusImplementations()) {
             System.out.println("Got run");
-            System.out.println(conf.getIExecuteCommandImplementationsList().stream().findAny());
             if (implementation.getClass().getModule().getName().equals("Warehouse")) {
                 System.out.println("TEST");
-                response = implementation.sendCommand("readFrom", "GetInventory");
+                String responseString = implementation.getInventory();
+                response = JsonParser.parseString(responseString).getAsJsonObject();
             }
         }
+
 
         if (response != null && response.has("Inventory")) {
             JsonArray itemsArray = response.getAsJsonArray("Inventory");

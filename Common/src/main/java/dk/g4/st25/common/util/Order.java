@@ -6,7 +6,7 @@ public class Order {
     private int amount;
     private Product product;
     private Status status;
-    private enum Status {
+    public enum Status {
         IN_QUEUE,
         BEING_PROCESSED,
         FINISHED
@@ -38,4 +38,5 @@ public class Order {
     public Status getStatus() {
         return status;
     }
+    public void setStatus(Status status) { this.status = status; }
 }

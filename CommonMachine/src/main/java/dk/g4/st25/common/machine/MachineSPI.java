@@ -1,13 +1,24 @@
 package dk.g4.st25.common.machine;
 
-public interface MachineSPI {
-    enum systemState{
+import dk.g4.st25.common.services.IExecuteCommand;
+import dk.g4.st25.common.services.IMonitorStatus;
 
+public interface MachineSPI extends IExecuteCommand, IMonitorStatus, ItemConfirmationI {
+    enum systemState{
     }
-    // Signals that a task is complete
+    /**
+     * This method is used to verify that the sequence of actions within the (Coordinator/production) step is complete
+     */
     int taskCompletion();
 
+    /**
+     * This method is used to verify that the latest action (move, pick up, present object) is finished
+     * */
+    int actionCompletion();
 
-    // Signals when all tasks relating to a production are complete
-    int productionCompletion();
+    /**
+     * Ideally this method is used to handle object drop-off, since an object can be passed (in Coordinator) through this method,
+     * I.E. from Warehouse->AGV->Assembly->AGV->Warehouse
+     * */
+    void setMostRecentlyReceived(Object mostRecentlyReceived);
 }

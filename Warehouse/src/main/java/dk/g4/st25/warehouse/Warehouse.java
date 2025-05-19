@@ -2,8 +2,10 @@ package dk.g4.st25.warehouse;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import dk.g4.st25.common.machine.Drone;
 import dk.g4.st25.common.machine.Machine;
 import dk.g4.st25.common.machine.MachineSPI;
+import dk.g4.st25.common.protocol.Protocol;
 
 import java.util.HashMap;
 
@@ -33,21 +35,15 @@ public class Warehouse extends Machine implements MachineSPI {
         /**
          * This method is used to verify that the sequence of actions within the (Coordinator/production) step is complete
          * */
-        try {
-            // Attempt to fetch an item from tray 1
-            String message = "{\"action\":\"pick\",\"trayId\":1}";
-            protocol.writeTo(message, endpoint);
-
-            // Increment the counter if no exception is thrown
-            itemsFetched++;
-            System.out.println("Item successfully fetched from tray 1.");
-            return 0;
-        } catch (Exception e) {
-            // Return a failure message
-            System.err.println("Error fetching item from tray 1: " + e.getMessage());
-            System.out.println("Failed to fetch item from tray 1.");
-            return 0;
+        int taskCompletion = 0;
+        switch (this.systemStatus) {
+            case IDLE:
+                taskCompletion = 1;
+            case EXECUTING:
+            case ERROR:
+            case UNKNOWN:
         }
+        return taskCompletion;
     }
 
     @Override
@@ -56,15 +52,24 @@ public class Warehouse extends Machine implements MachineSPI {
          * This method is used to verify that the latest action (move, pick up, present object) is finished,
          * as opposed to taskCompletion that verifies that the sequence of actions within the (Coordinator/production) step is complete
          * */
-        return 0;
+        if (this.systemStatus == SystemStatus.IDLE){
+            return 1;
+        }else{
+            return 0;
+        }
     }
+
     @Override
     public boolean confirmItemDelivery() {
         /**
          * This method verifies that the correct item was delivered *To* this machine.
          * Should be checking that object was instanceof DroneComponent or Drone
          * */
-        return false;
+        if (mostRecentlyReceived instanceof Drone) {
+            return true;
+        }else{
+            return false;
+        }
     }
 
     @Override
@@ -78,6 +83,7 @@ public class Warehouse extends Machine implements MachineSPI {
 
     @Override
     public JsonObject sendCommand(String commandType) {
+        this.systemStatus = SystemStatus.EXECUTING;
         JsonObject result = new JsonObject();
         JsonArray tempInventory = this.protocol.readFrom("getInventory",endpoint).get("Inventory").getAsJsonArray();
         switch (commandType.toLowerCase()) {
@@ -142,7 +148,10 @@ public class Warehouse extends Machine implements MachineSPI {
     @Override
     public String getCurrentConnectionStatus() {
         // Create a list to store connection status messages
-        return "Soap Active";
+        if (this.protocol != null) {
+            return "Warehouse protocol active. Protocol: " + this.protocol;
+        }
+        return "ERROR: Warehouse protocol not active";
     }
 
     public void refreshInventory(String endpoint) {

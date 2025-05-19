@@ -36,12 +36,8 @@ public class Warehouse extends Machine implements MachineSPI {
          * This method is used to verify that the sequence of actions within the (Coordinator/production) step is complete
          * */
         int taskCompletion = 0;
-        switch (this.systemStatus) {
-            case IDLE:
-                taskCompletion = 1;
-            case EXECUTING:
-            case ERROR:
-            case UNKNOWN:
+        if (this.systemStatus == SystemStatus.IDLE) {
+            taskCompletion = 1;
         }
         return taskCompletion;
     }
@@ -52,11 +48,14 @@ public class Warehouse extends Machine implements MachineSPI {
          * This method is used to verify that the latest action (move, pick up, present object) is finished,
          * as opposed to taskCompletion that verifies that the sequence of actions within the (Coordinator/production) step is complete
          * */
-        if (this.systemStatus == SystemStatus.IDLE){
-            return 1;
-        }else{
-            return 0;
+        int actionCompletion = 0;
+        if (this.systemStatus == SystemStatus.EXECUTING) {
+            if (this.getCurrentSystemStatus().equals("idle")){
+                this.systemStatus = SystemStatus.IDLE;
+                actionCompletion = 1;
+            }
         }
+        return actionCompletion;
     }
 
     @Override

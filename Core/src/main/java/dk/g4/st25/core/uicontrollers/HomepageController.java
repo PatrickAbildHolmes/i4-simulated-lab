@@ -20,7 +20,7 @@ public class HomepageController {
     private Parent root;
 
     @FXML
-    private Button setParameters;
+    private Button production;
     @FXML
     private Button status;
     @FXML
@@ -43,7 +43,7 @@ public class HomepageController {
     // Initializes all functionalities when the scene is opened
     public void initialize(){
         // Applies hovering effect to increase size
-        UIEffects.applyHoverEffect(setParameters);
+        UIEffects.applyHoverEffect(production);
         UIEffects.applyHoverEffect(status);
         UIEffects.applyHoverEffect(inventory);
         UIEffects.applyHoverEffect(backlog);

@@ -2,14 +2,14 @@ package dk.g4.st25.core;
 
 import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.util.Order;
+import dk.g4.st25.database.Database;
 
 import java.util.LinkedList;
-import java.util.Optional;
+import java.util.List;
 import java.util.Queue;
 
 public class ProductionQueue {
-    private final static ProductionQueue productionQueue = new ProductionQueue();
-    private Queue<Order> orders = new LinkedList<>();
+    private static final ProductionQueue productionQueue = new ProductionQueue();
     private boolean productionStarted = false;
 
     private ProductionQueue() {}
@@ -17,27 +17,30 @@ public class ProductionQueue {
     public void start() {
         productionStarted = true;
 
-        ICoordinate coordinate = App.getAppContext().getICoordinateImplementations().stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No ICoordinate implementations found"));
+        // Get coordinator
+        Configuration conf = Configuration.get();
+        ICoordinate coordinator = conf.coordinatorLoader();
 
+        // Database
+        Database db = Database.getDB();
+
+        List<Order> orders = db.getOrders();
         while (!orders.isEmpty()) {
-            Order nextItem = orders.remove(); // retrieves and removes head of queue
-            coordinate.startProduction(nextItem);
+            // Start next order
+            Order nextItem = orders.get(0);
+            coordinator.startProduction(nextItem);
+
+            // Delete order from db
+            db.deleteOrder(nextItem.getId());
+
+            // Update Orders (other orders might have been added)
+            orders = db.getOrders();
         }
         productionStarted = false;
     }
 
-    public void add(Order order) {
-        orders.add(order);
-    }
-
     public boolean isProductionStarted() {
         return productionStarted;
-    }
-
-    public Queue<Order> getOrders() {
-        return orders;
     }
 
     static public ProductionQueue getInstance() {

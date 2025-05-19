@@ -1,25 +1,15 @@
 package dk.g4.st25.core.uicontrollers;
 
-import dk.g4.st25.common.util.Order;
 import dk.g4.st25.core.ProductionQueue;
+import dk.g4.st25.database.Database;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import dk.g4.st25.common.util.Product;
 
 
-public class SetParametersController {
-    private Stage stage;
-    private Scene scene;
-    private Parent root;
-
+public class ProductionController {
     @FXML
     private TextField prodNamePara;
     @FXML
@@ -33,10 +23,6 @@ public class SetParametersController {
     @FXML
     private Button clearPara;
 
-    private List<String> productList = new ArrayList<String>();
-
-
-
     // Method for switching back to the "Homepage" site
     public void switchToHomepage(ActionEvent event) throws IOException {
         new SceneController().switchToHomepage(event);
@@ -46,11 +32,10 @@ public class SetParametersController {
     public void initialize(){
         // Applies hovering effect to increase size
         UIEffects.applyHoverEffect(backBtnPara);
-        // Adds product selection to the dropdown menu
-        productList.add("Racing drone");
-        productList.add("Recon drone");
-        productList.add("pick-up drone");
-        prodTypePara.getItems().addAll(productList);
+
+        // Add drone types
+        Database db = Database.getDB();
+        prodTypePara.getItems().addAll(db.getDroneTypes());
 
         // Set button actions
         startProd.setOnAction(event -> startProduction());
@@ -89,16 +74,18 @@ public class SetParametersController {
             return;
         }
 
-        // Create new order
-        Product product = new Product(productType);
-        Order order = new Order(productionName, product, amount);
+        // Insert new order in db
+        Database db = Database.getDB();
+        int typeId = prodTypePara.getSelectionModel().getSelectedIndex(); // is zero-indexed
+        db.insertOrder(productionName, typeId+1, amount);
 
         // Add order to queue
         ProductionQueue productionQueue = ProductionQueue.getInstance();
-        productionQueue.add(order);
         if (!productionQueue.isProductionStarted()) {
-            showAlert("Success", "Production started.");
+            showAlert("Success", "Order added and production started.");
             productionQueue.start();
+        } else {
+            showAlert("Success", "Order added.");
         }
     }
 

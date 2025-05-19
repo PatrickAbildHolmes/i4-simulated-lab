@@ -77,14 +77,11 @@ public class Coordinator implements ICoordinate{
 
         // Amount of products needed to be assembled, and parts needed for each product
         int amountOfProductsToAssemble = order.getAmount();
-        int amountOfPartsNeeded = order.getProduct().getParts().length;
         this.produced = 0; // Reset to 0 at start of Order production cycle
+
         // Initial sequence
-        // Put each inside a check for component availability, AND don't continue until it returns YES
-        for (int k = 0; k < amountOfPartsNeeded; k++) {
-            coordinator.step1_WarehouseWithdrawComponent();
-            coordinator.step2_AGVDeliverComponentToAssembly();
-        }
+        coordinator.step1_WarehouseWithdrawComponent();
+        coordinator.step2_AGVDeliverComponentToAssembly();
         coordinator.step1_WarehouseWithdrawComponent();
 
         // Afterwards, loops steps '3-4-5-2-1' for every product
@@ -96,10 +93,8 @@ public class Coordinator implements ICoordinate{
             if(i == amountOfProductsToAssemble - 1){ // Don't prepare more components for assembly once enough drones have been produced
                 break;
             }
-            for (int k = 0; k < amountOfPartsNeeded; k++) {
-                coordinator.step2_AGVDeliverComponentToAssembly();
-                coordinator.step1_WarehouseWithdrawComponent();
-            }
+            coordinator.step2_AGVDeliverComponentToAssembly();
+            coordinator.step1_WarehouseWithdrawComponent();
         }
         order.setStatus(Order.Status.FINISHED);
 
@@ -195,7 +190,7 @@ public class Coordinator implements ICoordinate{
             if(isMachineIdle(this.assemblyMachine)){stepCount++;}else{throw new Exception("Error getting machine status");}
             if(machineCommand(this.agvMachine, "PickAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling AGV command");}
 
-            Drone newDrone = new Drone(generateUnboundedRandomHexUsingRandomNextInt()); // Generate a random String-hex id for the created drone
+            Drone newDrone = new Drone(this.produced+1,"type"); // The Drone ID is the production number (Drone #3 has id=3)
             this.agvMachine.setMostRecentlyReceived(newDrone); // And give the drone to the AGV
 
             // Confirm carrying item
@@ -240,11 +235,6 @@ public class Coordinator implements ICoordinate{
     }
 
     // Helper-methods:
-    String generateUnboundedRandomHexUsingRandomNextInt() { // Used to generate drone ID/names
-        Random random = new Random();
-        int randomInt = random.nextInt();
-        return Integer.toHexString(randomInt);
-    }
     public boolean machineCommand(MachineSPI machine,String command){
         for (int i = 0; i < 5; i++) { // Attempt 5 times
             if (machine.sendCommand(command)         //Load program and execute

@@ -21,6 +21,8 @@ public class BacklogController {
     private Label id;
     @FXML
     private ScrollPane scrollPane;
+    @FXML
+    private Button  backButton;
 
     public void backBtnClick(ActionEvent event) throws IOException {
         new SceneController().switchToHomepage(event);
@@ -52,6 +54,9 @@ public class BacklogController {
     }
 
     public void initialize() {
+        // Applies hovering effect to increase size
+        UIEffects.applyHoverEffect(backButton);
+
         loadOrdersIntoScrollPane();
     }
 }

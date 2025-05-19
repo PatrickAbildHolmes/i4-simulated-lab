@@ -73,6 +73,7 @@
          </children>
       </HBox>
       <HBox alignment="CENTER" spacing="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" />
-        <Button fx:id="backBtnBacklog" layoutX="25.0" layoutY="353.0" mnemonicParsing="false" onAction="#backBtnClick" text="Back" />
+      <HBox layoutX="-6.0" prefHeight="400.0" prefWidth="608.0" />
+        <Button fx:id="backButton" layoutX="24.0" layoutY="359.0" mnemonicParsing="false" onAction="#backBtnClick" text="Back" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="20.0" />
     </children>
 </AnchorPane>

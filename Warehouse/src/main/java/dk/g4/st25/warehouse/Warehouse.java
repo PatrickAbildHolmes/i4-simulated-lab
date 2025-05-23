@@ -9,7 +9,7 @@ import dk.g4.st25.common.protocol.ProtocolSPI;
 
 import java.util.HashMap;
 
-public class Warehouse extends Machine implements MachineSPI {
+public class Warehouse extends Machine {
     // SOAP service object for interacting with the warehouse system
     // Counter to track the number of items successfully fetched
     private int itemsFetched = 0;
@@ -121,7 +121,7 @@ public class Warehouse extends Machine implements MachineSPI {
 
     @Override
     public String getInventory() {
-        return protocol.readFrom(endpoint, "GetInventory").toString();
+        return protocol.readFrom(endpoint, "getInventory").toString();
     }
 
     @Override

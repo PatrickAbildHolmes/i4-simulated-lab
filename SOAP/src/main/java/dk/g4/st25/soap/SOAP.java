@@ -69,6 +69,7 @@ public class SOAP extends Protocol {
 
     @Override
     public JsonObject readFrom(String endpoint, String method) {
+        System.out.println("TESSST");
         // If the method is getInventory, then do the following:
         if ("getInventory".equalsIgnoreCase(method)) {
             // Creates a JsonObject

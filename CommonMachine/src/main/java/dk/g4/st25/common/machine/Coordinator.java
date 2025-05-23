@@ -1,5 +1,7 @@
 package dk.g4.st25.common.machine;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dk.g4.st25.common.protocol.ProtocolSPI;
 import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.util.Order;
@@ -48,38 +50,49 @@ public class Coordinator implements ICoordinate{
                     case "warehouse":
                         this.warehouse = machine;
                         this.warehouseFlag = true;
-                        System.out.println("THING: " + Objects.requireNonNull(Dotenv.load().get("WAREHOUSE_PROTOCOL")).toLowerCase());
                         // Matches the .env variables to the corresponding protocol classnames, to ensure they exist.
                         if (protocolName.equals(Objects.requireNonNull(Dotenv.load().get("WAREHOUSE_PROTOCOL")).toLowerCase())) {
                             this.warehouse.setMachineProtocol(protocol);
-                            System.out.println("Warehouse protocol has been defined!!");
-                            continue;
+                            Machine warehouseMachine = (Machine) this.warehouse;
+                            System.out.println("Warehouse Protocol has now been set to: " + warehouseMachine.getProtocol());
                         } else {
                             System.out.println("Warehouse protocol defined in env, not found!");
                         }
+                        break;
                     case "agv":
                         this.agvMachine = machine;
                         this.agvFlag = true;
                         if (protocolName.equals(Objects.requireNonNull(Dotenv.load().get("AGV_PROTOCOL")).toLowerCase())) {
-                            this.warehouse.setMachineProtocol(protocol);
-                            continue;
+                            this.agvMachine.setMachineProtocol(protocol);
+                            Machine agvMachineMachine = (Machine) this.agvMachine;
+                            System.out.println("AGV Protocol has now been set to: " + agvMachineMachine.getProtocol());
                         } else {
                             System.out.println("AGV protocol defined in env, not found!");
                         }
-                    case "assembly":
+                        break;
+                    case "assemblystation":
                         this.assemblyMachine = machine;
                         this.assemblyFlag = true;
                         if (protocolName.equals(Objects.requireNonNull(Dotenv.load().get("ASSEMBLY_PROTOCOL")).toLowerCase())) {
-                            this.warehouse.setMachineProtocol(protocol);
-                            continue;
+                            this.assemblyMachine.setMachineProtocol(protocol);
+                            Machine assemblyMachineMachine = (Machine) this.assemblyMachine;
+                            System.out.println("Assembly Protocol has now been set to: " + assemblyMachineMachine.getProtocol());
                         } else {
                             System.out.println("Assembly protocol defined in env, not found!");
                         }
+                        break;
                     default:
                         break;
                 }
             }
         }
+
+        Machine warehouseMachine = (Machine) this.warehouse;
+        System.out.println("Warehouse Protocol now: " + warehouseMachine.getProtocol());
+        Machine agvMachineMachine = (Machine) this.agvMachine;
+        System.out.println("AGV Protocol now: " + agvMachineMachine.getProtocol());
+        Machine assemblyMachineMachine = (Machine) this.assemblyMachine;
+        System.out.println("Assembly Protocol now: " + assemblyMachineMachine.getProtocol());
 
         if (!this.warehouseFlag) {System.err.println("Warehouse module is missing.");}
         if (!this.agvFlag) {System.err.println("AGV module is missing.");}
@@ -92,6 +105,24 @@ public class Coordinator implements ICoordinate{
          * */
         return this.produced;
     }
+
+    @Override
+    public JsonObject getMachineInventory(String machine) {
+        Machine warehouseMachine = (Machine) warehouse;
+        System.out.println("Warehouse protocol: " + warehouseMachine.getProtocol());
+        switch (machine.toLowerCase()) {
+            case "warehouse":
+                return JsonParser.parseString(warehouse.getInventory()).getAsJsonObject();
+            case "agv":
+                return JsonParser.parseString(agvMachine.getInventory()).getAsJsonObject();
+            case "assemblystation":
+                return JsonParser.parseString(assemblyMachine.getInventory()).getAsJsonObject();
+            default:
+                System.out.println("Could not fetch inventory from the machine");
+                return null;
+        }
+    }
+
     @Override
     public List<Object> getObjectList() {
         return objectList;

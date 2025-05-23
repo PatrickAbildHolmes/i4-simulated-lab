@@ -7,7 +7,7 @@ import dk.g4.st25.common.protocol.ProtocolSPI;
 
 import java.util.HashMap;
 
-public class AssemblyStation extends Machine implements MachineSPI{
+public class AssemblyStation extends Machine{
     private SystemStatus systemStatus; // What it is currently doing (producing, idle, etc.)
     private int processNumber; // Increasing integer starting at 1 that logs what process nr. it is at. '9999' is not allowed.
     private final Tray entryTray; // Trays for delivery and pick-up. Fixed number. "Can't receive a 'new' Tray, hence final"
@@ -131,7 +131,7 @@ public class AssemblyStation extends Machine implements MachineSPI{
 
     @Override
     public void setMachineProtocol(ProtocolSPI protocol) {
-
+        this.protocol = protocol;
     }
 
     public void confirmItemQuantity() {

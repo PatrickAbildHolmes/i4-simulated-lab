@@ -233,7 +233,7 @@ public class Database {
         }
     }
 
-    static public Database getDB() {
+    public static Database getDB() {
         return db;
     }
 

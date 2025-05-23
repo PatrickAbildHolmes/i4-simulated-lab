@@ -3,6 +3,7 @@ package dk.g4.st25.core.uicontrollers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
 import dk.g4.st25.core.App;
@@ -63,16 +64,9 @@ public class InventoryController {
     private void getInventory() {
         App app = App.getAppContext();
 
-        JsonObject response = new JsonObject();
+        ICoordinate coordinator = app.getICoordinateImplementations().getFirst();
 
-        for (IMonitorStatus implementation : app.getIMonitorStatusImplementations()) {
-            System.out.println("Got run");
-            if (implementation.getClass().getModule().getName().equals("Warehouse")) {
-                System.out.println("TEST");
-                String responseString = implementation.getInventory();
-                response = JsonParser.parseString(responseString).getAsJsonObject();
-            }
-        }
+        JsonObject response = coordinator.getMachineInventory("warehouse");
 
 
         if (response != null && response.has("Inventory")) {

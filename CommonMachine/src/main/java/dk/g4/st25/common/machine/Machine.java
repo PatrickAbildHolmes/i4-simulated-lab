@@ -14,4 +14,7 @@ public abstract class Machine implements MachineSPI {
     protected Drone product; // Assembles products, in our case, Drones
     public enum SystemStatus { // Implement this in inherited classes
     }
+    public ProtocolSPI getProtocol() {
+        return protocol;
+    }
 }

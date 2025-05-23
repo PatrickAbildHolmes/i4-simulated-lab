@@ -60,5 +60,36 @@
           <version>1.0.1-SNAPSHOT</version>
           <scope>compile</scope>
       </dependency>
+      <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.7.5</version>
+      </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.1</version> <executions>
+        <execution>
+          <id>copy-core-dependencies</id>
+          <phase>package</phase>
+          <goals>
+            <goal>copy-dependencies</goal>
+          </goals>
+          <configuration>
+            <outputDirectory>${project.parent.basedir}/libs</outputDirectory>
+            <overWriteReleases>false</overWriteReleases>
+            <overWriteSnapshots>false</overWriteSnapshots>
+            <overWriteIfNewer>true</overWriteIfNewer>
+            <includeScope>runtime</includeScope>
+          </configuration>
+        </execution>
+      </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

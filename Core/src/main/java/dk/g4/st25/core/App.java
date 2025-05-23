@@ -1,7 +1,6 @@
 package dk.g4.st25.core;
 
 import dk.g4.st25.common.services.ICoordinate;
-import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

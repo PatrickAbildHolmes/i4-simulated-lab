@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class ProductionController {
@@ -83,10 +84,24 @@ public class ProductionController {
         ProductionQueue productionQueue = ProductionQueue.getInstance();
         if (!productionQueue.isProductionStarted()) {
             showAlert("Success", "Order added and production started.");
-            productionQueue.start();
+            AtomicBoolean running = new AtomicBoolean(true);
+            Thread productionTread = new Thread(() -> {
+                while (running.get()) {
+                    try {
+                        System.out.println("Production Start");
+                        productionQueue.start();
+                        running.set(false);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            productionTread.setDaemon(true);
+            productionTread.start();
         } else {
             showAlert("Success", "Order added.");
         }
+
     }
 
     // Method for showing the alert (Used elsewhere in this class)

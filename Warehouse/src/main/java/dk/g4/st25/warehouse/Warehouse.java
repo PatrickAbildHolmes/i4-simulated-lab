@@ -2,6 +2,8 @@ package dk.g4.st25.warehouse;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import dk.g4.st25.common.machine.Drone;
 import dk.g4.st25.common.machine.Machine;
 import dk.g4.st25.common.machine.MachineSPI;
 import dk.g4.st25.common.protocol.Protocol;
@@ -16,6 +18,7 @@ public class Warehouse extends Machine {
     private final String endpoint = "http://localhost:8081/Service.asmx";
     private SystemStatus systemStatus;
     private Object mostRecentlyReceived;
+    private boolean firstTimeInventoryUsed = true;
     public enum SystemStatus {
         IDLE,
         EXECUTING,
@@ -35,21 +38,13 @@ public class Warehouse extends Machine {
         /**
          * This method is used to verify that the sequence of actions within the (Coordinator/production) step is complete
          * */
-        try {
-            // Attempt to fetch an item from tray 1
-            String message = "{\"action\":\"pick\",\"trayId\":1}";
-            protocol.writeTo(message, endpoint);
-
-            // Increment the counter if no exception is thrown
-            itemsFetched++;
-            System.out.println("Item successfully fetched from tray 1.");
-            return 0;
-        } catch (Exception e) {
-            // Return a failure message
-            System.err.println("Error fetching item from tray 1: " + e.getMessage());
-            System.out.println("Failed to fetch item from tray 1.");
-            return 0;
+        int taskCompletion = 0;
+        System.out.println("WE ARE IN TASK");
+        if (this.systemStatus == SystemStatus.IDLE) {
+            System.out.println("WE ARE IN IDLE2");
+            taskCompletion = 1;
         }
+        return taskCompletion;
     }
 
     @Override
@@ -58,7 +53,14 @@ public class Warehouse extends Machine {
          * This method is used to verify that the latest action (move, pick up, present object) is finished,
          * as opposed to taskCompletion that verifies that the sequence of actions within the (Coordinator/production) step is complete
          * */
-        return 0;
+        int actionCompletion = 0;
+        if (this.getCurrentSystemStatus().equalsIgnoreCase(SystemStatus.IDLE.name())){
+            System.out.println("WE ARE IN IDLE");
+            this.systemStatus = SystemStatus.IDLE;
+            actionCompletion = 1;
+        }
+
+        return actionCompletion;
     }
     @Override
     public boolean confirmItemDelivery() {
@@ -66,7 +68,11 @@ public class Warehouse extends Machine {
          * This method verifies that the correct item was delivered *To* this machine.
          * Should be checking that object was instanceof DroneComponent or Drone
          * */
-        return false;
+        if (mostRecentlyReceived instanceof Drone) {
+            return true;
+        }else{
+            return false;
+        }
     }
 
     @Override
@@ -86,49 +92,60 @@ public class Warehouse extends Machine {
     @Override
     public JsonObject sendCommand(String commandType) {
         JsonObject result = new JsonObject();
-        JsonArray tempInventory = this.protocol.readFrom("getInventory",endpoint).get("Inventory").getAsJsonArray();
+        JsonArray tempInventory = JsonParser.parseString(getInventory()).getAsJsonObject().get("Inventory").getAsJsonArray();
         switch (commandType.toLowerCase()) {
             case "refresh":
                 refreshInventory(endpoint);
-                result.addProperty("status","Success");
+                result.addProperty("status","Success!");
                 result.addProperty("message","Inventory refreshed for warehouse");
                 return result;
             // Forslag til måden at måske håndtere det på
             case "pickitem":
-                for (int i = 0; i>tempInventory.size(); i++) {
-                    if (tempInventory.get(i).getAsString().equals("Drone component")) {
+                System.out.println("WE got to PICK ITEM");
+                System.out.println("JSON INVENTORY: " + tempInventory.size());
+                for (int i = 0; i<tempInventory.size(); i++) {
+                    System.out.println("Content: " + tempInventory.get(i).getAsJsonObject().get("Content").getAsString());
+                    if (tempInventory.get(i).getAsJsonObject().get("Content").getAsString().equals("Drone component")) {
+                        System.out.println("WE WERE HERE: " + i + " " + tempInventory);
                         String pickMessage = "{\"action\":\"pick\",\"trayId\":" + i +"}";
                         this.protocol.writeTo(pickMessage,endpoint);
-                        result.addProperty("status","Success");
+                        result.addProperty("status","Success!");
                         result.addProperty("message","Success! Picked item from slot: " + i);
+                        return result;
                     }
                 }
             case "insertitem":
-                for (int i = 0; i>tempInventory.size();i++) {
-                    if (tempInventory.get(i).getAsString().equals("")) {
-                        String insertMessage = "{\"action\":\"insert\", \"trayId\":"+ i +", \"itemName\":\"Finished drone\"}";
+                for (int i = 0; i<tempInventory.size();i++) {
+                    if (tempInventory.get(i).getAsJsonObject().get("Content").getAsString().equals("")) {
+                        String insertMessage = "{\"action\":\"insert\", \"trayId\":"+ (i+1) +", \"itemName\":\"Finished drone\"}";
                         this.protocol.writeTo(insertMessage,endpoint);
-                        result.addProperty("status","Success");
-                        result.addProperty("message","Success! Inserted an item at slot: " + i);
+                        result.addProperty("status","Success!");
+                        result.addProperty("message","Success! Inserted an item at slot: " + (i+1));
+                        return result;
                     }
                 }
             default:
                 result.addProperty("status", "error");
                 result.addProperty("message", "Unknown command type.");
+                System.out.println("RESULT: " + result);
                 return result;
         }
     }
 
     @Override
     public String getInventory() {
+        if (this.firstTimeInventoryUsed) {
+            refreshInventory(endpoint);
+            this.firstTimeInventoryUsed = false;
+        }
         return protocol.readFrom(endpoint, "getInventory").toString();
     }
 
     @Override
     public String getCurrentSystemStatus() {
         // Create a list to store system status messages
-        String status = protocol.readFrom(endpoint, "GetInventory").get("State").getAsString();
-        System.out.println(status);
+        String status = JsonParser.parseString(getInventory()).getAsJsonObject().get("State").getAsString();
+        System.out.println("WUHUU THIS IS STATUS: "+status);
         String stateDesc;
         switch (status) {
             case "0":
@@ -153,11 +170,11 @@ public class Warehouse extends Machine {
     }
 
     public void refreshInventory(String endpoint) {
-        for (int i = 0; i<10; i++) {
+        for (int i = 0; i<11; i++) {
             String pickMessage = "{\"action\":\"pick\",\"trayId\":" + i +"}";
             this.protocol.writeTo(pickMessage, endpoint);
-            for (int j = 0; j<8; j++){
-                String insertMessage = "{\"action\":\"insert\", \"trayId\":"+ i +", \"itemName\":\"Drone component\"}";
+            for (int j = 0; j<9; j++){
+                String insertMessage = "{\"action\":\"insert\", \"trayId\":"+ j +", \"itemName\":\"Drone component\"}";
                 this.protocol.writeTo(insertMessage,endpoint);
             }
         }

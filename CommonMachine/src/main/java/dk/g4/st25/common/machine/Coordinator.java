@@ -108,8 +108,6 @@ public class Coordinator implements ICoordinate{
 
     @Override
     public JsonObject getMachineInventory(String machine) {
-        Machine warehouseMachine = (Machine) warehouse;
-        System.out.println("Warehouse protocol: " + warehouseMachine.getProtocol());
         switch (machine.toLowerCase()) {
             case "warehouse":
                 return JsonParser.parseString(warehouse.getInventory()).getAsJsonObject();
@@ -147,22 +145,31 @@ public class Coordinator implements ICoordinate{
 
         // Initial sequence
         coordinator.step1_WarehouseWithdrawComponent();
+        System.out.println("Step 1 completed!");
         coordinator.step2_AGVDeliverComponentToAssembly();
+        System.out.println("Step 2 completed!");
         coordinator.step1_WarehouseWithdrawComponent();
+        System.out.println("Step 1 completed! Again");
 
         // Afterwards, loops steps '3-4-5-2-1' for every product
         for (int i = 0; i < amountOfProductsToAssemble; i++) {
             coordinator.step3_AssemblyAssembleProduct();
+            System.out.println("Step 3 Completed in loop! " + i);
             coordinator.step4_AGVDeliverProductToWarehouse();
+            System.out.println("Step 4 Completed in loop! " + i);
             coordinator.step5_WarehouseDepositProduct();
+            System.out.println("Step 5 Completed in loop! " + i);
             this.produced++;
             if(i == amountOfProductsToAssemble - 1){ // Don't prepare more components for assembly once enough drones have been produced
                 break;
             }
             coordinator.step2_AGVDeliverComponentToAssembly();
+            System.out.println("Step 2 Completed in loop! " + i);
             coordinator.step1_WarehouseWithdrawComponent();
+            System.out.println("Step 1 Completed in loop! " + i);
         }
         order.setStatus(Order.Status.FINISHED);
+        System.out.println("Order has been finished");
 
         // Returns 1 for success: All products produced.
         // Returns 0 for partial success: Only some products were produced.
@@ -177,10 +184,10 @@ public class Coordinator implements ICoordinate{
 
             // 1.4) Warehouse moves the tray to the pickup area
             if (isMachineIdle(this.warehouse)) {stepCount++;}else{throw new Exception("Error getting warehouse state");}
-            if (this.warehouse.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
+            if (this.warehouse.taskCompletion()==1){stepCount++;}else{throw new Exception("Error completing task");}
 
         }catch (Exception e) {
-            System.out.println("Failed at Step 4, action: "+stepCount); e.printStackTrace();
+            System.out.println("Failed at Step 1, action: "+stepCount); e.printStackTrace();
         }
     }
     public void step2_AGVDeliverComponentToAssembly(){
@@ -303,8 +310,9 @@ public class Coordinator implements ICoordinate{
     // Helper-methods:
     public boolean machineCommand(MachineSPI machine,String command){
         for (int i = 0; i < 5; i++) { // Attempt 5 times
-            if (machine.sendCommand(command)         //Load program and execute
-                    .has("Success!")){   // and if it returns success
+            if (machine.sendCommand(command).get("status").getAsString()
+                    .equals("Success!")){// and if it returns success
+                System.out.println("COMMAND WAS SUCCESSFULLY RECIEVED");
                 return true;                         // Then move on
             }
             else {
@@ -348,6 +356,7 @@ public class Coordinator implements ICoordinate{
     public boolean isMachineIdle(MachineSPI machine){
         for (int i = 0; i < 5; i++) { // Try the I/O operation 5 times
             String machineState = machine.getCurrentSystemStatus();
+            System.out.println("STATE FROM MACHINE: " + machineState);
             if (machineState.equals("Idle")) {
                 return true;
             }else if (machineState.equals("Error") || machineState.equals("Unknown")) {

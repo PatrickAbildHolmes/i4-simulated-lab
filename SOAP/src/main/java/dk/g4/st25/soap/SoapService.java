@@ -80,6 +80,7 @@ public class SoapService {
     }
 
     public void insertItem(int trayId, String name, String endpoint){
+        System.out.println("WE INSERTED A FINISHED DRONE: " + name + trayId);
         HttpResponse<String> response = buildAndPostHttpResponse("InsertItem",
                 "<InsertItem xmlns=\"http://tempuri.org/\">\n      " +
                         "<trayId>" + trayId + "</trayId>\n      " +

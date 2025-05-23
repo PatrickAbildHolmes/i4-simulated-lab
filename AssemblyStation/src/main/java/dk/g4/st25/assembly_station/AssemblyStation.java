@@ -105,18 +105,23 @@ public class AssemblyStation extends Machine{
          */
         this.systemStatus = SystemStatus.AWAITING_PARTS;
             if (this.entryTray.isAvailable()) {
+                System.out.println("Assembly tray is available");
                 this.entryTray.setContent(new DroneComponent()); // Adds received item to tray. Placeholder statement until AGV can transfer object
                 this.entryTray.setAvailable(false);
+                System.out.println("places item on tray: " + entryTray);
                 if (mostRecentlyReceived instanceof DroneComponent) {
                     // Add it to inventory
+                    System.out.println("inside inventory if-statement for assembly");
                     this.inventory.put("DroneComponents", this.inventory.get("DroneComponents") + 1); // Placeholder statement. Increases the V of K,V-pair DroneComponents
                     return true;
                 } else {
+                    System.out.println("Item was not a drone component - removes item from the tray, and returns null");
                     this.entryTray.setContent(null); // remove the incorrect item
                     this.entryTray.setAvailable(true);
                     return false;
                 }
             }
+        System.out.println("We never made it through assembly confirm");
         return false;
     }
 

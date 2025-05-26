@@ -5,9 +5,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dk.g4.st25.common.machine.Drone;
 import dk.g4.st25.common.machine.Machine;
-import dk.g4.st25.common.machine.MachineSPI;
-import dk.g4.st25.common.protocol.Protocol;
 import dk.g4.st25.common.protocol.ProtocolSPI;
+import dk.g4.st25.database.DronePart;
 
 import java.util.HashMap;
 
@@ -170,11 +169,13 @@ public class Warehouse extends Machine {
     }
 
     public void refreshInventory(String endpoint) {
+        DronePart[] droneItems = DronePart.values();
+
         for (int i = 0; i<11; i++) {
             String pickMessage = "{\"action\":\"pick\",\"trayId\":" + i +"}";
             this.protocol.writeTo(pickMessage, endpoint);
             for (int j = 0; j<9; j++){
-                String insertMessage = "{\"action\":\"insert\", \"trayId\":"+ j +", \"itemName\":\"Drone component\"}";
+                String insertMessage = "{\"action\":\"insert\", \"trayId\":"+ j +", \"itemName\":\"" + droneItems[j].getItemName() + "\"}";
                 this.protocol.writeTo(insertMessage,endpoint);
             }
         }

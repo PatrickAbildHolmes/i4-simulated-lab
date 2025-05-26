@@ -7,6 +7,7 @@ import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.services.IExecuteCommand;
 import dk.g4.st25.common.services.IMonitorStatus;
 import dk.g4.st25.core.App;
+import dk.g4.st25.database.Database;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,6 +21,7 @@ import javafx.stage.Stage;
 import javafx.collections.ObservableList;
 
 import java.io.IOException;
+import java.util.List;
 
 public class InventoryController {
     private Stage stage;
@@ -67,7 +69,6 @@ public class InventoryController {
         ICoordinate coordinator = app.getICoordinateImplementations().getFirst();
 
         JsonObject response = coordinator.getMachineInventory("warehouse");
-
 
         if (response != null && response.has("Inventory")) {
             JsonArray itemsArray = response.getAsJsonArray("Inventory");

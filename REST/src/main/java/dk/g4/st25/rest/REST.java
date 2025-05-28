@@ -30,12 +30,10 @@ public class REST extends Protocol {
         /**
          * Executes the loaded program
          */
-        if (hasProgram) return null; // else AGV will freeze
+        if (!hasProgram) return null; // else AGV will freeze
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("State", 2);
-        JsonObject res = put(requestBody, endpoint);
-        hasProgram = true;
-        return res;
+        return put(requestBody, endpoint);
     }
 
     public JsonObject get(String endpoint) {
@@ -65,19 +63,45 @@ public class REST extends Protocol {
         return JsonParser.parseString(string).getAsJsonObject();
     }
 
-    public int restExecutionCommand(String programName, String endpoint) {
-        /**
-         * Handles the process of first loading a program to the endpoint, and afterwards
-         * executing that program
-         */
-        JsonObject responseLoad = loadProgram(programName, endpoint);
-        JsonObject execute = execute(endpoint);
+    private boolean isTaskInProgress(String endpoint) {
+        JsonObject status = get(endpoint);
+        if (status == null || !status.has("state")) return false;
 
-        if (responseLoad != null && execute != null) {
-            return 1;
-        } else {
+        int state = status.get("state").getAsInt();
+        return state == 2; // 2 = task is executing
+    }
+
+    public boolean waitForTaskCompletion(String endpoint) {
+        int attempts = 0;
+        while (attempts < 30) {  // Wait up to 30 seconds
+            if (!isTaskInProgress(endpoint)) {
+                return true;  // Task is done
+            }
+            try {
+                Thread.sleep(1000);  // Wait 1 second
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return false;
+            }
+            attempts++;
+        }
+        return false;  // Timeout
+    }
+
+
+    public int restExecutionCommand(String programName, String endpoint) {
+        if (!waitForTaskCompletion(endpoint)) {
+            System.out.println("Timeout waiting for previous task to complete");
             return 0;
         }
+
+        JsonObject responseLoad = loadProgram(programName, endpoint);
+        if (responseLoad == null) {
+            return 0;
+        }
+
+        JsonObject execute = execute(endpoint);
+        return execute != null ? 1 : 0;
     }
 
     @Override
@@ -91,6 +115,7 @@ public class REST extends Protocol {
 
     @Override
     public int writeTo(String message, String endpoint) {
+        System.out.println("Inside REST writeTo");
         switch (message.toLowerCase()) {
             // Collected all cases as they all run the same
             case "movetochargeroperation":

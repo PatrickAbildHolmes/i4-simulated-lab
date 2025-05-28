@@ -4,6 +4,8 @@ import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.util.Order;
 import dk.g4.st25.core.App;
 import dk.g4.st25.core.ProductionQueue;
+import dk.g4.st25.database.Database;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -14,6 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.List;
 
 public class StatusController {
     private Stage stage;
@@ -40,7 +43,8 @@ public class StatusController {
     private String state;
     private Thread statusThread;
     private volatile boolean running = true;
-    private App app = App.getAppContext();
+    private final App app = App.getAppContext();
+    Database db = Database.getDB();
 
     // Method for switching back to the "Homepage" site
     public void switchToHomepage(ActionEvent event) throws IOException {
@@ -57,45 +61,63 @@ public class StatusController {
         // Applies hovering effect to increase size
         UIEffects.applyHoverEffect(backBtnStat);
 
+
         // Checks if a production is active, and if not, alert
-//        if (ProductionQueue.getInstance().getOrders().peek() != null) {
-//            updateStatus(ProductionQueue.getInstance().getOrders().peek());
-//        } else {
-//            showAlert("ERROR!","No production has been started, or queue empty!");
-//        }
+        if (!db.getOrders().isEmpty()) {
+            startStatusThread();
+        } else {
+            showAlert("ERROR!","No production has been started, or queue empty!");
+        }
     }
 
     // Updating the current status
-    public void updateStatus(Order order) {
-        // Default values
-        ICoordinate coordinator = app.getICoordinateImplementations().stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No ICoordinate implementations found"));
-        this.productionName = order.getName();
-        this.productType = order.getProduct().getType();
-        this.producedAmount = 0;
-        this.totalAmount = order.getAmount();
-        this.state = "Executing";
+    public void updateStatus(Database db) throws IOException, InterruptedException {
+        if (!db.getOrders().isEmpty()) {
+            Order order = db.getOrders().getFirst();
+            // Default values
+            ICoordinate coordinator = app.getICoordinateImplementations().stream()
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("No ICoordinate implementations found"));
+            this.productionName = order.getName();
+            this.productType = order.getProduct().getType();
+            this.producedAmount = coordinator.getProduced();
+            this.totalAmount = order.getAmount();
+            this.state = Order.Status.BEING_PROCESSED.name();
+        } else {
+            this.producedAmount = this.totalAmount;
+            state = "Finished!";
+            Thread.sleep(2000);
+//            showAlert("Success!", "All orders in queue has been processed");
+        }
 
 
         // Thread for constantly updating
         App app = App.getAppContext();
+    }
+
+    private void startStatusThread() {
         statusThread = new Thread(() -> {
             while (running) {
                 try {
-                    //producedAmount = coordinate.getProduced();
+                    updateStatus(db);
 
                     // Update UI fields
-                    curProdNameStat.setText(productionName);
-                    prodTypeStat.setText(productType);
-                    amountStat.setText(producedAmount + "/" + totalAmount);
-                    stateStat.setText(state);
+                    javafx.application.Platform.runLater(()->{
+                        curProdNameStat.setText(productionName);
+                        prodTypeStat.setText(productType);
+                        amountStat.setText(producedAmount + "/" + totalAmount);
+                        stateStat.setText(state);
+                    });
 
                     // If production is finished, run initialize again, to check if theres a production
                     if (producedAmount == totalAmount) {
                         state = "Finished!";
-                        wait(2000);
-                        initialize();
+                        Thread.sleep(2000);
+                        if (db.getOrders().isEmpty()) {
+//                            showAlert("Success!", "All orders in queue has been processed");
+                        } else {
+                            initialize();
+                            }
                     }
                     // Check every 2 seconds
                     Thread.sleep(2000);

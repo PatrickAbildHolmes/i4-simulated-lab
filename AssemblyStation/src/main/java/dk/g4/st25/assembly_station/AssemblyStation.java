@@ -109,9 +109,9 @@ public class AssemblyStation extends Machine{
                 this.entryTray.setContent(new DroneComponent()); // Adds received item to tray. Placeholder statement until AGV can transfer object
                 this.entryTray.setAvailable(false);
                 System.out.println("places item on tray: " + entryTray);
+                System.out.println("MOST RECENTLY RECIEVED: " + this.mostRecentlyReceived);
                 if (mostRecentlyReceived instanceof DroneComponent) {
                     // Add it to inventory
-                    System.out.println("inside inventory if-statement for assembly");
                     this.inventory.put("DroneComponents", this.inventory.get("DroneComponents") + 1); // Placeholder statement. Increases the V of K,V-pair DroneComponents
                     return true;
                 } else {
@@ -140,9 +140,7 @@ public class AssemblyStation extends Machine{
     }
 
     public void confirmItemQuantity() {
-        /**
-         * How many Drone components to make a Drone?
-         */
+        // How many components to create a drone
         int componentsNeeded = 1;
         if (this.inventory.get("DroneComponents")>=componentsNeeded){
             this.systemStatus = SystemStatus.READY;
@@ -161,6 +159,7 @@ public class AssemblyStation extends Machine{
         if (commandType.equals("assemble")) {
             this.confirmItemQuantity(); // this will set SystemStatus.READY if enough components in inventory
             if (this.systemStatus == SystemStatus.READY && this.exitTray.isAvailable()) { // AStation must have received components, and have an available exit tray
+                System.out.println("We are inside if ASSEMBLE");
                 this.command = commandType; // Set latest received command
                 String actualMessage = "\"ProcessID\": "+this.processNumber;
                 this.protocol.writeTo(actualMessage,"emulator/operation");
@@ -172,7 +171,10 @@ public class AssemblyStation extends Machine{
                 this.systemStatus = SystemStatus.ASSEMBLING;
                 this.entryTray.setContent(null); // Clears the entry tray
                 this.entryTray.setAvailable(true);
-                return new JsonObject().getAsJsonObject("Success!"); // Success
+                JsonObject result = new JsonObject();
+                result.addProperty("status","Success!");
+                result.addProperty("message","Assembly station operation to assemble success");
+                return result; // Success
             } else
                 return null; // Assemble command sent, but machine not ready
         }
@@ -209,15 +211,18 @@ public class AssemblyStation extends Machine{
             String stateDesc;
             switch (stateNumber) {
                 case 0:
-                    stateDesc = "Idle";
+                    stateDesc = SystemStatus.IDLE.name();
+                    return stateDesc;
                 case 1:
-                    stateDesc = "Executing";
+                    stateDesc = SystemStatus.ASSEMBLING.name();
+                    return stateDesc;
                 case 2:
-                    stateDesc = "Error";
+                    stateDesc = SystemStatus.ERROR.name();
+                    return stateDesc;
                 default:
                     stateDesc = "Unknown";
+                    return stateDesc;
             }
-            return stateDesc;
         } catch (Exception e) {
             e.printStackTrace();
             return "Error getting Assembly Station status";

@@ -1,5 +1,6 @@
 package dk.g4.st25.database;
 
+import dk.g4.st25.common.util.DronePart;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 

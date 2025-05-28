@@ -7,6 +7,5 @@ module Warehouse {
     requires CommonProtocol;
     requires unirest.java;
     requires com.google.gson;
-    requires Database;
     provides MachineSPI with dk.g4.st25.warehouse.Warehouse;
 }

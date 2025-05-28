@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
+import java.util.Objects;
 
 public class MonitoringController {
     private Stage stage;
@@ -28,36 +29,35 @@ public class MonitoringController {
     private Button backBtnMon;
 
     private VBox monitoredContainer = new VBox(5);
-    private List<Object> monitoredObjects = new ArrayList<>();
+    private List<IMonitorStatus> monitoredStatuses = new ArrayList<>();
+    private final List<SystemItem> systemItems = new ArrayList<>();
+    List<Object> objects;
+
     private Thread monitoringThread;
     private volatile boolean running = true;
+    // Get coordinator
+    ICoordinate coordinate = App.getAppContext().getICoordinateImplementations().stream()
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("No ICoordinate implementations found"));
+    // Fetch objects from the coordinator
+
 
     private void startMonitoringThread() {
-        App app = App.getAppContext();
 
         monitoringThread = new Thread(() -> {
             while (running) {
                 try {
-                    // Fetch all implementations of iMonitorStatus
-                    List<IMonitorStatus> implementations = app.getIMonitorStatusImplementations();
-                    // List of their statuses
-                    List<String> statuses = new ArrayList<>();
-
-                    for (IMonitorStatus implementation : implementations) {
-                        // Fetch status for the current object
-                        statuses.add(implementation.getCurrentSystemStatus());
+                    // Loop over monitoredStatuses which are guaranteed to implement IMonitorStatus
+                    for (int i=0; i<objects.size(); i++) {
+                        IMonitorStatus monitorStatus = (IMonitorStatus) objects.get(i);
+                        String currentSystemStatus = monitorStatus.getCurrentSystemStatus();
+                        SystemItem systemItem = systemItems.get(i);
+                        javafx.application.Platform.runLater(() -> {
+                            systemItem.updateState(currentSystemStatus);
+                        });
                     }
-                    // Put it into the UI
-                    javafx.application.Platform.runLater(() -> {
-                        for (int i = 0; i < monitoredObjects.size(); i++) {
-                            Object object = monitoredObjects.get(i);
-                            if (object instanceof SystemItem && i < statuses.size()) {
-                                ((SystemItem)object).updateState(statuses.get(i));
-                            }
-                        }
-                    });
-                    // Poll every 5 seconds
-                    Thread.sleep(5000);
+
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     break;
@@ -84,23 +84,31 @@ public class MonitoringController {
 
     // Initializes all functionalities when the scene is opened
     public void initialize(){
+        ICoordinate coordinate = App.getAppContext().getICoordinateImplementations().stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No ICoordinate implementations found"));
+
+        this.objects = coordinate.getObjectList();
         // Applies hovering effect to increase size
         UIEffects.applyHoverEffect(backBtnMon);
         // Set up UI container inside the ScrollPane
         unifiedScrollPane.setContent(monitoredContainer);
-        // Get coordinator
-        ICoordinate coordinate = App.getAppContext().getICoordinateImplementations().stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No ICoordinate implementations found"));
-        // Fetch objects from the coordinator
-        List<Object> objects = coordinate.getObjectList();
+
         // For each machine to be loaded into the UI:
         for (Object object : objects) {
-            SystemItem systemItem = new SystemItem(object.toString());
-            monitoredObjects.add(systemItem);
-            monitoredContainer.getChildren().add(systemItem.getItemBox());
+            if (object instanceof IMonitorStatus) {
+                IMonitorStatus monitor = (IMonitorStatus) object;
+                monitoredStatuses.add(monitor);
+
+                String name = object.getClass().getSimpleName();
+                SystemItem item = new SystemItem(name);
+                systemItems.add(item);
+                monitoredContainer.getChildren().add(item.getItemBox());
+            }
         }
         // start background monitoring
+        System.out.println("Monitored items: " + systemItems.size());
+        System.out.println("Monitored statuses: " + monitoredStatuses.size());
         startMonitoringThread();
     }
 
@@ -111,6 +119,7 @@ public class MonitoringController {
         private String state;
         private Label nameLabel;
         private Label stateLabel;
+        private Label fullLabel;
         private VBox itemBox;
 
         public SystemItem(String name) {
@@ -118,7 +127,8 @@ public class MonitoringController {
             this.state = "N/A";
             this.nameLabel = new Label(name);
             this.stateLabel = new Label("State: "+ state);
-            itemBox = new VBox(2, nameLabel, stateLabel);
+            this.fullLabel = new Label(nameLabel.getText() + " - " + stateLabel.getText());
+            itemBox = new VBox(2, fullLabel);
         }
         public VBox getItemBox() {
             return itemBox;
@@ -126,7 +136,8 @@ public class MonitoringController {
 
         public void updateState(String newState) {
             this.state = newState;
-            stateLabel.setText("State: "+ newState);
+            this.stateLabel.setText("State: " + newState);
+            this.fullLabel.setText(nameLabel.getText() + " - " + stateLabel.getText());
         }
     }
 }

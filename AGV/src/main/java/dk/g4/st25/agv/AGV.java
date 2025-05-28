@@ -1,5 +1,6 @@
 package dk.g4.st25.agv;
 
+import com.google.gson.JsonParser;
 import dk.g4.st25.common.machine.*;
 import com.google.gson.JsonObject;
 import dk.g4.st25.common.protocol.ProtocolSPI;
@@ -16,6 +17,7 @@ public class AGV extends Machine {
         IDLE,
         READY,
         MOVING,
+        CHARGING,
         EXECUTING,
         ERROR
     }
@@ -67,19 +69,22 @@ public class AGV extends Machine {
          * This method is used to verify that the latest action (move, pick up, present object) is finished,
          * as opposed to taskCompletion that verifies that the sequence of actions within the (Coordinator/production) step is complete
          */
-        int productionCompletion = 0;
-        if (!this.command.equalsIgnoreCase(AGVCommands.PUTWAREHOUSE.getCommandString()) ||
-                !(this.command.equalsIgnoreCase(AGVCommands.PUTASSEMBLY.getCommandString())))
-            switch (this.systemStatus) {
-                case IDLE: // Default value is 0
-                case MOVING:
-                case EXECUTING:
-                case READY:
-                    productionCompletion = 1;
-                case ERROR:
-                    productionCompletion = 0;
-            }
-        return productionCompletion;
+        int actionCompletion = 0;
+        System.out.println("AGV SystemStatus: " + this.systemStatus);
+        switch (this.systemStatus) {
+            case IDLE: // Default value is 0
+            case MOVING:
+            case EXECUTING:
+            case READY:
+                this.systemStatus = SystemStatus.READY;
+                System.out.println("I was inside READY!");
+                actionCompletion = 1;
+                return actionCompletion;
+            case ERROR:
+                return actionCompletion;
+            default:
+                return actionCompletion;
+        }
     }
 
     @Override
@@ -123,44 +128,88 @@ public class AGV extends Machine {
          * Sends the given command through AGV's given protocol, and handles which states should be set based
          * on which operation is run
          */
+        // Battery Check:
+        int batteryAmount = getStatus().get("battery").getAsInt();
+        System.out.println("BATTERY: " + batteryAmount);
+
+        if (batteryAmount < 20) {
+            this.protocol.writeTo(AGVCommands.MOVECHARGER.getCommandString(), endpoint);
+            this.systemStatus = SystemStatus.CHARGING;
+            while (this.systemStatus.equals(SystemStatus.CHARGING)) {
+                if (!getStatus().get("state").getAsString().equals("3")) {
+                    this.systemStatus = SystemStatus.READY;
+                } else {
+                    try {
+                        System.out.println("Waiting for AGV to charge");
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+
+        JsonObject result = new JsonObject();
+        int returnValue = 0;
+        System.out.println("CommandType: " + commandType.toLowerCase());
         this.command = commandType; // We set the command to be latest received command
         switch (commandType.toLowerCase()) {
-            case "movetochargeroperation":
-                if (this.protocol.writeTo(AGVCommands.MOVECHARGER.getCommandString(), endpoint) == 1) {
-                    this.systemStatus = SystemStatus.MOVING;
-                    return new JsonObject().getAsJsonObject("Success moving to Charger!");
-                }
             case "movetoassemblyoperation":
-                if (this.protocol.writeTo(AGVCommands.MOVEASSEMBLY.getCommandString(), endpoint) == 1) {
+                System.out.println("Inside move to assembly");
+                returnValue = this.protocol.writeTo(AGVCommands.MOVEASSEMBLY.getCommandString(), endpoint);
+                if (returnValue == 1) {
                     this.systemStatus = SystemStatus.MOVING;
-                    return new JsonObject().getAsJsonObject("Success moving to Assembly!");
+                    this.command = AGVCommands.MOVEASSEMBLY.getCommandString();
+                    result.addProperty("status", "Success!");
+                    result.addProperty("message", "AGV moved to assembly");
+                    return result;
                 }
             case "movetostorageoperation":
-                if (this.protocol.writeTo(AGVCommands.MOVESTORAGE.getCommandString(), endpoint) == 1) {
+                returnValue = this.protocol.writeTo(AGVCommands.MOVESTORAGE.getCommandString(), endpoint);
+                if (returnValue == 1) {
+                    this.command = AGVCommands.MOVESTORAGE.getCommandString();
                     this.systemStatus = SystemStatus.MOVING;
-                    return new JsonObject().getAsJsonObject("Success moving to Storage!");
+                    result.addProperty("status", "Success!");
+                    result.addProperty("message", "AGV moved to warehouse");
+                    return result;
                 }
             case "putassemblyoperation":
-                if (this.protocol.writeTo(AGVCommands.PUTASSEMBLY.getCommandString(), endpoint) == 1) {
+                returnValue = this.protocol.writeTo(AGVCommands.PUTASSEMBLY.getCommandString(), endpoint);
+                if (returnValue == 1) {
                     this.systemStatus = SystemStatus.EXECUTING;
-                    return new JsonObject().getAsJsonObject("Success delivering to Assembly!");
+                    this.command = AGVCommands.PUTASSEMBLY.getCommandString();
+                    result.addProperty("status", "Success!");
+                    result.addProperty("message", "AGV put item in assembly");
+                    return result;
                 }
             case "pickassemblyoperation":
-                if (this.protocol.writeTo(AGVCommands.PICKASSEMBLY.getCommandString(), endpoint) == 1) {
+                returnValue = this.protocol.writeTo(AGVCommands.PICKASSEMBLY.getCommandString(), endpoint);
+                if (returnValue == 1) {
                     this.systemStatus = SystemStatus.EXECUTING;
+                    this.command = AGVCommands.PICKASSEMBLY.getCommandString();
                     confirmItemDelivery();
-                    return new JsonObject().getAsJsonObject("Success picking from Assembly!");
+                    result.addProperty("status", "Success!");
+                    result.addProperty("message", "AGV picked up item from assembly");
+                    return result;
                 }
             case "pickwarehouseoperation":
-                if (this.protocol.writeTo(AGVCommands.PICKWAREHOUSE.getCommandString(), endpoint) == 1) {
+                returnValue = this.protocol.writeTo(AGVCommands.PICKWAREHOUSE.getCommandString(), endpoint);
+                if (returnValue == 1) {
                     this.systemStatus = SystemStatus.EXECUTING;
+                    this.command = AGVCommands.PICKWAREHOUSE.getCommandString();
                     confirmItemDelivery();
-                    return new JsonObject().getAsJsonObject("Success picking from Storage!");
+                    result.addProperty("status", "Success!");
+                    result.addProperty("message", "AGV picked up item in warehouse");
+                    return result;
                 }
-            case "putstorageoperation":
-                if (this.protocol.writeTo(AGVCommands.PUTWAREHOUSE.getCommandString(), endpoint) == 1) {
+            case "putwarehouseoperation":
+                returnValue = this.protocol.writeTo(AGVCommands.PUTWAREHOUSE.getCommandString(), endpoint);
+                if (returnValue == 1) {
                     this.systemStatus = SystemStatus.EXECUTING;
-                    return new JsonObject().getAsJsonObject("Success delivering to Storage!");
+                    this.command = AGVCommands.PUTWAREHOUSE.getCommandString();
+                    result.addProperty("status", "Success!");
+                    result.addProperty("message", "AGV put item in warehouse");
+                    return result;
                 }
             default:
                 System.out.println("No Operation of that name found!");
@@ -178,19 +227,23 @@ public class AGV extends Machine {
 
     @Override
     public String getCurrentSystemStatus() {
-        int stateNumber = getStatus().getAsInt();
+        String status = getStatus().get("state").getAsString();
+        System.out.println("GET STATE NUMBER AGV: " + status);
         String stateDesc;
-        switch (stateNumber) {
-            case 1:
+        switch (status) {
+            case "1":
                 stateDesc = SystemStatus.IDLE.name();
-            case 2:
+                return stateDesc;
+            case "2":
                 stateDesc = SystemStatus.EXECUTING.name();
-            case 3:
-                stateDesc = SystemStatus.ERROR.name();
+                return stateDesc;
+            case "3":
+                stateDesc = SystemStatus.CHARGING.name();
+                return stateDesc;
             default:
                 stateDesc = "Unknown";
+                return stateDesc;
         }
-        return stateDesc;
     }
 
     @Override

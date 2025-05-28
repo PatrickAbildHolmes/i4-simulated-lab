@@ -12,7 +12,7 @@ import java.util.*;
 import static java.util.stream.Collectors.toList;
 
 public class Coordinator implements ICoordinate{
-    private final List<Object> objectList = new ArrayList<Object>();
+    private final List<MachineSPI> objectList = new ArrayList<>();
     private MachineSPI warehouse;
     private MachineSPI agvMachine;
     private MachineSPI assemblyMachine;
@@ -87,16 +87,12 @@ public class Coordinator implements ICoordinate{
             }
         }
 
-        Machine warehouseMachine = (Machine) this.warehouse;
-        System.out.println("Warehouse Protocol now: " + warehouseMachine.getProtocol());
-        Machine agvMachineMachine = (Machine) this.agvMachine;
-        System.out.println("AGV Protocol now: " + agvMachineMachine.getProtocol());
-        Machine assemblyMachineMachine = (Machine) this.assemblyMachine;
-        System.out.println("Assembly Protocol now: " + assemblyMachineMachine.getProtocol());
-
-        if (!this.warehouseFlag) {System.err.println("Warehouse module is missing.");}
-        if (!this.agvFlag) {System.err.println("AGV module is missing.");}
-        if (!this.assemblyFlag) {System.err.println("AssemblyStation module is missing.");}
+        if (!this.warehouseFlag) {System.err.println("Warehouse module is missing.");} else {Machine warehouseMachine = (Machine) this.warehouse;
+            System.out.println("Warehouse Protocol now: " + warehouseMachine.getProtocol()); this.objectList.add(warehouse);}
+        if (!this.agvFlag) {System.err.println("AGV module is missing.");} else {Machine agvMachineMachine = (Machine) this.agvMachine;
+            System.out.println("AGV Protocol now: " + agvMachineMachine.getProtocol()); this.objectList.add(agvMachine);}
+        if (!this.assemblyFlag) {System.err.println("AssemblyStation module is missing.");} else {Machine assemblyMachineMachine = (Machine) this.assemblyMachine;
+            System.out.println("Assembly Protocol now: " + assemblyMachineMachine.getProtocol()); this.objectList.add(assemblyMachine);}
     }
     @Override
     public int getProduced(){
@@ -123,7 +119,7 @@ public class Coordinator implements ICoordinate{
 
     @Override
     public List<Object> getObjectList() {
-        return objectList;
+        return new ArrayList<>(objectList);
     }
     @Override
     public int startProduction(Order order) {
@@ -136,12 +132,20 @@ public class Coordinator implements ICoordinate{
          * 1 - Present new component for pickup if 2-or-more trays empty
          */
 
+        // Firstly check if a component is missing, and if there is, do not allow production
+        if (!this.warehouseFlag || !this.agvFlag || !this.assemblyFlag) {
+            System.out.println("A component is missing, cannot start production!");
+            return 0;
+        }
+
         Coordinator coordinator = new Coordinator();
         order.setStatus(Order.Status.BEING_PROCESSED);
 
         // Amount of products needed to be assembled, and parts needed for each product
         int amountOfProductsToAssemble = order.getAmount();
         this.produced = 0; // Reset to 0 at start of Order production cycle
+
+        System.out.println("Production has been started successfully");
 
         // Initial sequence
         coordinator.step1_WarehouseWithdrawComponent();
@@ -218,6 +222,7 @@ public class Coordinator implements ICoordinate{
             // 2.10) AGV delivers item to AssemblyLine. Load program and execute
             if(machineCommand(this.agvMachine, "PutAssemblyOperation")){stepCount++;}else{throw new Exception("Error handling agv command");}
             this.assemblyMachine.setMostRecentlyReceived(droneComponent); // Pass the DroneComponent to the AssemblyLine
+            System.out.println("Assembly Most recently recieved has been set");
 
             // 2.11) AGV sends task completion signal. Confirm not carrying item
             if(this.agvMachine.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
@@ -240,7 +245,7 @@ public class Coordinator implements ICoordinate{
 
             // 3.8) AssemblyLine sends task completion signal (Instant)
             // .taskCompletion() returns 0 or 1, but it is not needed, since the previous step will leave AssemblyStation in the correct state
-            if(this.assemblyMachine.taskCompletion()!=1){throw new Exception("Error completing task");}
+            if(this.assemblyMachine.taskCompletion()==1){throw new Exception("Error completing task");}
 
         } catch (Exception e){
             System.out.println("Failed at Step 3, action: "+stepCount); e.printStackTrace();
@@ -292,6 +297,7 @@ public class Coordinator implements ICoordinate{
     public void step5_WarehouseDepositProduct(){
         int stepCount = 1;
         try {
+            this.warehouse.setMostRecentlyReceived(new Drone(1, "transport"));
             // 5.1 - 5.2) Warehouse confirms correct item is delivered
             if (confirmItemDelivery(this.warehouse)) {stepCount++;}else{throw new Exception("Error confirming item delivery");}
 
@@ -300,7 +306,7 @@ public class Coordinator implements ICoordinate{
 
             // 5.4) Warehouse sends task completion signal
             if (isMachineIdle(this.warehouse)) {stepCount++;}else{throw new Exception("Error getting machine status");}
-            if (this.warehouse.taskCompletion()!=1){stepCount++;}else{throw new Exception("Error completing task");}
+            if (this.warehouse.taskCompletion()==1){stepCount++;}else{throw new Exception("Error completing task");}
 
         }catch (Exception e) {
             System.out.println("Failed at Step 5, action: "+stepCount); e.printStackTrace();
@@ -357,9 +363,9 @@ public class Coordinator implements ICoordinate{
         for (int i = 0; i < 5; i++) { // Try the I/O operation 5 times
             String machineState = machine.getCurrentSystemStatus();
             System.out.println("STATE FROM MACHINE: " + machineState);
-            if (machineState.equals("Idle")) {
+            if (machineState.equals("IDLE")) {
                 return true;
-            }else if (machineState.equals("Error") || machineState.equals("Unknown")) {
+            }else if (machineState.equals("ERROR") || machineState.equals("Unknown")) {
                 System.out.println("An Error occurred while assembling the product");
                 return false;
             }else {

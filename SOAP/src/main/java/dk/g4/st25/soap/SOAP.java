@@ -70,7 +70,6 @@ public class SOAP extends Protocol {
     @Override
     public JsonObject readFrom(String endpoint, String method) {
         // If the method is getInventory, then do the following:
-        System.out.println("SOAP Method used: " + method);
         if ("getInventory".equalsIgnoreCase(method)) {
             // Creates a JsonObject
             JSONObject jsonInventory = soapService.getInventory(endpoint);
@@ -79,10 +78,8 @@ public class SOAP extends Protocol {
             JsonObject GsonJsonInventory = JsonParser.parseString(jsonInventory.toString()).getAsJsonObject();
             // As the readfrom is a "JsonObject" and not a JsonObject, it is then a gson
             // This is parsed as a gson then
-            System.out.println("Json Inventory: " + GsonJsonInventory);
             return GsonJsonInventory;
         } else {
-            System.out.println("Wrong method used!");
             String errorMessage = "Wrong Method, no inventory";
             return new JsonObject().getAsJsonObject(errorMessage);
         }

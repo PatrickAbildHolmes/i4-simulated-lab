@@ -83,7 +83,6 @@ public class ProductionController {
         // Add order to queue
         ProductionQueue productionQueue = ProductionQueue.getInstance();
         if (!productionQueue.isProductionStarted()) {
-            showAlert("Success", "Order added and production started.");
             AtomicBoolean running = new AtomicBoolean(true);
             Thread productionTread = new Thread(() -> {
                 while (running.get()) {

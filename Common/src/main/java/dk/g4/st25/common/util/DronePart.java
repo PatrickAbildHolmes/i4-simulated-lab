@@ -1,4 +1,4 @@
-package dk.g4.st25.database;
+package dk.g4.st25.common.util;
 
 public enum DronePart {
     PROPELLER("propeller"),

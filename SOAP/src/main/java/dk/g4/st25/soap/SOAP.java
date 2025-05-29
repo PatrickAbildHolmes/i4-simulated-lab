@@ -9,7 +9,7 @@ import kong.unirest.Unirest;
 import kong.unirest.json.JSONObject;
 //import kong.unirest.json.JsonObject;
 
-public class SOAP extends Protocol implements ProtocolSPI {
+public class SOAP extends Protocol {
 
     private final SoapService soapService = new SoapService();
     @Override
@@ -78,10 +78,8 @@ public class SOAP extends Protocol implements ProtocolSPI {
             JsonObject GsonJsonInventory = JsonParser.parseString(jsonInventory.toString()).getAsJsonObject();
             // As the readfrom is a "JsonObject" and not a JsonObject, it is then a gson
             // This is parsed as a gson then
-            System.out.println("Json Inventory: " + GsonJsonInventory);
             return GsonJsonInventory;
         } else {
-            System.out.println("Wrong method used!");
             String errorMessage = "Wrong Method, no inventory";
             return new JsonObject().getAsJsonObject(errorMessage);
         }

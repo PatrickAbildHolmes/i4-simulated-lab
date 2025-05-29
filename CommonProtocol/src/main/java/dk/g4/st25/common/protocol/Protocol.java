@@ -25,4 +25,5 @@ public abstract class Protocol extends Connection implements ProtocolSPI{
     }
     // This class is a placeholder for the Protocol module.
     // The actual implementation will be provided in the actual protocol modules (REST, SOAP, MQTT)
+
 }

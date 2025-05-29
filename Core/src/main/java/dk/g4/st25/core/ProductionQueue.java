@@ -3,6 +3,7 @@ package dk.g4.st25.core;
 import dk.g4.st25.common.services.ICoordinate;
 import dk.g4.st25.common.util.Order;
 import dk.g4.st25.database.Database;
+import javafx.scene.control.Alert;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -18,8 +19,9 @@ public class ProductionQueue {
         productionStarted = true;
 
         // Get coordinator
-        Configuration conf = Configuration.get();
-        ICoordinate coordinator = conf.coordinatorLoader();
+        ICoordinate coordinator = App.getAppContext().getICoordinateImplementations().stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No ICoordinate implementations found"));
 
         // Database
         Database db = Database.getDB();
@@ -28,11 +30,14 @@ public class ProductionQueue {
         while (!orders.isEmpty()) {
             // Start next order
             Order nextItem = orders.get(0);
-            coordinator.startProduction(nextItem);
-
-            // Delete order from db
-            db.deleteOrder(nextItem.getId());
-
+            if (coordinator.startProduction(nextItem) == 0) {
+                // Delete order from db
+                db.deleteOrder(nextItem.getId());
+                break;
+            } else {
+                // Delete order from db
+                db.deleteOrder(nextItem.getId());
+            }
             // Update Orders (other orders might have been added)
             orders = db.getOrders();
         }

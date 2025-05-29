@@ -1,5 +1,6 @@
 package dk.g4.st25.common.services;
 
+import com.google.gson.JsonObject;
 import dk.g4.st25.common.util.Order;
 
 import java.util.List;
@@ -12,5 +13,7 @@ public interface ICoordinate {
     List<Object> getObjectList();
 
     int getProduced();
+
+    JsonObject getMachineInventory(String machine);
 
 }

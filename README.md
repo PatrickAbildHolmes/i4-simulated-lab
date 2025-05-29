@@ -1,4 +1,26 @@
 # How to run project
+1. Make sure to have all external libraries installed
+2. Create a local database called DroneSimulation, through PostgreSQL (This is to avoid not being able to compile, 
+as some tests will fail)
+3. Create a .env file which should look like the following (Remember to add DB_PASSWORD if using one): <br>
+```
+REST_URL=http://localhost:8082/v1/status/
+
+# Endpoints:
+AGV_ENDPOINT=http://localhost:8082/v1/status/
+MQTT_ENDPOINTPORT=9001
+
+# Machine protocols:
+WAREHOUSE_PROTOCOL=SOAP
+AGV_PROTOCOL=REST
+ASSEMBLY_PROTOCOL=MQTT
+
+DB_URL="jdbc:postgresql://localhost:5432/DroneSimulation"
+DB_USER="postgres"
+DB_PASSWORD=
+```
+4. Run `mvn clean install` to compile all of the modules
+5. Run `java --module-path mods-mvn --class-path "libs/*" --module=Core/dk.g4.st25.core.App` to start the application
 
 # Architecture
 ### List of Components

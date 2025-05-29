@@ -72,9 +72,7 @@ public class SoapService {
                 "<PickItem xmlns=\"http://tempuri.org/\">\n      " +
                         "<trayId>" + trayId + "</trayId>\n    " +
                         "</PickItem>\n  ", endpoint);
-        if (response.getStatus() == 200) {
-            System.out.println(response.getBody());
-        } else {
+        if (response.getStatus() != 200) {
             System.out.println(response.getStatusText());
         }
     }
@@ -85,9 +83,7 @@ public class SoapService {
                         "<trayId>" + trayId + "</trayId>\n      " +
                         "<name>" + name + "</name>\n    " +
                         "</InsertItem>\n  ", endpoint);
-        if(response.getStatus() == 200) {
-            System.out.println(response.getBody());
-        } else {
+        if (response.getStatus() != 200) {
             System.out.println(response.getStatusText());
         }
     }

@@ -37,15 +37,11 @@ public class BacklogController {
         // Create labels and add them to the layout pane
         for (Order order : orders) {
             Label orderLabel = new Label(order.getName());
-
             // Add onClick method to label
-            orderLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    id.setText(String.valueOf(order.getProduct().getId()));
-                    amount.setText(String.valueOf(order.getAmount()));
-                    droneType.setText(order.getProduct().getType());
-                }
+            orderLabel.setOnMouseClicked(event -> {
+                id.setText(String.valueOf(order.getProduct().getId()));
+                amount.setText(String.valueOf(order.getAmount()));
+                droneType.setText(order.getProduct().getType());
             });
 
             orderListPane.getChildren().add(orderLabel);

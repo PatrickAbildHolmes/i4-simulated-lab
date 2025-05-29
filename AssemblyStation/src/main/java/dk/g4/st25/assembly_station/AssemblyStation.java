@@ -2,10 +2,12 @@ package dk.g4.st25.assembly_station;
 
 import com.google.gson.JsonObject;
 import dk.g4.st25.common.machine.*;
+import dk.g4.st25.common.protocol.Protocol;
+import dk.g4.st25.common.protocol.ProtocolSPI;
 
 import java.util.HashMap;
 
-public class AssemblyStation extends Machine implements MachineSPI{
+public class AssemblyStation extends Machine{
     private SystemStatus systemStatus; // What it is currently doing (producing, idle, etc.)
     private int processNumber; // Increasing integer starting at 1 that logs what process nr. it is at. '9999' is not allowed.
     private final Tray entryTray; // Trays for delivery and pick-up. Fixed number. "Can't receive a 'new' Tray, hence final"
@@ -103,18 +105,23 @@ public class AssemblyStation extends Machine implements MachineSPI{
          */
         this.systemStatus = SystemStatus.AWAITING_PARTS;
             if (this.entryTray.isAvailable()) {
+                System.out.println("Assembly tray is available");
                 this.entryTray.setContent(new DroneComponent()); // Adds received item to tray. Placeholder statement until AGV can transfer object
                 this.entryTray.setAvailable(false);
+                System.out.println("places item on tray: " + entryTray);
+                System.out.println("MOST RECENTLY RECIEVED: " + this.mostRecentlyReceived);
                 if (mostRecentlyReceived instanceof DroneComponent) {
                     // Add it to inventory
                     this.inventory.put("DroneComponents", this.inventory.get("DroneComponents") + 1); // Placeholder statement. Increases the V of K,V-pair DroneComponents
                     return true;
                 } else {
+                    System.out.println("Item was not a drone component - removes item from the tray, and returns null");
                     this.entryTray.setContent(null); // remove the incorrect item
                     this.entryTray.setAvailable(true);
                     return false;
                 }
             }
+        System.out.println("We never made it through assembly confirm");
         return false;
     }
 
@@ -127,10 +134,13 @@ public class AssemblyStation extends Machine implements MachineSPI{
         this.mostRecentlyReceived = mostRecentlyReceived;
     }
 
+    @Override
+    public void setMachineProtocol(ProtocolSPI protocol) {
+        this.protocol = protocol;
+    }
+
     public void confirmItemQuantity() {
-        /**
-         * How many Drone components to make a Drone?
-         */
+        // How many components to create a drone
         int componentsNeeded = 1;
         if (this.inventory.get("DroneComponents")>=componentsNeeded){
             this.systemStatus = SystemStatus.READY;
@@ -149,6 +159,7 @@ public class AssemblyStation extends Machine implements MachineSPI{
         if (commandType.equals("assemble")) {
             this.confirmItemQuantity(); // this will set SystemStatus.READY if enough components in inventory
             if (this.systemStatus == SystemStatus.READY && this.exitTray.isAvailable()) { // AStation must have received components, and have an available exit tray
+                System.out.println("We are inside if ASSEMBLE");
                 this.command = commandType; // Set latest received command
                 String actualMessage = "\"ProcessID\": "+this.processNumber;
                 this.protocol.writeTo(actualMessage,"emulator/operation");
@@ -160,7 +171,10 @@ public class AssemblyStation extends Machine implements MachineSPI{
                 this.systemStatus = SystemStatus.ASSEMBLING;
                 this.entryTray.setContent(null); // Clears the entry tray
                 this.entryTray.setAvailable(true);
-                return new JsonObject().getAsJsonObject("Success!"); // Success
+                JsonObject result = new JsonObject();
+                result.addProperty("status","Success!");
+                result.addProperty("message","Assembly station operation to assemble success");
+                return result; // Success
             } else
                 return null; // Assemble command sent, but machine not ready
         }
@@ -197,15 +211,18 @@ public class AssemblyStation extends Machine implements MachineSPI{
             String stateDesc;
             switch (stateNumber) {
                 case 0:
-                    stateDesc = "Idle";
+                    stateDesc = SystemStatus.IDLE.name();
+                    return stateDesc;
                 case 1:
-                    stateDesc = "Executing";
+                    stateDesc = SystemStatus.ASSEMBLING.name();
+                    return stateDesc;
                 case 2:
-                    stateDesc = "Error";
+                    stateDesc = SystemStatus.ERROR.name();
+                    return stateDesc;
                 default:
                     stateDesc = "Unknown";
+                    return stateDesc;
             }
-            return stateDesc;
         } catch (Exception e) {
             e.printStackTrace();
             return "Error getting Assembly Station status";

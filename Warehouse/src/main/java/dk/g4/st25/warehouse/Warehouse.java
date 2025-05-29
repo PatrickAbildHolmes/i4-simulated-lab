@@ -56,9 +56,9 @@ public class Warehouse extends Machine {
             this.systemStatus = SystemStatus.IDLE;
             actionCompletion = 1;
         }
-
         return actionCompletion;
     }
+
     @Override
     public boolean confirmItemDelivery() {
         /**
@@ -88,6 +88,7 @@ public class Warehouse extends Machine {
 
     @Override
     public JsonObject sendCommand(String commandType) {
+        this.systemStatus = SystemStatus.EXECUTING;
         JsonObject result = new JsonObject();
         JsonArray tempInventory = JsonParser.parseString(getInventory()).getAsJsonObject().get("Inventory").getAsJsonArray();
         switch (commandType.toLowerCase()) {
@@ -174,11 +175,10 @@ public class Warehouse extends Machine {
 
     @Override
     public String getCurrentConnectionStatus() {
-        // Create a list to store connection status messages
         if (!getCurrentSystemStatus().equals(SystemStatus.UNKNOWN.name())) {
-            return "Soap Active";
+            return "Warehouse Active";
         } else {
-            return "Soap NOT Active";
+            return "Warehouse NOT Active";
         }
     }
 

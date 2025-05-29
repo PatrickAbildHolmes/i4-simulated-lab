@@ -37,10 +37,8 @@ public class BacklogController {
         // Create labels and add them to the layout pane
         for (Order order : orders) {
             Label orderLabel = new Label(order.getName());
-            System.out.println(order);
             // Add onClick method to label
             orderLabel.setOnMouseClicked(event -> {
-                System.out.println("clicked");
                 id.setText(String.valueOf(order.getProduct().getId()));
                 amount.setText(String.valueOf(order.getAmount()));
                 droneType.setText(order.getProduct().getType());

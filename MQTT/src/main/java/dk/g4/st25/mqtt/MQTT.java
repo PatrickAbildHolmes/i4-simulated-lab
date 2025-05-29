@@ -63,7 +63,6 @@ public class MQTT extends Protocol {
          The endpoint is saved in the MQTTClient instance, and it is thereby not needed
          Topic is needed instead, as the client needs to know which topic to publish to */
         connect(this.endpoint);
-        System.out.println("We are in MQTT writeTo!");
 
         // Convert String message to JSON
         Gson gson = new Gson();

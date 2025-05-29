@@ -1,4 +1,7 @@
 # How to run project
+1. Make sure to have all external libraries installed
+2. Run `mvn clean install` to compile all of the modules
+3. Run `java --module-path mods-mvn --class-path "libs/*" --module=Core/dk.g4.st25.core.App` to start the application
 
 # Architecture
 ### List of Components

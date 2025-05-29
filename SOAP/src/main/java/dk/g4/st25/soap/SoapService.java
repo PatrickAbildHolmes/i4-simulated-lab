@@ -72,23 +72,18 @@ public class SoapService {
                 "<PickItem xmlns=\"http://tempuri.org/\">\n      " +
                         "<trayId>" + trayId + "</trayId>\n    " +
                         "</PickItem>\n  ", endpoint);
-        if (response.getStatus() == 200) {
-            System.out.println(response.getBody());
-        } else {
+        if (response.getStatus() != 200) {
             System.out.println(response.getStatusText());
         }
     }
 
     public void insertItem(int trayId, String name, String endpoint){
-        System.out.println("WE INSERTED A FINISHED DRONE: " + name + trayId);
         HttpResponse<String> response = buildAndPostHttpResponse("InsertItem",
                 "<InsertItem xmlns=\"http://tempuri.org/\">\n      " +
                         "<trayId>" + trayId + "</trayId>\n      " +
                         "<name>" + name + "</name>\n    " +
                         "</InsertItem>\n  ", endpoint);
-        if(response.getStatus() == 200) {
-            System.out.println(response.getBody());
-        } else {
+        if (response.getStatus() != 200) {
             System.out.println(response.getStatusText());
         }
     }

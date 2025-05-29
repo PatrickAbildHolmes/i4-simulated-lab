@@ -99,7 +99,6 @@ public class Warehouse extends Machine {
             // Forslag til måden at måske håndtere det på
             case "pickitem":
                 for (int i = 0; i<tempInventory.size(); i++) {
-                    System.out.println("Content: " + tempInventory.get(i).getAsJsonObject().get("Content").getAsString());
                     if (!tempInventory.get(i).getAsJsonObject().get("Content").getAsString().equals("") ||
                             !(tempInventory.get(i).getAsJsonObject().get("Content").getAsString().equals("Finished drone"))) {
                         String pickMessage = "{\"action\":\"pick\",\"trayId\":" + i +"}";
